@@ -348,3 +348,19 @@ test("all 50 animation clips belong to a runtime-consumed action route", async (
       file + " has no playback route",
     );
 });
+
+test('the current operation is excluded from history and returns there once settled',async()=>{
+ const {taskPresentation}=await import('../lib/shared/task/presentation.js');
+ const current={id:'current',status:'running',stage:'working'};
+ const snapshot={stage:'working',current,operations:[current,{id:'past',status:'done',stage:'working'}]};
+ assert.deepEqual(taskPresentation(snapshot).operations.map(op=>op.id),['past']);
+ assert.deepEqual(taskPresentation({...snapshot,stage:'done'}).operations.map(op=>op.id),['current','past']);
+});
+
+test('short panels anchor beside the mascot without reserving the full maximum height',async()=>{
+ const {panelGeometry}=await import('../lib/shared/client/panel-geometry.js');
+ const result=panelGeometry({top:340,height:260},{w:1100,h:807});
+ assert.equal(result.top,390);assert(result.maxHeight<520);assert(result.top+result.maxHeight<=795);
+ const nearBottom=panelGeometry({top:530,height:260},{w:1100,h:807},360);
+ assert.equal(nearBottom.top,435);assert.equal(nearBottom.maxHeight,360);
+});

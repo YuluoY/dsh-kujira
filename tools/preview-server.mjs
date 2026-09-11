@@ -183,6 +183,12 @@ const server = createServer(async (req, res) =>
     const url = new URL(req.url ?? '/', 'http://localhost');
     const pathname = url.pathname;
 
+    const gallery = new URL(req.headers.referer || '/', 'http://localhost').searchParams.has('gallery');
+    if (pathname === '/dsh-kujira/balance' && gallery) {
+        const account = {currency:'¥',rawCurrency:'CNY',total:110,granted:10,toppedUp:100};
+        res.writeHead(200, {'content-type':'application/json','cache-control':'no-store'});
+        res.end(JSON.stringify({ok:true,available:true,...account,balances:[account],fetchedAt:Date.now()}));return;
+    }
     if(pathname==='/dsh-kujira/activity') {
         const value=previewActivityReader.read(url.searchParams.get('sessionId'));
         res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify({...value,preview:true}));return;

@@ -1,0 +1,127 @@
+.dsh-kujira-root .kj-markdown {
+  min-width: 0;
+  color: var(--kj-text);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.dsh-kujira-root .kj-markdown > :first-child {
+  margin-top: 0;
+}
+.dsh-kujira-root .kj-markdown > :last-child {
+  margin-bottom: 0;
+}
+.dsh-kujira-root .kj-markdown p {
+  margin: 8px 0;
+  white-space: normal;
+}
+.dsh-kujira-root .kj-markdown :is(h3, h4, h5, h6) {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 16px 0 8px;
+  font-weight: 600;
+  color: var(--kj-ink);
+}
+.dsh-kujira-root .kj-markdown h3 {
+  font-size: 14px;
+}
+.dsh-kujira-root .kj-markdown :is(ul, ol) {
+  padding-inline-start: 20px;
+  margin: 8px 0;
+}
+.dsh-kujira-root .kj-markdown li {
+  padding: 0;
+  margin: 4px 0;
+}
+.dsh-kujira-root .kj-markdown :is(code, pre) {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+}
+.dsh-kujira-root .kj-markdown code {
+  background: var(--kj-surface-soft);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+.dsh-kujira-root .kj-markdown pre {
+  max-width: 100%;
+  overflow: auto;
+  padding: 10px 12px;
+  margin: 10px 0;
+  border: 1px solid var(--kj-line);
+  border-radius: 7px;
+  background: var(--kj-surface-soft);
+  white-space: pre;
+  overscroll-behavior: contain;
+}
+.dsh-kujira-root .kj-markdown pre code {
+  padding: 0;
+  background: none;
+}
+.dsh-kujira-root .kj-markdown blockquote {
+  margin: 10px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--kj-line);
+  border-radius: 7px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-markdown blockquote p {
+  margin: 0;
+}
+.dsh-kujira-root .kj-markdown :is(a, .kj-md-file) {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: var(--kj-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--kj-line-strong);
+}
+.dsh-kujira-root .kj-markdown :is(a, .kj-md-file):hover {
+  color: var(--kj-ink);
+  text-decoration-color: currentcolor;
+}
+.dsh-kujira-root .kj-markdown :is(a, button, pre, .kj-md-table):focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 2px;
+}
+.dsh-kujira-root .kj-md-table {
+  max-width: 100%;
+  overflow: auto;
+  margin-block: 10px;
+  overscroll-behavior: contain;
+}
+.dsh-kujira-root .kj-md-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.dsh-kujira-root .kj-md-table :is(th, td) {
+  padding: 6px 8px;
+  border: 1px solid var(--kj-line);
+  min-width: 64px;
+  vertical-align: top;
+}
+.dsh-kujira-root .kj-md-table th {
+  font-weight: 600;
+  background: var(--kj-surface-soft);
+}
+.dsh-kujira-root .kj-markdown .kj-md-task {
+  list-style: none;
+  position: relative;
+}
+.dsh-kujira-root .kj-md-task input {
+  position: absolute;
+  left: -20px;
+  top: 3px;
+  margin: 0;
+  accent-color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-markdown hr {
+  border: 0;
+  border-top: 1px solid var(--kj-line);
+  margin-block: 12px;
+}

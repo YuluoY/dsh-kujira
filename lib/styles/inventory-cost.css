@@ -151,21 +151,30 @@
   background: var(--dsw-alias-interactive-bg-hover, var(--kj-surface-soft));
   color: var(--dsw-alias-label-secondary, var(--kj-text));
 }
-:has(> [data-composer-card]):has(> .kj-usage-root) {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
+
+/* The DSH slot wrapper is display:contents by default. */
+[data-slot="conversation.composer.dock"]:has(> .kj-usage-root) {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  max-width: var(--dsh-composer-card-max-width, 100%);
+  margin-inline: auto;
+  padding: 0 8px;
+  box-sizing: border-box;
 }
-:has(> [data-composer-card]):has(> .kj-usage-root)
-  > :not([data-composer-stats], .kj-usage-root) {
-  grid-column: 1/-1;
-}
-:has(> [data-composer-card]):has(> .kj-usage-root) > [data-composer-stats] {
-  grid-column: 1;
+[data-slot="conversation.composer.dock"]:has(> .kj-usage-root)
+  > [data-composer-stats] {
+  flex: 1 1 0;
   min-width: 0;
+  max-width: none;
+  width: auto;
+  margin: 0;
+  padding: 4px 0 0;
+  justify-content: flex-start;
 }
-:has(> [data-composer-card]):has(> .kj-usage-root) > .kj-usage-root {
-  grid-column: 2;
-  justify-self: end;
+[data-slot="conversation.composer.dock"] > .kj-usage-root {
+  flex: 0 0 auto;
+  margin-left: auto;
   width: auto;
 }

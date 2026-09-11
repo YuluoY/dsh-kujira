@@ -182,6 +182,22 @@
 </style>
 </head>
 <body>
+<script>
+const galleryOptions = new URLSearchParams(location.search);
+const galleryMode = galleryOptions.has('gallery');
+if (galleryMode) {
+  document.documentElement.dataset.gallery = 'true';
+  const locale = galleryOptions.get('lang') === 'en' ? 'en-US' : 'zh-CN';
+  document.documentElement.lang = locale;
+  localStorage.setItem('dsh-kujira:settings', JSON.stringify({appearance:{locale,theme:'dark',size:260,usage:false,execution:galleryOptions.get('gallery')==='task',care:false,playful:false}}));
+  localStorage.setItem('dsh-kujira:position', JSON.stringify({x:Math.round(innerWidth / 2 + 95),y:Math.round(innerHeight / 2 - 70)}));
+}
+</script>
+<style>
+html[data-gallery] body {background:#181a1f}
+html[data-gallery] :is(#frame,#hud,#sim,#preview-composer) {display:none}
+html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visibility:hidden}
+</style>
 
 <div id="frame"></div>
 
@@ -290,7 +306,7 @@
                     },
                     register(meta, Component)
                     {
-                        return React.createElement(Component, { sessionId: 'preview-session', useProjection: () => undefined });
+                        return React.createElement(Component, { sessionId: galleryMode && galleryOptions.get('gallery')!=='task' ? null : 'preview-session', useProjection: () => undefined });
                     }
                 }
             }

@@ -7,9 +7,9 @@ A desktop companion for DeepSeek Harness Web. Track agent tasks, session costs a
 [![Release](https://img.shields.io/github/v/release/YuluoY/dsh-kujira)](https://github.com/YuluoY/dsh-kujira/releases)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<img src="docs/images/task-progress.png" width="560" alt="Kujira and the task progress panel" />
+<img src="docs/images/menu.en.png" width="355" alt="Kujira radial feature menu" />
 
-*Cropped screenshot with demo task data.*
+*Isolated preview screenshots. The balance panel below uses demo amounts.*
 
 ## Installation
 
@@ -38,7 +38,7 @@ Installation, live balances and historical session reads were verified with DSH 
 - **Preferences** — position, size, bubble duration and menu size. Chinese, English, Korean and Russian, or follow the system.
 - **Extensions** — weather, a GitHub shortcut and an [API for external menu actions](docs/EXTENSIONS.md).
 
-<img src="docs/images/session-cost.png" width="248" alt="Off-peak, peak and total session costs" />
+<img src="docs/images/balance.en.png" width="600" alt="Balance panel beside Kujira" />
 
 ### Before you start
 
@@ -79,4 +79,4 @@ This is a community plugin. The OpenAI credit acknowledges Codex development ass
 
 ## License
 
-[MIT](LICENSE). Animations retain their original copyright. Vendored i18next retains its [third-party license](lib/shared/vendor/i18next.LICENSE).
+[MIT](LICENSE). Animations retain their original copyright. Vendored [i18next](lib/shared/vendor/i18next.LICENSE) and [Marked](lib/shared/vendor/marked.LICENSE) retain their licenses.

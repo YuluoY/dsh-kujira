@@ -27,7 +27,7 @@ export function activityPreview(mode='working', now=Date.now()) {
     if(mode==='error'){result('test-1','测试服务暂时不可用，请检查网络后重试。',110000,true);add('turn/end',{reason:{kind:'error',error:{message:'验证未完成，已有修改已保留。'}}},120000);}
     if(mode==='abort')add('turn/end',{reason:{kind:'aborted'}},120000);
     if(mode==='retry')add('llm/retry-started',{},115000);
-    if(mode==='success'){add('assistant/message',{message:{content:text('已完成会话费用面板优化。\n\n• 底栏只保留峰谷标记与当前会话金额。\n• 悬浮只显示下次切换时间。\n• 保留原币种，人民币显示 ¥，美元显示 $。\n\n验证：8 项国际化测试通过；峰谷合计校验通过。\n修改文件：lib/shared/usage-ui.js。')}},118000);add('turn/end',{reason:{kind:'completed'}},120000);}
+    if(mode==='success'){add('assistant/message',{message:{content:text('### 会话费用\n\n已完成 **费用面板** 优化。\n\n- 底栏只保留峰谷标记与当前会话金额。\n- 悬浮只显示下次切换时间。\n- 保留原币种，人民币显示 ¥，美元显示 $。\n\n验证：8 项国际化测试通过；峰谷合计校验通过。\n\n\n| 检查项 | 结果 |\n| --- | --- |\n| 国际化 | 通过 |\n| 峰谷合计 | 通过 |\n\n```bash\nnpm test\n```\n\n修改文件：[usage-ui.js](lib/shared/usage-ui.js)。')}},118000);add('turn/end',{reason:{kind:'completed'}},120000);}
     if(mode==='extreme') {
         add('user/message',{source:{kind:'human'},content:text('检查跨语言、超长文本和大量子任务。\n'+('长任务目标 LongTask목표ДлиннаяЗадача🐳 ').repeat(80))},121000);
         add('todo/write',{todos:Array.from({length:50},(_,i)=>({content:'任务 '+(i+1)+' · '+('LongUnbrokenText_长内容_다국어_Подробности_').repeat(10),status:i<12?'completed':'pending'}))},122000);

@@ -7,9 +7,9 @@ DeepSeek Harness Web 桌宠插件。查看任务进度、会话费用和账户�
 [![Release](https://img.shields.io/github/v/release/YuluoY/dsh-kujira)](https://github.com/YuluoY/dsh-kujira/releases)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<img src="docs/images/task-progress.png" width="560" alt="鲸鱼娘和任务进展面板" />
+<img src="docs/images/menu.zh.png" width="355" alt="鲸鱼娘发散功能按钮组" />
 
-*局部截图，任务内容为演示数据。*
+*独立预览截图；下方余额面板使用演示金额。*
 
 ## 安装
 
@@ -38,7 +38,7 @@ npm run unlink   # 卸载后重启 DSH Web
 - **个性化**：调整位置、大小、气泡停留时间和菜单数量；支持中、英、韩、俄，以及跟随系统。
 - **扩展**：天气、GitHub 快捷入口，以及供外部插件注册功能的 [扩展 API](docs/EXTENSIONS.md)。
 
-<img src="docs/images/session-cost.png" width="248" alt="会话费用：谷价、峰价和合计" />
+<img src="docs/images/balance.zh.png" width="600" alt="余额面板与鲸鱼娘" />
 
 ### 使用前了解
 
@@ -79,4 +79,4 @@ npm run typecheck
 
 ## 许可
 
-[MIT](LICENSE)。动画保留原作者版权，内置 i18next 的许可见 [第三方声明](lib/shared/vendor/i18next.LICENSE)。
+[MIT](LICENSE)。动画保留原作者版权，内置 [i18next](lib/shared/vendor/i18next.LICENSE) 与 [Marked](lib/shared/vendor/marked.LICENSE) 保留各自许可。
