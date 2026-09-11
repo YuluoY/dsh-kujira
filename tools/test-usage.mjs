@@ -83,3 +83,11 @@ test('host endpoint selects the explicit session and handles absent selection', 
     assert.equal((await request('/dsh-kujira/usage')).status, 400);
     assert.equal((await request('/dsh-kujira/usage?sessionId=other')).body.ok, false);
 });
+
+test('DSH official adapter costs the same usage while unrelated providers remain unpriced', () => {
+    const official={type:'request/header',data:{header:{config:{provider:'deepseek-official',model:'deepseek-flash'}}}};
+    const cost=sessionCost([official,usage(1,valley)]);
+    assert.equal(cost.provider,'deepseek-official');assert.equal(cost.complete,true);assert.equal(cost.totals.total,5.02);
+    const proxy={type:'request/header',data:{header:{config:{provider:'deepseek-proxy',model:'deepseek-flash'}}}};
+    assert.equal(sessionCost([proxy,usage(1,valley)]).skipped[0].reason,'unsupported-provider');
+});

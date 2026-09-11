@@ -1,40 +1,19 @@
-<div align="center">
-
 # Kujira
 
-**A quiet, animated companion for real DeepSeek Harness work.**
+A desktop companion for DeepSeek Harness Web. Track agent tasks, session costs and account balances, with off-peak scheduling and pet interactions.
 
-[简体中文](README.md) · [Releases](https://github.com/YuluoY/dsh-kujira/releases) · [Issues](https://github.com/YuluoY/dsh-kujira/issues) · [Extension API](docs/EXTENSIONS.md)
+[简体中文](README.md) · [Releases](https://github.com/YuluoY/dsh-kujira/releases) · [Usage](docs/USAGE.en.md) · [Issues](https://github.com/YuluoY/dsh-kujira/issues)
 
-[![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/YuluoY/dsh-kujira)](https://github.com/YuluoY/dsh-kujira/releases)
-[![Stars](https://img.shields.io/github/stars/YuluoY/dsh-kujira?style=flat)](https://github.com/YuluoY/dsh-kujira/stargazers)
+[![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<img src="docs/images/task-progress.png" width="560" alt="Kujira beside a live task panel with subagent progress and result links" />
+<img src="docs/images/task-progress.png" width="560" alt="Kujira and the task progress panel" />
 
-*Real component screenshots with isolated demo tasks and estimated costs.*
+*Cropped screenshot with demo task data.*
 
-</div>
+## Installation
 
-## Features
-
-- **Real task context.** Thinking, working, waiting, completion and errors, with progressively revealed plans, tool results, modified files and subagents. Open supported destinations in the host.
-- **50 transparent animations.** Idle gestures, work transitions, a three-part sleep sequence, dragging, feeding, weather and wallet actions. Task state takes priority; reduced motion and static companionship are supported.
-- **Global tariff scheduling.** Pause all main agents and subagents in the same DSH service at peak-price step boundaries; resume the original work off-peak.
-- **Compact session costs.** A right-aligned composer entry shows only the tariff marker and session estimate. Its small popover contains off-peak, peak and total amounts.
-- **Balances and weather.** Official DeepSeek balances retain their original currency. Leave the city blank for automatic location or specify one. Follow the system or select China, United States, Korea or Russia.
-- **Optional companion inventory.** Verifiable DeepSeek usage estimates earn randomized interaction supplies. A free-interaction setting removes inventory consumption.
-- **Extensible radial menu.** Hide the GitHub shortcut, choose 3–8 buttons per page including More, or register external actions.
-
-## Screenshots
-
-<p align="center"><img src="docs/images/session-cost.png" width="256" alt="Compact off-peak, peak and total session cost breakdown" /></p>
-
-Panels grow downward to a maximum of 520px or 78% of the viewport. Content scrolls beyond the cap while headers and settings actions remain visible. Large task collections start with eight rows. Technical details stay behind their relevant action instead of dominating the overview.
-
-## Install in DSH
-
-Start with a working DeepSeek Harness Web installation. DSH supplies React, slots, sessions and agents; no separate frontend build is needed.
+Requires Node.js 22+ and a working DeepSeek Harness Web installation.
 
 ```bash
 git clone https://github.com/YuluoY/dsh-kujira.git
@@ -42,80 +21,62 @@ cd dsh-kujira
 npm run link
 ```
 
-Restart DSH Web and refresh the page. Alternatively, extract the plugin archive from [Releases](https://github.com/YuluoY/dsh-kujira/releases) and run the same link command inside the extracted directory.
+Restart DSH Web and refresh the page. Alternatively, extract a [release archive](https://github.com/YuluoY/dsh-kujira/releases) and run `npm run link` from its directory. Keep the directory: the installation links to it.
 
 ```bash
-npm run unlink
+npm run unlink   # Restart DSH Web after removing the plugin
 ```
 
-Balance queries use your existing DSH DeepSeek credentials. Keys stay on the host. Missing credentials produce an explicit unavailable state, never a fabricated balance.
+Installation, live balances and historical session reads were verified with DSH **0.1.5-rc.1**. Scheduling was tested through that version’s agent event dispatcher.
 
-### Global peak/off-peak scheduling
+## Features
 
-Enable **Settings → Global session schedule → Run off-peak**. It is off by default and persists on the host.
+- **Task progress** — current operations, plans and subagents, with expandable results, files and links to their sessions.
+- **Tariff scheduling** — pause main agents and subagents during peak hours and resume off-peak within the same DSH service. Off by default; enable in settings.
+- **Costs and balances** — tariff status and session costs at the bottom right of the composer; balances from your configured DSH DeepSeek account.
+- **Pet interactions** — 50 animations for idle, work, sleep and interactions. DeepSeek usage earns random supplies; free interaction is also available.
+- **Preferences** — position, size, bubble duration and menu size. Chinese, English, Korean and Russian, or follow the system.
+- **Extensions** — weather, a GitHub shortcut and an [API for external menu actions](docs/EXTENSIONS.md).
 
-| Event | Behavior |
-|---|---|
-| Peak tariff | Global `agent/pre-step` gate blocks the next step for main agents and subagents. |
-| Off-peak tariff | Release each waiting original continuation. No synthetic “continue” prompt is submitted. |
-| Manual cancellation | Cancelled work stays cancelled; off-peak scheduling does not resurrect it. |
-| Disable scheduling | Immediately release scheduler-held steps. |
+<img src="docs/images/session-cost.png" width="248" alt="Off-peak, peak and total session costs" />
 
-An already-issued model request or running tool finishes before the pause. This does not retract requests or reverse charges. The scope is **one DSH service process**, not independent installations on other machines. The active pricing configuration and its time zone define tariff boundaries; UI language does not.
+### Before you start
 
-Local preview has no real DSH agents and is labelled accordingly. The installed host uses real lifecycle hooks. Unsupported host capabilities display an unavailable state instead of reporting a false success.
+Scheduling takes effect at **agent step boundaries**. An issued model request or running tool finishes first. Manually cancelled tasks stay cancelled. Other independently running DSH services are outside its scope.
 
-### Amounts and inventory
+Amounts retain the currency returned by DeepSeek. Language selection does not convert currencies. Paid credit means remaining deposited funds, not lifetime deposits; session costs are usage estimates, not an official invoice.
 
-`total_balance` is available credit, `topped_up_balance` is remaining paid credit, and `granted_balance` is granted credit. None is a lifetime deposit total. Country selection changes formatting, **not account currency**. Session costs are estimates from verifiable usage records and prices, not an official invoice.
+[Scheduling and supply rules](docs/USAGE.en.md) · [Animation triggers](docs/ANIMATIONS.md)
 
-By default, every CNY 0.10 of eligible usage estimates earns one supply. Each randomized five-drop bag contains two fish snacks and one pat, play and stretch action. Interactions share a cooldown. Free mode preserves inventory; preview usage never earns real supplies.
-
-## Preview and development
+## Development
 
 ```bash
 npm ci --legacy-peer-deps
-npm run preview
-# Default: http://127.0.0.1:8792/
-# Custom: PREVIEW_PORT=8793 npm run preview
-```
-
-The preview offers task states, tariff examples and a long-content/many-tasks scenario. Task and cost fixtures are isolated from production routes. Balance and weather panels may still query real services; keep private account information out of public screenshots.
-
-```bash
+npm run preview   # http://127.0.0.1:8792/
 npm test
 npm run lint
 npm run typecheck
 ```
 
-There is no frontend build step. Strict type checking covers annotated status, geometry, locale and resource models; dynamically injected React factories remain JavaScript.
+No frontend build is required. Host services live in `lib/host`, UI in `lib/shared/client` and `lib/shared/task`, and styles in `lib/styles`. Type checking covers annotated models and resource modules.
 
-```text
-lib/client.js                  DSH browser module and slot registration
-lib/index.js                   Host routes and service composition
-lib/host/                      Sessions, balance, usage, inventory, scheduler
-lib/shared/client/             Mascot state, animation, layout, menus, panels
-lib/shared/task/               Task store, status semantics, progressive UI
-lib/shared/feature-registry.js  External feature registration
-lib/shared/locales/            Chinese, English, Korean and Russian
-lib/styles/                    Component styles, combined by the host
-assets/anim/                   50 transparent WebM clips
-assets/pet.config.json         Behavior and layout configuration
-tools/                         Tests and isolated local preview
-```
+The preview includes task states, cost examples and long-content fixtures. Tasks and costs use isolated demo data; balance and weather panels may call real services.
 
-[Extension contract and examples](docs/EXTENSIONS.md) · [Full animation mapping](docs/ANIMATIONS.md)
+For bug reports, include your DSH version, reproduction steps and relevant screenshots. Check long text, small windows and all four languages when changing the UI. Open an issue to discuss larger contributions.
 
-## Compatibility and validation
+## Contributors and credits
 
-The implementation was checked against locally obtained DSH source for `agent/pre-step`, `conversation.composer.dock`, session snapshots and subagent navigation. Automated tests and browser previews have been verified. Compatibility with every real DSH version is not claimed. The supplied WebM clips do not provide independent pupil tracking.
+- [YuluoY](https://github.com/YuluoY) — maintenance and product design.
+- [OpenAI](https://openai.com/) · Codex — AI-assisted implementation, refactoring, testing and documentation.
+- [yanzwzz/dsh-whale-girl-pet](https://github.com/yanzwzz/dsh-whale-girl-pet) — animation assets.
+- [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet) — reference implementation.
+
+This is a community plugin. The OpenAI credit acknowledges Codex development assistance; it does not imply official maintenance, partnership or endorsement by OpenAI or DeepSeek.
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=YuluoY/dsh-kujira&type=Date)](https://www.star-history.com/#YuluoY/dsh-kujira&Date)
+[![Star History](https://api.star-history.com/svg?repos=YuluoY/dsh-kujira&type=Date)](https://www.star-history.com/#YuluoY/dsh-kujira&Date)
 
-[Star History](https://www.star-history.com/blog/how-to-use-github-star-history/) draws the chart from actual GitHub stars. A new repository needs data to accumulate; images may be cached.
+## License
 
-## License and credits
-
-Code is [MIT licensed](LICENSE). Animations come from [yanzwzz/dsh-whale-girl-pet](https://github.com/yanzwzz/dsh-whale-girl-pet), retaining their copyright and MIT license. Thanks to [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet) for reference implementations. Vendored i18next retains its [license](lib/shared/vendor/i18next.LICENSE). This is a community plugin, not an official DeepSeek product.
+[MIT](LICENSE). Animations retain their original copyright. Vendored i18next retains its [third-party license](lib/shared/vendor/i18next.LICENSE).
