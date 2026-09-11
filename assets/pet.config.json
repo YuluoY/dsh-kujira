@@ -234,6 +234,16 @@
       "outStaggerMs": 24,
       "labels": true,
       "hintOnce": true
+    },
+    "featureAnimations": {
+      "session": "偷吃Token",
+      "feed": "偷吃Token",
+      "balance": "翻钱包",
+      "weather": "看天气",
+      "growth": "点击回应 - 开心跃动",
+      "settings": "东张西望",
+      "github": "女仆屈膝礼仪",
+      "__more": "东张西望"
     }
   },
   "growth": {

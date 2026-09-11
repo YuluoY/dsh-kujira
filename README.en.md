@@ -34,7 +34,7 @@ Installation, live balances and historical session reads were verified with DSH 
 - **Task progress** — current operations, plans and subagents, with expandable results, files and links to their sessions.
 - **Tariff scheduling** — pause main agents and subagents during peak hours and resume off-peak within the same DSH service. Off by default; enable in settings.
 - **Costs and balances** — tariff status and session costs at the bottom right of the composer; balances from your configured DSH DeepSeek account.
-- **Pet interactions** — 50 animations for idle, work, sleep and interactions. DeepSeek usage earns random supplies; free interaction is also available.
+- **Pet interactions** — 50 animations for idle, work, sleep and interactions. DeepSeek usage earns random supplies; unlimited interaction is also available.
 - **Preferences** — position, size, bubble duration and menu size. Chinese, English, Korean and Russian, or follow the system.
 - **Extensions** — weather, a GitHub shortcut and an [API for external menu actions](docs/EXTENSIONS.md).
 

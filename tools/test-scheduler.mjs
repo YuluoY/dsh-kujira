@@ -43,3 +43,13 @@ test('a downstream rejection is returned even when the tariff changed during pre
  const decision=await scheduler.gate({agent:{id:'rejected'},signal:new AbortController().signal},async()=>{setTime(peak);return {kind:'reject',reason:'cancelled'};});
  assert.equal(decision.kind,'reject');assert.equal(scheduler.snapshot().paused,0);
 });
+
+test('enabling during existing work reports pending safe stops and gates the next request for every active agent',async t=>{
+ const directory=await mkdtemp(join(tmpdir(),'kujira-active-gate-'));let now=peak;
+ const agents=[{id:'main',status:'running'},{id:'child',status:'running'},{id:'idle',status:'idle'}];
+ const scheduler=createPeakScheduler({directory,now:()=>now,available:true,getAgents:()=>agents});t.after(async()=>{scheduler.dispose();await rm(directory,{recursive:true,force:true});});
+ await scheduler.configure(true);assert.equal(scheduler.snapshot().pausing,2);
+ let calls=0;const runs=agents.slice(0,2).map(agent=>scheduler.gate({agent,signal:new AbortController().signal},()=>{calls++;return {model:'deepseek-flash'};}));
+ await settled();assert.equal(calls,0);assert.equal(scheduler.snapshot().paused,2);assert.equal(scheduler.snapshot().pausing,0);
+ now=valley;scheduler.tick();await Promise.all(runs);assert.equal(calls,2);
+});

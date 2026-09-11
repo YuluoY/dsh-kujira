@@ -61,3 +61,13 @@ test('failed persistence cannot commit a debit or issue a successful receipt',as
  assert.equal((await f.wallet.snapshot()).stock.fish,2);
  t.after(()=>rm(target,{recursive:true,force:true}));
 });
+
+test('unlimited mode keeps earning exact inventory and monotonic reward totals across concurrent sessions and restart',async t=>{
+ const f=await fixture(t);await f.wallet.configure(true);f.advance(9000);
+ const one=f.session([header,usage(500000)]),two={...f.session([header,usage(500000)]),header:{id:'child'}};
+ await Promise.all([f.wallet.observe(one),f.wallet.observe(two),f.wallet.observe(one)]);
+ const earned=await f.wallet.snapshot();assert.equal(earned.drops,10);assert.deepEqual(earned.stock,{fish:4,pat:2,play:2,stretch:2});assert.deepEqual(earned.earned,earned.stock);
+ const used=await f.wallet.consume('fish','unlimited-request-123');assert.deepEqual(used.stock,earned.stock);assert.deepEqual(used.earned,earned.earned);
+ await f.wallet.configure(false);f.advance(9000);const paid=await f.wallet.consume('fish','limited-request-12345');assert.equal(paid.stock.fish,3);assert.deepEqual(paid.earned,earned.earned);
+ const restarted=await createInventory(f.options).snapshot();assert.deepEqual(restarted.stock,paid.stock);assert.deepEqual(restarted.earned,paid.earned);
+});

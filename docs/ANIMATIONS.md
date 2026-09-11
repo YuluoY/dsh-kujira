@@ -27,3 +27,7 @@ All 50 clips have a playback route. Reduced motion, focus mode and hidden tabs s
 工作状态优先于睡眠和空闲链；用户拖动、切换状态或主动互动会取消旧动画序列。所有影片通过双 video 缓冲交替，避免黑帧。未对 WebM 瞳孔进行独立变形，因此不声称支持眼睛追踪鼠标。
 
 Task state takes priority over idle and sleep sequences. New states and explicit actions cancel stale sequences. Two video buffers avoid a blank frame between clips. The supplied WebM clips do not support independent pupil tracking.
+
+## 功能与启动反馈 / Feature and startup reactions
+
+`ui.featureAnimations` configures first-session eating (`偷吃Token`) and the default menu actions. Feed hover combines the eating clip with a separate SVG drool overlay; wallet and weather use `翻钱包` and `看天气`. Hover waits for a deliberate dwell and observes cooldowns. Short reactions restore the latest agent state instead of leaving work frozen on a finished frame. Inventory gains use SVG symbols shared with the growth panel.

@@ -1,0 +1,107 @@
+.dsh-kujira-root .kj-reward-rise {
+  position: absolute;
+  top: 12%;
+  right: 4%;
+  width: 94px;
+  height: 40px;
+  z-index: 2;
+  pointer-events: none;
+  color: var(--kj-accent);
+  filter: drop-shadow(0 3px 6px var(--kj-line));
+  animation: kj-reward-rise 1350ms ease-out both;
+}
+.dsh-kujira-root .kj-reward-pill {
+  fill: var(--kj-surface);
+  stroke: var(--kj-line-strong);
+  stroke-width: 1;
+}
+.dsh-kujira-root .kj-reward-count {
+  fill: var(--kj-ink);
+  font:
+    600 14px system-ui,
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.dsh-kujira-root .kj-drool {
+  position: absolute;
+  width: 22px;
+  height: 26px;
+  left: 52%;
+  top: 55%;
+  fill: var(--kj-accent);
+  stroke: var(--kj-surface);
+  stroke-width: 1;
+  opacity: 0.8;
+  pointer-events: none;
+  animation: kj-drool 1100ms ease-in-out infinite;
+}
+.dsh-kujira-root .kj-care-actions .kj-action {
+  min-height: 40px;
+  gap: 6px;
+}
+.dsh-kujira-root .kj-care-actions .kj-action svg {
+  display: block;
+  width: 23px;
+  height: 23px;
+  color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-supply-items {
+  display: flex;
+  gap: 6px 10px;
+  flex-wrap: wrap;
+}
+.dsh-kujira-root .kj-supply-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+  border-radius: 4px;
+  color: var(--kj-text);
+}
+.dsh-kujira-root .kj-supply-item svg {
+  width: 17px;
+  height: 17px;
+  color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-supply-item:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 2px;
+}
+
+@keyframes kj-reward-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+  }
+  18%,
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(1);
+  }
+}
+
+@keyframes kj-drool {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  60% {
+    transform: translateY(4px);
+    opacity: 0.8;
+  }
+}
+.dsh-kujira-root[data-motion="reduced"] .kj-drool,
+.dsh-kujira-root .kj-reward-rise[data-reduced="true"] {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root .kj-reward-rise,
+  .dsh-kujira-root .kj-drool {
+    animation: none;
+  }
+}

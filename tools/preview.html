@@ -218,6 +218,7 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
         <button data-k="error">出错</button>
         <button class="warn" data-k="abort">中断回合</button>
         <button class="warn" data-k="idle">清空（回空闲）</button>
+        <button id="demo-rewards">模拟新会话与补给</button>
         <button data-k="extreme">长内容与多任务</button>
     </div>
     <div class="row" aria-label="费用模拟数据"><span>费用示例：</span><button data-usage="offpeak">模拟谷价</button><button data-usage="peak">模拟峰价</button><button data-usage="empty">暂无用量</button><span id="usage-mode">点击切换示例</span></div>
@@ -349,6 +350,7 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
 
     window.addEventListener('error', (e) => setStatus('运行时错误：' + e.message, true));
 
+    document.getElementById('demo-rewards').onclick=()=>fetch('/__preview/rewards',{method:'POST'});
     document.querySelectorAll('[data-usage]').forEach(button=>button.onclick=async()=>{
         await fetch('/__preview/usage?mode='+button.dataset.usage,{method:'POST'});
         document.getElementById('usage-mode').textContent='当前：'+button.textContent+'（最多 5 秒更新）';

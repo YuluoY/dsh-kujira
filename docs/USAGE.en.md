@@ -4,11 +4,11 @@
 
 ### Global peak/off-peak scheduling
 
-Enable **Settings → Global session schedule → Run off-peak**. It is off by default and persists on the host.
+Enable **Settings → Global session schedule → Emergency safeguard**. It is off by default and persists on the host.
 
 | Event | Behavior |
 |---|---|
-| Peak tariff | Global `agent/pre-step` gate blocks the next step for main agents and subagents. |
+| Peak tariff | Global `agent/pre-step` and `agent/request` gates blocks the next step for main agents and subagents. |
 | Off-peak tariff | Release each waiting original continuation. No synthetic “continue” prompt is submitted. |
 | Manual cancellation | Cancelled work stays cancelled; off-peak scheduling does not resurrect it. |
 | Disable scheduling | Immediately release scheduler-held steps. |
@@ -23,3 +23,9 @@ Local preview has no real DSH agents and is labelled accordingly. The installed 
 
 By default, every CNY 0.10 of eligible usage estimates earns one supply. Each randomized five-drop bag contains two fish snacks and one pat, play and stretch action. Interactions share a cooldown. Free mode preserves inventory; preview usage never earns real supplies.
 
+
+## Reactions and supplies
+
+Bubbles default to 5 seconds. Hovering the mascot reveals them again; deliberate keyboard focus remains accessible. New main and child sessions trigger an eating reaction on their first execution, while historical reads do not. Both inventory modes earn supplies from settled DeepSeek usage. Unlimited interactions never consume saved stock; turning the mode off reveals the actual quantities. SVG gains appear sequentially, merging bursts of the same kind without replaying past rewards after reload.
+
+Emergency safeguard also covers agents already running when enabled. In-flight model or tool operations are reported as waiting for a safe pause until they reach a request or step boundary. Issued operations cannot be retracted. The scheduler preserves the original continuation rather than interrupting and resubmitting a replacement task.

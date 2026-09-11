@@ -87,6 +87,8 @@ const apiKey = loadApiKey();
 // ============================================================================
 const routes = [];
 const sessionHandlers = [];
+const agentHandlers = [];
+let supplyDemoSerial=0;
 const previewEvents = [];
 const previewChildren=new Map();
 const previewSession = { header: { id: 'preview-session' }, inheritedEventCount: 0, snapshotEvents: () => previewEvents.slice() };
@@ -101,6 +103,7 @@ const ctx = {
     },
     on(event, handler)
     {
+        if (event === 'agent/status') agentHandlers.push(handler);
         if (event === 'session/event')
         {
             sessionHandlers.push(handler);
@@ -128,7 +131,7 @@ const ctx = {
     }
 };
 
-apply(ctx, { size: 260, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { directory: join(homedir(), '.dsh', 'dsh-kujira-preview') } });
+apply(ctx, { size: 260, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
 
 // ============================================================================
 // 模拟会话事件
@@ -183,6 +186,15 @@ const server = createServer(async (req, res) =>
     const url = new URL(req.url ?? '/', 'http://localhost');
     const pathname = url.pathname;
 
+    if(pathname==='/__preview/rewards' && req.method==='POST') {
+        const now=Date.now(), id='preview-supply-'+now+'-'+(++supplyDemoSerial);
+        const events=[{type:'request/header',time:now,data:{header:{config:{provider:'deepseek-official',model:'deepseek-flash'}}}},
+          {type:'assistant/message',time:now,seq:1,data:{turn:1,step:1,usage:{inputTokens:0,outputTokens:125000}}}];
+        const session={id,header:{id},snapshotEvents:()=>events,inheritedEventCount:0};
+        for(const handler of sessionHandlers)handler(session,events[1]);
+        for(const handler of agentHandlers)handler({agent:{id,session:{id,header:{id},snapshotEvents:()=>[]}},status:'running'});
+        res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({ok:true,preview:true}));return;
+    }
     const gallery = new URL(req.headers.referer || '/', 'http://localhost').searchParams.has('gallery');
     if (pathname === '/dsh-kujira/balance' && gallery) {
         const account = {currency:'¥',rawCurrency:'CNY',total:110,granted:10,toppedUp:100};
