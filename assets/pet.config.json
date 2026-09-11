@@ -24,7 +24,7 @@
     "  pollMs      轮询 /state 的间隔（毫秒，500-30000）。",
     "  ttl         每个档位的存活期（毫秒）。0 = 不过期。超时自动回空闲。",
     "              参考 Codex 官方值：工作中 3min / 出错 1h / 等你确认 24h。",
-    "  map         档位 → { anim 候选数组, label 标签文案, enterMs 进入动作时长 }",
+    "  map         档位 → { anim 候选数组, label 标签文案；过渡动作完整播放后衔接 }",
     "              候选数组 = 每次进入该档位时随机抽一个，避免总播同一段。",
     "  enter       档位 → 进入时先播的那一段（比如开始工作）。播完自动切到循环动作。",
     "",
@@ -166,44 +166,38 @@
         "anim": [
           "工作思考"
         ],
-        "label": "思考中",
-        "enterMs": 10000
+        "label": "思考中"
       },
       "working": {
         "anim": [
           "认真工作"
         ],
-        "label": "工作中",
-        "enterMs": 10000
+        "label": "工作中"
       },
       "result": {
         "anim": [
           "工作思考"
         ],
-        "label": "整理中",
-        "enterMs": 10000
+        "label": "整理中"
       },
       "waiting": {
         "anim": [
           "工作被打扰",
           "看表叹气"
         ],
-        "label": "等你确认",
-        "enterMs": 10000
+        "label": "等你确认"
       },
       "success": {
         "anim": [
           "工作结束"
         ],
-        "label": "完成",
-        "enterMs": 10000
+        "label": "完成"
       },
       "error": {
         "anim": [
           "长时间工作看表"
         ],
-        "label": "出错了",
-        "enterMs": 10000
+        "label": "出错了"
       }
     },
     "enter": {
@@ -237,6 +231,7 @@
     },
     "featureAnimations": {
       "session": "偷吃Token",
+      "reward": "点击回应 - 开心跃动",
       "feed": "偷吃Token",
       "balance": "翻钱包",
       "weather": "看天气",

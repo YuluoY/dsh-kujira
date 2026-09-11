@@ -105,10 +105,6 @@ async function main()
                 problems.push('state.map.' + stateName + ' 引用了不存在的素材：' + a);
             }
         }
-        if (def && def.enterMs === undefined)
-        {
-            problems.push('state.map.' + stateName + ' 缺 enterMs（进入动作播多久再切循环）');
-        }
     }
 
     for (const [stateName, arr] of Object.entries(stateEnter))

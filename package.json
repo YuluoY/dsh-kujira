@@ -1,6 +1,6 @@
 {
     "name": "dsh-kujira",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "private": true,
     "description": "DeepSeek 鲸鱼娘桌宠 —— 独立重写的 DeepSeek Harness Web 插件。零构建依赖：lib/ 里的 JS 就是源码，改完刷新即生效。",
     "keywords": [
@@ -54,7 +54,7 @@
         "check": "node tools/check-assets.mjs",
         "test:logic": "node tools/test-logic.mjs",
         "test:host": "node tools/test-host.mjs",
-        "test": "node tools/check-assets.mjs && node tools/test-logic.mjs && node tools/test-host.mjs && node tools/test-usage.mjs && node tools/test-live.mjs && node tools/test-controls.mjs && node tools/test-balance.mjs && node tools/test-i18n.mjs && node tools/test-inventory.mjs && node tools/test-usage-preview.mjs && node tools/test-activity.mjs && node tools/test-scheduler.mjs && node tools/test-client.mjs && node tools/test-session-access.mjs && node tools/test-markdown.mjs && node tools/test-companion-effects.mjs",
+        "test": "node tools/check-assets.mjs && node tools/test-logic.mjs && node tools/test-host.mjs && node tools/test-usage.mjs && node tools/test-live.mjs && node tools/test-controls.mjs && node tools/test-balance.mjs && node tools/test-i18n.mjs && node tools/test-inventory.mjs && node tools/test-usage-preview.mjs && node tools/test-activity.mjs && node tools/test-scheduler.mjs && node tools/test-client.mjs && node tools/test-session-access.mjs && node tools/test-markdown.mjs && node tools/test-companion-effects.mjs && node tools/test-video-player.mjs",
         "preview": "node tools/preview-server.mjs",
         "link": "dsh plugin --profile web add link:$PWD",
         "unlink": "dsh plugin --profile web remove dsh-kujira",

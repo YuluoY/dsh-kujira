@@ -48,7 +48,7 @@
   pointer-events: auto;
   cursor: grab;
   opacity: 0;
-  transition: opacity 0.18s ease;
+  transition: opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
 }
 .dsh-kujira-video.is-front {

@@ -105,3 +105,64 @@
     animation: none;
   }
 }
+
+.dsh-kujira-root .kj-reward-rise[data-peak="true"] {
+  color: var(--kj-tone-satiety, #d7a75c);
+}
+.dsh-kujira-root .kj-fish-scatter {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.dsh-kujira-root .kj-falling-fish {
+  position: absolute;
+  width: clamp(16px, 8%, 24px);
+  aspect-ratio: 1;
+  color: var(--kj-tone-satiety, #d7a75c);
+  filter: drop-shadow(0 2px 1px var(--kj-line));
+  animation: kj-fish-land 4100ms var(--kj-fish-delay) both;
+}
+.dsh-kujira-root .kj-falling-fish svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes kj-fish-land {
+  0% {
+    opacity: 0;
+    transform: translate(var(--kj-fish-drift), -90px) rotate(-35deg) scale(0.65);
+    animation-timing-function: ease-out;
+  }
+  10% {
+    opacity: 1;
+    transform: translate(calc(var(--kj-fish-drift) * 0.55), -110px) rotate(5deg);
+    animation-timing-function: ease-in;
+  }
+  23% {
+    transform: translate(0, 0) rotate(var(--kj-fish-tilt)) scale(1.08, 0.82);
+    animation-timing-function: ease-out;
+  }
+  29% {
+    transform: translate(0, var(--kj-fish-lift)) rotate(var(--kj-fish-tilt))
+      scale(1);
+    animation-timing-function: ease-in;
+  }
+  36%,
+  80% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(var(--kj-fish-tilt)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 3px) rotate(var(--kj-fish-tilt)) scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root .kj-fish-scatter {
+    display: none;
+  }
+}

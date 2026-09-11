@@ -71,3 +71,37 @@ test('unlimited mode keeps earning exact inventory and monotonic reward totals a
  await f.wallet.configure(false);f.advance(9000);const paid=await f.wallet.consume('fish','limited-request-12345');assert.equal(paid.stock.fish,3);assert.deepEqual(paid.earned,earned.earned);
  const restarted=await createInventory(f.options).snapshot();assert.deepEqual(restarted.stock,paid.stock);assert.deepEqual(restarted.earned,paid.earned);
 });
+
+test('peak spend earns twice the supplies per yuan, with actual costs and mixed-period carry preserved',async t=>{
+ const f=await fixture(t),peak=Date.parse('2026-09-14T09:00:00+08:00');f.advance(peak-START);
+ let s=await f.wallet.observe(f.session([header,usage(125000,1,peak)]));
+ assert.equal(s.credited,.25);assert.equal(s.bonusCredited,.25);assert.equal(s.drops,5);assert.deepEqual(s.peakEarned,s.earned);assert.equal(s.rewardMultiplier,2);
+ const mixed=f.session([header,usage(125000,1,peak),usage(25000,2,peak+3*3600000)]);
+ s=await f.wallet.observe(mixed);assert.equal(s.credited,.275);assert.equal(s.drops,5);assert.equal(s.progress,.25);assert.equal(s.remaining,.0375);
+ const restarted=createInventory(f.options);assert.equal((await restarted.observe(mixed)).drops,5);
+ await restarted.configure(true);
+ mixed.snapshotEvents=()=>[header,usage(125000,1,peak),usage(25000,2,peak+3*3600000),usage(125000,3,peak+1000)];
+ s=await restarted.observe(mixed);assert.equal(s.drops,10);assert.equal(s.credited,.525);assert.equal(s.bonusCredited,.5);assert.equal(s.stock.fish,4);
+});
+test('legacy inventory migration never grants a bonus for historical usage, including after restart',async t=>{
+ const {writeFile}=await import('node:fs/promises');const f=await fixture(t);
+ const peak=Date.parse('2026-09-14T09:00:00+08:00');
+ f.advance(peak-START);const session=f.session([header,usage(125000,1,peak)]);
+ await f.wallet.observe(session);
+ const file=join(f.directory,'inventory.json'),legacy=JSON.parse(await readFile(file,'utf8'));
+ delete legacy.bonusStartedAt;delete legacy.bonusCredited;delete legacy.bonusSessions;delete legacy.peakEarned;
+ legacy.drops=2;legacy.stock={fish:0,pat:0,play:1,stretch:1};legacy.earned={...legacy.stock};
+ await writeFile(file,JSON.stringify(legacy));f.advance(1000);
+ const migrated=createInventory(f.options);assert.equal((await migrated.observe(session)).drops,2);
+ session.snapshotEvents=()=>[header,usage(125000,1,peak),usage(125000,2,peak+2000)];
+ const after=await migrated.observe(session);assert.equal(after.credited,.5);assert.equal(after.bonusCredited,.25);assert.equal(after.drops,7);
+ assert.equal((await createInventory(f.options).observe(session)).drops,7);
+});
+
+test('delayed streamed usage before upgrade cannot earn a new peak bonus',async t=>{
+ const f=await fixture(t),peak=Date.parse('2026-09-14T09:00:00+08:00');f.advance(peak-START);
+ const {writeFile}=await import('node:fs/promises');const file=join(f.directory,'inventory.json');
+ const stored=JSON.parse(await readFile(file,'utf8'));stored.bonusStartedAt=peak+2000;await writeFile(file,JSON.stringify(stored));
+ const delayed={type:'assistant/message',time:peak+3000,seq:1,data:{turn:1,step:1,stream:[{time:peak,chunk:{type:'usage',usage:{inputTokens:0,outputTokens:125000}}}]}};
+ const s=await createInventory(f.options).observe(f.session([header,delayed]));assert.equal(s.credited,.25);assert.equal(s.bonusCredited,0);assert.equal(s.drops,2);
+});

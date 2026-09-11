@@ -40,6 +40,7 @@ import { homedir } from 'node:os';
 import { apply } from '../lib/index.js';
 import {createActivityReader} from '../lib/host/activity.js';
 import { activityPreview } from './fixtures/activity-preview.mjs';
+import {rateAt} from '../lib/shared/billing.js';
 import { previewUsage } from './fixtures/usage-preview.mjs';
 let usagePreviewMode='offpeak';
 
@@ -88,7 +89,7 @@ const apiKey = loadApiKey();
 const routes = [];
 const sessionHandlers = [];
 const agentHandlers = [];
-let supplyDemoSerial=0;
+let supplyDemoSerial=0, supplyClock=0;
 const previewEvents = [];
 const previewChildren=new Map();
 const previewSession = { header: { id: 'preview-session' }, inheritedEventCount: 0, snapshotEvents: () => previewEvents.slice() };
@@ -131,7 +132,7 @@ const ctx = {
     }
 };
 
-apply(ctx, { size: 260, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
+apply(ctx, { size: 260, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { now:()=>supplyClock || Date.now(), directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
 
 // ============================================================================
 // 模拟会话事件
@@ -187,7 +188,11 @@ const server = createServer(async (req, res) =>
     const pathname = url.pathname;
 
     if(pathname==='/__preview/rewards' && req.method==='POST') {
-        const now=Date.now(), id='preview-supply-'+now+'-'+(++supplyDemoSerial);
+        const requested=url.searchParams.get('mode') || usagePreviewMode;
+        let now=Date.now();
+        for(let i=0;i<336 && rateAt(now)!==requested;i++) now+=1800000;
+        supplyClock=now;
+        const id='preview-supply-'+now+'-'+(++supplyDemoSerial);
         const events=[{type:'request/header',time:now,data:{header:{config:{provider:'deepseek-official',model:'deepseek-flash'}}}},
           {type:'assistant/message',time:now,seq:1,data:{turn:1,step:1,usage:{inputTokens:0,outputTokens:125000}}}];
         const session={id,header:{id},snapshotEvents:()=>events,inheritedEventCount:0};
