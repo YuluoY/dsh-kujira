@@ -1,0 +1,220 @@
+/* Task companion: one spacing and interaction contract, using the shared panel palette. */
+.dsh-kujira-root .kj-task-bubble,
+.dsh-kujira-root .kj-task-panel {
+  --kj-task-success: #287366;
+  --kj-task-error: #b64442;
+  --kj-task-hover: color-mix(in srgb, var(--kj-ink) 5%, transparent);
+  --kj-task-pressed: color-mix(in srgb, var(--kj-ink) 9%, transparent);
+  --kj-task-radius: 7px;
+  --kj-task-transition: 150ms ease;
+}
+.dsh-kujira-root[data-theme="dark"] .kj-task-bubble,
+.dsh-kujira-root[data-theme="dark"] .kj-task-panel {
+  --kj-task-success: #88cbbb;
+  --kj-task-error: #f19e96;
+}
+.dsh-kujira-root .kj-task-bubble {
+  pointer-events: auto;
+  cursor: pointer;
+  border: 0;
+  text-align: start;
+  font: inherit;
+  gap: 9px;
+  max-width: 244px;
+  color: var(--kj-text);
+}
+.dsh-kujira-root .kj-task-bubble:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 4px;
+}
+.dsh-kujira-root .kj-task-bubble:hover {
+  filter: brightness(1.04);
+}
+.dsh-kujira-root .kj-task-symbol {
+  display: flex;
+  flex: none;
+  color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-task-bubble-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+.dsh-kujira-root .kj-task-bubble-copy strong {
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+.dsh-kujira-root .kj-task-bubble-copy > span {
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-bubble-copy strong,
+.dsh-kujira-root .kj-task-bubble-copy > span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsh-kujira-root .kj-task-open {
+  color: var(--kj-muted);
+  margin-left: auto;
+  font-size: 17px;
+}
+.dsh-kujira-root .dsh-kujira-panel[data-panel="activity"] > .kj-body {
+  flex: 0 1 auto;
+  padding: 12px;
+}
+.dsh-kujira-root .kj-task-panel .kj-title,
+.dsh-kujira-root .kj-task-panel .kj-sub {
+  display: block;
+}
+.dsh-kujira-root .kj-task-overview {
+  padding: 0 8px 16px;
+}
+.dsh-kujira-root .kj-task-phase {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--kj-accent);
+  min-height: 36px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-overview h3,
+.dsh-kujira-root .kj-task-result h3 {
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 550;
+  margin: 8px 0 12px;
+  color: var(--kj-ink);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.dsh-kujira-root .kj-task-current > span {
+  display: block;
+  margin: 12px 0 4px;
+  font-size: 11px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-disclosure-label {
+  min-width: 0;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsh-kujira-root .kj-disclosure-count {
+  font-size: 10px;
+  margin-left: auto;
+  margin-right: 8px;
+  color: var(--kj-muted);
+  font-variant-numeric: tabular-nums;
+}
+.dsh-kujira-root .kj-task-panel .kj-disclosure {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--kj-line);
+  border-radius: 0;
+}
+.dsh-kujira-root .kj-task-panel .kj-disclosure > summary {
+  gap: 8px;
+  margin: 0;
+  padding: 0 8px;
+  min-height: 40px;
+  border-radius: var(--kj-task-radius);
+  color: var(--kj-text);
+  font-size: 12px;
+  font-weight: 500;
+  transition:
+    background var(--kj-task-transition),
+    color var(--kj-task-transition);
+}
+.dsh-kujira-root .kj-task-panel .kj-disclosure-count {
+  margin-right: 0;
+  font-size: 11px;
+  font-weight: 400;
+}
+.dsh-kujira-root .kj-task-panel .kj-disclosure[open] > summary {
+  color: var(--kj-ink);
+}
+.dsh-kujira-root .kj-task-panel .kj-detail {
+  padding: 4px 0 12px;
+}
+.dsh-kujira-root .kj-task-operation-head {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto 12px;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: var(--kj-task-radius);
+  background: none;
+  font: inherit;
+  text-align: start;
+  color: var(--kj-text);
+  cursor: pointer;
+  transition:
+    background var(--kj-task-transition),
+    color var(--kj-task-transition);
+}
+.dsh-kujira-root .kj-task-operation-head > svg {
+  color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-task-operation-head > span:not(.kj-task-status) {
+  min-width: 0;
+}
+.dsh-kujira-root .kj-task-operation-head strong {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--kj-ink);
+}
+.dsh-kujira-root .kj-task-status {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--kj-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+}
+.dsh-kujira-root .kj-task-row-chevron {
+  display: flex;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-row-chevron svg {
+  width: 12px;
+  height: 12px;
+  transition: transform var(--kj-task-transition);
+}
+.dsh-kujira-root
+  .kj-task-operation-head[aria-expanded="true"]
+  .kj-task-row-chevron
+  svg {
+  transform: rotate(180deg);
+}
+.dsh-kujira-root .kj-task-operation-detail {
+  margin: 2px 8px 12px;
+  padding: 8px 0 0 24px;
+  border: 0;
+  background: none;
+}
+.dsh-kujira-root .kj-task-operation-detail p,
+.dsh-kujira-root .kj-task-result p {
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: break-word;
+  color: var(--kj-text);
+  margin: 0 0 12px;
+}
+.dsh-kujira-root .kj-task-operation-detail p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

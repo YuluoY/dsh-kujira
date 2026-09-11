@@ -1,0 +1,125 @@
+{
+    "name": "dsh-kujira",
+    "version": "0.1.0",
+    "private": true,
+    "description": "DeepSeek 鲸鱼娘桌宠 —— 独立重写的 DeepSeek Harness Web 插件。零构建依赖：lib/ 里的 JS 就是源码，改完刷新即生效。",
+    "keywords": [
+        "dsh",
+        "dsh-plugin",
+        "deepseek-harness",
+        "desktop-pet",
+        "mascot",
+        "web-ui",
+        "cordis"
+    ],
+    "_comment": [
+        "=============== 这个包的清单说明 ===============",
+        "type: module            本包是 ESM",
+        "main: lib/index.js      宿主半侧入口（Cordis 插件：name / inject / apply）",
+        "exports['./client']     浏览器半侧入口；DSH 模块系统按它提供 /plugins/dsh-kujira/client.js",
+        "dsh.bundle.patch        声明本包是 bundle，patch 文件 cordis.patch.yml 安装后自动进配置树层栈",
+        "dsh.client              声明浏览器半侧的注入依赖与平台（web）",
+        "files                   若将来要 npm publish，只发这些",
+        "peerDependencies        运行时由 DSH 宿主提供，本包不打包；全部标 optional 避免 pnpm 因解析不到而报错",
+        "=============================================="
+    ],
+    "type": "module",
+    "main": "lib/index.js",
+    "exports": {
+        ".": {
+            "default": "./lib/index.js"
+        },
+        "./client": {
+            "default": "./lib/client.js"
+        },
+        "./cordis.patch.yml": "./cordis.patch.yml",
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "lib",
+        "assets",
+        "cordis.patch.yml",
+        "README.md",
+        "README.en.md",
+        "LICENSE",
+        "tools",
+        "docs/images",
+        "docs/EXTENSIONS.md",
+        "docs/ANIMATIONS.md"
+    ],
+    "license": "MIT",
+    "scripts": {
+        "check": "node tools/check-assets.mjs",
+        "test:logic": "node tools/test-logic.mjs",
+        "test:host": "node tools/test-host.mjs",
+        "test": "node tools/check-assets.mjs && node tools/test-logic.mjs && node tools/test-host.mjs && node tools/test-usage.mjs && node tools/test-live.mjs && node tools/test-controls.mjs && node tools/test-balance.mjs && node tools/test-i18n.mjs && node tools/test-inventory.mjs && node tools/test-usage-preview.mjs && node tools/test-activity.mjs && node tools/test-scheduler.mjs && node tools/test-client.mjs",
+        "preview": "node tools/preview-server.mjs",
+        "link": "dsh plugin --profile web add link:$PWD",
+        "unlink": "dsh plugin --profile web remove dsh-kujira",
+        "reinstall": "dsh plugin --profile web remove dsh-kujira && dsh plugin --profile web add link:$PWD",
+        "rename": "node tools/rename.mjs",
+        "test:usage": "node tools/test-usage.mjs",
+        "test:live": "node tools/test-live.mjs",
+        "test:controls": "node tools/test-controls.mjs",
+        "test:client": "node tools/test-client.mjs",
+        "lint": "eslint lib/client.js lib/shared/client lib/shared/task lib/shared/locales lib/shared/messages.js lib/shared/activity-ui.js lib/host/resources.js && stylelint \"lib/styles/*.css\" lib/appearance.css",
+        "typecheck": "tsc --noEmit"
+    },
+    "dsh": {
+        "bundle": {
+            "patch": "./cordis.patch.yml"
+        },
+        "client": {
+            "inject": [
+                "@deepseek-ai/dsh-client-runtime",
+                "@deepseek-ai/dsh-client-ui-slots"
+            ],
+            "platform": "web"
+        }
+    },
+    "peerDependencies": {
+        "@deepseek-ai/cordis": "*",
+        "@deepseek-ai/dsh-client-runtime": "*",
+        "@deepseek-ai/dsh-client-ui-slots": "*",
+        "@deepseek-ai/dsh-host-webserver": "*",
+        "react": "^18.2.0"
+    },
+    "peerDependenciesMeta": {
+        "@deepseek-ai/cordis": {
+            "optional": true
+        },
+        "@deepseek-ai/dsh-host-webserver": {
+            "optional": true
+        },
+        "@deepseek-ai/dsh-client-runtime": {
+            "optional": true
+        },
+        "@deepseek-ai/dsh-client-ui-slots": {
+            "optional": true
+        },
+        "react": {
+            "optional": true
+        }
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.5",
+        "eslint": "^9.39.5",
+        "eslint-plugin-react-hooks": "^5.2.0",
+        "globals": "^17.12.0",
+        "prettier": "^3.9.6",
+        "stylelint": "^16.26.1",
+        "stylelint-config-standard": "^38.0.0",
+        "typescript": "^5.9.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/YuluoY/dsh-kujira.git"
+    },
+    "homepage": "https://github.com/YuluoY/dsh-kujira",
+    "bugs": {
+        "url": "https://github.com/YuluoY/dsh-kujira/issues"
+    },
+    "engines": {
+        "node": ">=22"
+    }
+}

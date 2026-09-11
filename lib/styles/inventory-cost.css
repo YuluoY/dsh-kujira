@@ -1,0 +1,171 @@
+/* Stock belongs to the existing radial action; no additional menu is introduced. */
+.dsh-kujira-root .kj-stock-badge {
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  border-radius: 9px;
+  border: 1px solid var(--kj-line);
+  background: var(--kj-surface);
+  color: var(--kj-ink);
+  font-size: 10px;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  pointer-events: none;
+}
+.dsh-kujira-root .kj-care-count {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-care-actions .kj-action {
+  gap: 3px;
+}
+.dsh-kujira-root .kj-care-actions .kj-action svg {
+  display: none;
+}
+.dsh-kujira-root .kj-supply-log {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-supply-log time {
+  font-variant-numeric: tabular-nums;
+}
+
+.dsh-kujira-root .dsh-kujira-orb > svg {
+  width: var(--kj-orb-icon, 17px);
+  height: var(--kj-orb-icon, 17px);
+}
+.dsh-kujira-root .dsh-kujira-orb::before {
+  inset: min(-3px, calc((var(--kj-orb-size, 34px) - 44px) / 2));
+}
+.dsh-kujira-root .kj-care-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.dsh-kujira-root .kj-care-summary p {
+  margin: 0;
+  min-width: 0;
+}
+.dsh-kujira-root .kj-supply-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  color: var(--kj-accent);
+  cursor: help;
+}
+.dsh-kujira-root .kj-supply-ring:hover,
+.dsh-kujira-root .kj-supply-ring:focus-visible {
+  background: var(--kj-surface-soft);
+  outline: 1px solid var(--kj-line-strong);
+}
+.dsh-kujira-root .kj-supply-ring svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke-width: 2.5;
+}
+.dsh-kujira-root .kj-ring-track {
+  stroke: var(--kj-line-strong);
+}
+.dsh-kujira-root .kj-ring-value {
+  stroke: currentcolor;
+  stroke-linecap: round;
+}
+.dsh-kujira-root .kj-supply-ring span {
+  position: absolute;
+  font-size: 11px;
+}
+.kj-usage-trigger {
+  flex-wrap: nowrap;
+  gap: 6px;
+  white-space: nowrap;
+  min-width: 0;
+}
+.kj-usage-trigger .kj-rate,
+.kj-usage-trigger strong {
+  flex-shrink: 0;
+}
+
+@media (width <= 600px) {
+  .kj-usage-popover {
+    height: auto;
+  }
+}
+
+.kj-fee-lines {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.kj-fee-lines > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  padding: 4px 0;
+}
+.kj-fee-lines dt {
+  font-size: 11px;
+  color: var(--kj-muted);
+}
+.kj-fee-lines dd {
+  margin: 0;
+  color: var(--kj-ink);
+  font-size: 12px;
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+.kj-fee-lines .kj-fee-sum {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--kj-line);
+}
+.kj-fee-lines .kj-fee-sum dd {
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+}
+
+.kj-usage-trigger:hover,
+.kj-usage-trigger[aria-expanded="true"] {
+  background: var(--dsw-alias-interactive-bg-hover, var(--kj-surface-soft));
+  color: var(--dsw-alias-label-secondary, var(--kj-text));
+}
+:has(> [data-composer-card]):has(> .kj-usage-root) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+:has(> [data-composer-card]):has(> .kj-usage-root)
+  > :not([data-composer-stats], .kj-usage-root) {
+  grid-column: 1/-1;
+}
+:has(> [data-composer-card]):has(> .kj-usage-root) > [data-composer-stats] {
+  grid-column: 1;
+  min-width: 0;
+}
+:has(> [data-composer-card]):has(> .kj-usage-root) > .kj-usage-root {
+  grid-column: 2;
+  justify-self: end;
+  width: auto;
+}

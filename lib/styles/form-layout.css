@@ -1,0 +1,169 @@
+/* Compact row sizing, contextual help, and a filled slider with thumb tooltip. */
+.dsh-kujira-root .kj-setting {
+  min-height: 38px;
+}
+.dsh-kujira-root .kj-field-caption {
+  display: inline-block;
+  width: max-content;
+  max-width: 100%;
+  color: var(--kj-text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.dsh-kujira-root .kj-help {
+  position: absolute;
+  right: 0;
+  top: -3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--kj-muted);
+  cursor: help;
+}
+.dsh-kujira-root .kj-help svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+}
+.dsh-kujira-root .kj-help:hover {
+  color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-help:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 2px;
+}
+.dsh-kujira-root .kj-setting input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+.dsh-kujira-root .kj-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+}
+.dsh-kujira-root .kj-slider-row > .kj-field-caption {
+  flex: none;
+  width: 64px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+.dsh-kujira-root .kj-slider {
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  width: 0;
+  height: 4px;
+  margin: 0;
+  border: 0;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    var(--kj-accent) 0 var(--kj-progress),
+    var(--kj-line-strong) var(--kj-progress) 100%
+  );
+  cursor: pointer;
+}
+.dsh-kujira-root .kj-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--kj-surface);
+  border-radius: 50%;
+  background: var(--kj-accent);
+  box-shadow: 0 0 0 1px var(--kj-line-strong);
+}
+.dsh-kujira-root .kj-slider::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--kj-surface);
+  border-radius: 50%;
+  background: var(--kj-accent);
+  box-shadow: 0 0 0 1px var(--kj-line-strong);
+}
+.dsh-kujira-root .kj-slider:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 5px;
+}
+.dsh-kujira-root .kj-slider-value {
+  flex: none;
+  width: 39px;
+  text-align: right;
+  color: var(--kj-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.dsh-kujira-root .kj-slider-tip {
+  padding: 4px 7px;
+  font-variant-numeric: tabular-nums;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  transform: none;
+  transition: none;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-disclosure[open] .kj-chevron {
+  transform: none;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-chevron svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+  transform-origin: 50% 50%;
+  transition: transform 160ms ease;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-disclosure[open] .kj-chevron svg {
+  transform: rotate(180deg);
+}
+.dsh-kujira-root .kj-refresh-status {
+  height: 17px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsh-kujira-root .kj-head-action[aria-busy="true"] svg {
+  animation: kj-refresh-spin 900ms linear infinite;
+}
+.dsh-kujira-root .kj-head-action:disabled {
+  cursor: wait;
+  color: var(--kj-muted);
+}
+
+@keyframes kj-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (width <= 600px) {
+  .dsh-kujira-root .kj-number {
+    height: 40px;
+  }
+  .dsh-kujira-root .kj-number button,
+  .dsh-kujira-root .kj-number input[type="text"] {
+    height: 38px;
+  }
+  .dsh-kujira-root .kj-slider-row {
+    min-height: 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root .kj-head-action[aria-busy="true"] svg {
+    animation: none;
+  }
+  .dsh-kujira-root .dsh-kujira-panel .kj-chevron svg {
+    transition: none;
+  }
+}

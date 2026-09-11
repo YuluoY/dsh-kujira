@@ -1,0 +1,39 @@
+/* Feature popovers. Neutral surfaces, one accent, one continuous SVG outline.
+   The character and radial menu deliberately keep their own existing skin. */
+.dsh-kujira-root .dsh-kujira-panel[data-panel],
+.dsh-kujira-root .dsh-kujira-bubble,
+.kj-usage-root {
+  --kj-surface: #fcfcfd;
+  --kj-surface-soft: #f1f2f4;
+  --kj-ink: #24262b;
+  --kj-text: #42454d;
+  --kj-muted: #686d77;
+  --kj-quiet: #686d77;
+  --kj-line: #e5e6e9;
+  --kj-line-strong: #d1d4da;
+  --kj-accent: #526b8b;
+  --kj-accent-soft: #eaf0f6;
+  --kj-accent-line: #dbe4ee;
+  --kj-outline-color: #dbdde3;
+  --kj-elevation: 0 12px 24px #141b2620;
+  --kj-tone-mood: var(--kj-accent);
+  --kj-tone-satiety: var(--kj-accent);
+  --kj-tone-energy: var(--kj-accent);
+}
+.dsh-kujira-root[data-theme="dark"] .dsh-kujira-panel[data-panel],
+.dsh-kujira-root[data-theme="dark"] .dsh-kujira-bubble,
+.kj-usage-root[data-theme="dark"] {
+  --kj-surface: #27292e;
+  --kj-surface-soft: #303339;
+  --kj-ink: #f3f4f6;
+  --kj-text: #d5d7dd;
+  --kj-muted: #a3a8b2;
+  --kj-quiet: #a3a8b2;
+  --kj-line: #3b3e45;
+  --kj-line-strong: #4c515a;
+  --kj-accent: #b2c5df;
+  --kj-accent-soft: #333e4c;
+  --kj-accent-line: #424e60;
+  --kj-outline-color: #494c53;
+  --kj-elevation: 0 12px 24px #00000040;
+}

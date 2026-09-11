@@ -1,0 +1,104 @@
+/* Balance: one total and two directly readable sources, no repeated chart. */
+.dsh-kujira-root .kj-balance-account + .kj-balance-account {
+  border-top: 1px solid var(--kj-line);
+  padding-top: 14px;
+  margin-top: 14px;
+}
+.dsh-kujira-root .kj-balance-heading {
+  color: var(--kj-muted);
+  font-size: 11px;
+  line-height: 18px;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-balance-total {
+  margin: 5px 0 12px;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  font-size: 30px;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.dsh-kujira-root .kj-balance-account .kj-account-split {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--kj-line);
+  padding: 12px 0 0;
+  gap: 12px;
+}
+.dsh-kujira-root .kj-balance-account .kj-account-split dt {
+  line-height: 18px;
+}
+.dsh-kujira-root .kj-balance-account .kj-account-split dd {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+:is(.dsh-kujira-root, .kj-usage-root)
+  .kj-skeleton[data-kind="balance"]
+  .kj-skeleton-row {
+  margin: 5px 0 12px;
+}
+:is(.dsh-kujira-root, .kj-usage-root)
+  .kj-skeleton[data-kind="balance"]
+  .kj-skeleton-columns {
+  border-top: 1px solid var(--kj-line);
+  padding-top: 12px;
+  margin: 0;
+}
+.dsh-kujira-root .kj-clock {
+  flex-wrap: wrap;
+}
+.dsh-kujira-root .kj-setting {
+  gap: 12px;
+  align-items: center;
+}
+.dsh-kujira-root .kj-setting > .kj-field-caption {
+  min-width: 0;
+  max-width: 55%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root .kj-slider-row .kj-field-caption {
+  width: 88px;
+  flex: 0 0 88px;
+  white-space: normal;
+  line-height: 1.35;
+}
+.dsh-kujira-root .kj-care-actions .kj-action {
+  flex-wrap: wrap;
+  line-height: 1.3;
+}
+.dsh-kujira-root .kj-select-trigger > span:first-child {
+  white-space: normal;
+  text-align: start;
+  line-height: 1.35;
+}
+.dsh-kujira-root .kj-select-trigger {
+  min-height: 30px;
+  height: auto;
+}
+.dsh-kujira-root .kj-select-list .kj-select-option {
+  white-space: normal;
+  min-height: 34px;
+  height: auto;
+  line-height: 1.4;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-weather-temperature {
+  font-size: 25px;
+  white-space: nowrap;
+}
+.dsh-kujira-root .kj-footer .kj-action {
+  line-height: 1.3;
+  text-align: center;
+  white-space: normal;
+}
+.dsh-kujira-root[lang^="ru"] .kj-body .kj-care-actions .kj-action svg {
+  display: none;
+}
+.dsh-kujira-root .kj-slider-row .kj-label-text {
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root[lang^="ru"] .kj-slider-row .kj-field-caption {
+  width: 116px;
+  flex-basis: 116px;
+}

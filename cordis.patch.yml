@@ -1,0 +1,30 @@
+# ============================================================================
+# dsh-kujira 的 bundle patch —— 把桌宠挂进 DSH 配置树
+# ============================================================================
+#
+# 【这是什么】
+#   一个 DSH 插件的"挂载声明"。DSH 启动时按 bundle 层栈把各插件的 patch
+#   叠起来，最终组成配置树。本文件就是本包这一层的内容。
+#
+# 【工作原理】
+#   - insert：往配置树里加新的插件行（entry）
+#   - id   ：行的唯一标识。注意：必须和已装插件区分开！
+#            你本机现有的 dsh-whale-girl-pet 用的是 id: pet，
+#            所以这里用 kujira，两者才能共存（方便对照调试）。
+#   - name ：模块名。填 'dsh-kujira' 会解析到本包的 main（lib/index.js）。
+#            因为 package.json 声明了 dsh.client，DSH 模块系统同时会把本包
+#            当作浏览器插件，在页面里提供 /plugins/dsh-kujira/client.js。
+#
+# 【config】
+#   这里写的 config 会传给宿主半侧的 apply(ctx, config)。
+#   注意：浏览器半侧目前收不到 patch 里的 config（DSH 客户端配置管线的已知
+#   限制），所以桌宠的外观/行为参数走 assets/pet.config.json，
+#   由宿主半侧通过 HTTP 发给浏览器半侧。见 lib/index.js。
+#
+# ============================================================================
+
+- insert:
+    - id: kujira                   # 行 id（唯一，别和别的插件撞）
+      name: 'dsh-kujira'           # 模块名 → lib/index.js
+      config:
+        size: 260                     # 保留字段：宿主半侧可见，浏览器半侧用 config.json

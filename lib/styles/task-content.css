@@ -1,0 +1,174 @@
+.dsh-kujira-root .kj-task-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 4px;
+}
+.dsh-kujira-root .kj-task-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  box-sizing: border-box;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 5px 8px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--kj-task-radius);
+  background: none;
+  color: var(--kj-accent);
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.6;
+  font-weight: 500;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background var(--kj-task-transition),
+    color var(--kj-task-transition);
+}
+.dsh-kujira-root .kj-task-link-copy {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--kj-task-transition);
+}
+.dsh-kujira-root .kj-task-link-icon {
+  display: flex;
+  flex: none;
+  opacity: 0.7;
+}
+.dsh-kujira-root .kj-task-link-icon svg {
+  width: 11px;
+  height: 11px;
+}
+.dsh-kujira-root .kj-task-link:disabled {
+  color: var(--kj-muted);
+  opacity: 0.55;
+  cursor: wait;
+}
+.dsh-kujira-root .kj-task-file .kj-task-link {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-height: 36px;
+}
+.dsh-kujira-root .kj-task-file .kj-task-link-copy {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 400;
+}
+.dsh-kujira-root .kj-task-progress {
+  margin-top: 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-progress [role="progressbar"] {
+  height: 3px;
+  background: var(--kj-line);
+  margin-top: 8px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dsh-kujira-root .kj-task-progress i {
+  display: block;
+  height: 100%;
+  background: var(--kj-accent);
+  transition: width var(--kj-task-transition);
+}
+.dsh-kujira-root .kj-task-child {
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--kj-line);
+}
+.dsh-kujira-root .kj-task-child:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.dsh-kujira-root .kj-task-child > div:first-child {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+}
+.dsh-kujira-root .kj-task-child strong {
+  font-size: 13px;
+  line-height: 1.55;
+  font-weight: 500;
+  color: var(--kj-ink);
+  min-width: 0;
+}
+.dsh-kujira-root .kj-task-child > div:first-child > svg {
+  color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-task-child p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--kj-text);
+  margin: 6px 0 4px 24px;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dsh-kujira-root .kj-task-child .kj-task-actions {
+  padding-left: 16px;
+}
+.dsh-kujira-root .kj-task-plan {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.dsh-kujira-root .kj-task-plan li {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.dsh-kujira-root .kj-task-plan svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-plan [data-status="completed"] {
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-attention,
+.dsh-kujira-root .kj-task-notice {
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+  margin: 8px 0;
+  color: var(--kj-text);
+}
+.dsh-kujira-root .kj-task-empty {
+  padding: 12px 0;
+  font-size: 13px;
+}
+.dsh-kujira-root .kj-task-empty p,
+.dsh-kujira-root .kj-task-public-update {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--kj-muted);
+  margin: 8px 0;
+  overflow-wrap: break-word;
+}
+.dsh-kujira-root .kj-task-public-update {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

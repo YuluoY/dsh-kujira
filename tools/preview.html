@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dsh-kujira 预览</title>
+<link rel="icon" href="data:,">
+<style>
+    html, body
+    {
+        margin: 0;
+        height: 100%;
+        background: #14141A;
+        color: #E8E8EC;
+        font: 13px/1.7 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        overflow: hidden;
+    }
+
+    #hud
+    {
+        position: fixed;
+        left: 16px;
+        top: 14px;
+        max-width: 330px;
+        z-index: 20;
+    }
+
+    #hud h1
+    {
+        margin: 0 0 5px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    #hud p
+    {
+        margin: 0 0 7px;
+        font-size: 12px;
+        color: #7C7C88;
+        line-height: 1.65;
+    }
+
+    #hud code
+    {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 11px;
+        color: #9FD0FF;
+        background: rgba(80, 140, 220, .12);
+        border-radius: 4px;
+        padding: 1px 5px;
+    }
+
+    #status
+    {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 11px;
+        color: #6FBF9A;
+        white-space: pre-line;
+    }
+
+    #status.err
+    {
+        color: #F09595;
+    }
+
+    /* 状态模拟条 */
+    #sim
+    {
+        position: fixed;
+        left: 16px;
+        bottom: 16px;
+        z-index: 20;
+        max-width: 470px;
+    }
+
+    #sim .lbl
+    {
+        font-size: 11px;
+        color: #6E6E7A;
+        margin-bottom: 6px;
+        font-family: ui-monospace, Menlo, monospace;
+    }
+
+    #sim .row
+    {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    #sim button
+    {
+        border: 1px solid #38383F;
+        background: #22222A;
+        color: #C8C8D4;
+        border-radius: 7px;
+        padding: 4px 11px;
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    #sim button:hover
+    {
+        border-color: #6FA8DC;
+        color: #EAF2FF;
+    }
+
+    #sim button.warn:hover
+    {
+        border-color: #EF9F27;
+        color: #FFD79A;
+    }
+
+    #sim .note
+    {
+        margin-top: 7px;
+        font-size: 11.5px;
+        color: #5E5E6A;
+        line-height: 1.6;
+    }
+
+    #frame
+    {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        border: 1px dashed rgba(120, 160, 220, .16);
+        z-index: 80;
+    }
+
+    /* 窄视口（DSH 侧边预览面板基本都在这个区间）。
+       左下角这排调试按钮会盖住宠物本体，而这页的重点本来就是看宠物 ——
+       所以窄屏下让调试区缩到最小、说明文字直接收起，把舞台让出来。 */
+    @media (max-width: 620px)
+    {
+        #sim
+        {
+            left: 8px;
+            bottom: 8px;
+            max-width: calc(100vw - 16px);
+        }
+
+        #sim .lbl,
+        #sim .note
+        {
+            display: none;
+        }
+
+        #sim .row
+        {
+            gap: 4px;
+        }
+
+        #sim button
+        {
+            padding: 3px 8px;
+            font-size: 11px;
+        }
+
+        header
+        {
+            padding: 10px 12px;
+        }
+
+        header p
+        {
+            font-size: 10.5px;
+        }
+    }
+
+    #sim {top:14px;right:16px;left:auto;bottom:auto;max-width:390px}
+    #preview-composer {position:fixed;left:24px;bottom:58px;width:min(590px,calc(100vw - 48px));height:64px;box-sizing:border-box;border:1px solid #353840;border-radius:12px;padding:14px 16px;background:#202228;color:#9da2ae;font-size:12px;z-index:10}
+    @media(max-width:700px){#hud{display:none}#sim{left:12px;right:12px;max-width:none}#sim .note{display:none}}
+
+    #hud summary {color:#9da2ae;font-size:11px;cursor:pointer;margin-top:6px}
+    #preview-debug[open] {background:#202228;padding:10px;border:1px solid #353840;border-radius:8px}
+    #sim {padding:12px 14px;background:#202228;border:1px solid #353840;border-radius:12px;box-sizing:border-box}
+    #sim button {font-size:11px;padding:5px 9px}
+    #sim .row {gap:5px;margin-top:8px}
+    #usage-mode {font-size:10px;color:#9da2ae}
+</style>
+</head>
+<body>
+
+<div id="frame"></div>
+
+<div id="hud">
+    <h1>鲸鱼娘 · 本地预览</h1>
+    <details id="preview-debug"><summary>运行信息</summary><div id="status">正在加载…</div></details>
+</div>
+
+<div id="sim">
+    <div class="lbl">状态预览</div>
+    <div class="row">
+        <button data-k="thinking">思考</button>
+        <button data-k="working">工作中</button>
+        <button data-k="result">整理</button><button data-k="retry">重试</button>
+        <button data-k="waiting">等你确认</button>
+        <button data-k="ask">模型提问</button>
+        <button data-k="success">完成</button>
+        <button data-k="error">出错</button>
+        <button class="warn" data-k="abort">中断回合</button>
+        <button class="warn" data-k="idle">清空（回空闲）</button>
+        <button data-k="extreme">长内容与多任务</button>
+    </div>
+    <div class="row" aria-label="费用模拟数据"><span>费用示例：</span><button data-usage="offpeak">模拟谷价</button><button data-usage="peak">模拟峰价</button><button data-usage="empty">暂无用量</button><span id="usage-mode">点击切换示例</span></div>
+
+</div>
+
+<div id="preview-composer">输入框位置（仅用于展示下方费用栏）</div>
+<!-- 真 React（DSH 外壳在真实环境里提供的也是这个） -->
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+
+<script>
+/* ============================================================================
+ *  预览宿主（harness）
+ *  ---------------------------------------------------------------------------
+ *  真实 DSH 环境里，外壳会预先注入 window.__ModuleLoader__，并提供
+ *  require('react') 等模块。这里把这两件事补上，让未经改动的 lib/client.js
+ *  原样跑起来 —— 预览里能跑，装进 DSH 里就能跑。
+ *
+ *  唯一被"假"掉的是 ctx.slots（真实规则是 inject + yield register）和
+ *  ctx.on / ctx.credentials（由 tools/preview-server.mjs 提供）。
+ * ========================================================================= */
+
+(function ()
+{
+    const statusEl = document.getElementById('status');
+    const root = document.createElement('div');
+    root.id = 'preview-pet-root';
+    document.body.appendChild(root);
+
+    function setStatus(text, isError)
+    {
+        statusEl.textContent = text;
+        statusEl.className = isError ? 'err' : '';
+    }
+
+    function fakeRequire(name)
+    {
+        if (name === 'react')
+        {
+            return window.React;
+        }
+        if (name === 'react/jsx-runtime')
+        {
+            return {
+                jsx: (type, props) => window.React.createElement(type, props),
+                jsxs: (type, props) => window.React.createElement(type, props),
+                Fragment: window.React.Fragment
+            };
+        }
+        if (name === 'react-dom')
+        {
+            return window.ReactDOM;
+        }
+        throw new Error('preview: 没有 stub 的模块 "' + name + '"');
+    }
+
+    function makeFakeContext()
+    {
+        const mounted = [];
+        return {
+            mounted,
+            ctx: {
+                previewNavigation: async target => {
+                    const dialog=document.createElement('dialog');
+                    dialog.style.cssText='max-width:480px;width:calc(100vw - 64px);background:#27292e;color:#e5e7eb;border:1px solid #4c515a;border-radius:14px;padding:20px;font:13px/1.7 system-ui';
+                    const title=document.createElement('strong');title.textContent='模拟导航 · '+(target.kind==='child'?'子代理会话':target.kind==='file'?target.path:'对应会话步骤');
+                    const content=document.createElement('p');content.style.whiteSpace='pre-wrap';
+                    content.textContent=target.kind==='file'?'文件入口已连接。在 DSH 中会打开当前会话的文件预览。':'会话定位入口已连接。在 DSH 中会打开对应的会话内容。';
+                    if(target.kind==='child') {const response=await fetch('/dsh-kujira/activity?sessionId='+encodeURIComponent(target.id));const value=await response.json();content.textContent=value.activity?.summary || '子代理正在执行回归验证。';}
+                    const close=document.createElement('button');close.textContent='关闭预览';close.onclick=()=>dialog.close();dialog.append(title,content,close);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();return true;
+                },
+                slots: {
+                    inject(slotName, generatorFactory)
+                    {
+                        const step = generatorFactory().next();
+                        mounted.push({ slotName, element: step.value });
+                        const target = document.createElement('div');
+                        root.appendChild(target);
+                        if (slotName === 'conversation.composer.dock')
+                        {
+                            target.style.cssText = 'position:fixed;left:24px;width:min(590px,calc(100vw - 48px));bottom:20px;z-index:20';
+                            target.setAttribute('aria-label', '会话费用栏预览');
+                        }
+                        ReactDOM.createRoot(target).render(step.value);
+                    },
+                    register(meta, Component)
+                    {
+                        return React.createElement(Component, { sessionId: 'preview-session', useProjection: () => undefined });
+                    }
+                }
+            }
+        };
+    }
+
+    window.__ModuleLoader__ = {
+        load(info)
+        {
+            try
+            {
+                const mod = info.factory(fakeRequire);
+                const fake = makeFakeContext();
+                mod.apply(fake.ctx);
+
+                const slots = fake.mounted.map((m) => m.slotName).join(', ') || '(无)';
+
+                fetch('/__preview/info').then((r) => r.json()).then((m) =>
+                {
+                    setStatus(
+                        '插件 id    : ' + info.id + '\n' +
+                        '插件 name  : ' + mod.name + '\n' +
+                        'inject     : ' + JSON.stringify(mod.inject) + '\n' +
+                        '已挂槽位   : ' + slots + '\n' +
+                        'React      : ' + window.React.version + '\n' +
+                        '余额可用   : ' + (m.hasApiKey ? '是（密钥来源 ' + m.apiKeySource + '，只在服务端用）' : '否 — 没找到 DEEPSEEK_API_KEY')
+                    );
+                }).catch(() =>
+                {
+                    setStatus('插件已加载，但读不到 /__preview/info');
+                });
+            }
+            catch (error)
+            {
+                setStatus('加载失败：' + (error && error.message ? error.message : error), true);
+                console.error('[preview]', error);
+            }
+        }
+    };
+
+    window.addEventListener('error', (e) => setStatus('运行时错误：' + e.message, true));
+
+    document.querySelectorAll('[data-usage]').forEach(button=>button.onclick=async()=>{
+        await fetch('/__preview/usage?mode='+button.dataset.usage,{method:'POST'});
+        document.getElementById('usage-mode').textContent='当前：'+button.textContent+'（最多 5 秒更新）';
+    });
+    // 状态模拟按钮
+    document.querySelectorAll('#sim button[data-k]').forEach((btn) =>
+    {
+        btn.onclick = async () =>
+        {
+            const kind = btn.dataset.k;
+            try
+            {
+                const out = await fetch('/__preview/emit', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ kind })
+                }).then((r) => r.json());
+                btn.blur();
+                console.log('[preview] emit', kind, out);
+            }
+            catch (error)
+            {
+                setStatus('模拟事件失败：' + error.message, true);
+            }
+        };
+    });
+})();
+</script>
+
+<!-- 未经改动的真实客户端半侧 -->
+<script src="/client.js"></script>
+
+</body>
+</html>

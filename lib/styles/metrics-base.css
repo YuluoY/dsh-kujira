@@ -1,0 +1,95 @@
+.dsh-kujira-panel .kj-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 0 14px;
+}
+.dsh-kujira-panel .kj-metric {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+.dsh-kujira-panel .kj-metric-label {
+  font-size: 10.5px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-panel .kj-metric-value {
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-panel .kj-metric .bar {
+  margin: 2px 0 0;
+  height: 3px;
+  box-shadow: none;
+}
+.dsh-kujira-panel .kj-caption {
+  font-size: 10.5px;
+  color: var(--kj-quiet);
+  margin: 0 0 9px;
+}
+.dsh-kujira-panel .kj-weather-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--kj-accent-soft);
+  color: var(--kj-accent);
+}
+.dsh-kujira-panel .kj-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 0 10px;
+}
+.dsh-kujira-panel .kj-footer .kj-action {
+  padding: 0;
+  min-height: 28px;
+}
+.dsh-kujira-tip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 240px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #a03b32;
+  background: #fdf0ec;
+  border: 1px solid rgb(176 68 55 / 30%);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 14px 32px rgb(74 58 36 / 26%);
+  pointer-events: none;
+  animation: kj-tip-in 0.24s ease both;
+}
+
+@keyframes kj-tip-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root *,
+  .dsh-kujira-root *::before,
+  .dsh-kujira-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+  .dsh-kujira-video {
+    transition: none;
+  }
+}

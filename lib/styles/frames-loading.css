@@ -1,0 +1,207 @@
+/* Content grows within a shared viewport cap; headers and footers never scroll. */
+.dsh-kujira-root .kj-label-text {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-right: 14px;
+}
+.dsh-kujira-root .dsh-kujira-panel[data-panel] {
+  height: auto;
+  min-height: 0;
+  max-height: min(520px, 78dvh);
+}
+.dsh-kujira-root .dsh-kujira-panel > .kj-head {
+  flex: 0 0 52px;
+  height: 52px;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 8px 16px;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-title {
+  line-height: 18px;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-sub {
+  line-height: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsh-kujira-root .dsh-kujira-panel > .kj-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow: hidden scroll;
+  scrollbar-gutter: stable;
+  overflow-anchor: none;
+  box-sizing: border-box;
+  padding: 12px 20px 10px;
+}
+.dsh-kujira-root .dsh-kujira-panel > .kj-footer {
+  flex: 0 0 52px;
+  height: 52px;
+  min-height: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 16px;
+  border-top: 1px solid var(--kj-line);
+}
+.dsh-kujira-root .dsh-kujira-panel > .kj-footer .kj-action {
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+.dsh-kujira-root .dsh-kujira-panel > .kj-footer .kj-action:hover {
+  background: var(--kj-surface-soft);
+  border-color: var(--kj-line);
+  color: var(--kj-ink);
+}
+.dsh-kujira-root .dsh-kujira-panel > .kj-footer .kj-action:active {
+  background: var(--kj-accent-soft);
+  border-color: var(--kj-accent-line);
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton {
+  padding: 2px 0 10px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-line {
+  display: block;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--kj-line);
+  animation: kj-skeleton-pulse 1.4s ease-in-out infinite;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-columns {
+  display: flex;
+  gap: 18px;
+  margin: 20px 0 12px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-columns > div,
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-columns > .kj-skeleton-line {
+  flex: 1;
+  min-width: 0;
+}
+:is(.dsh-kujira-root, .kj-usage-root)
+  .kj-skeleton-columns
+  .kj-skeleton-line
+  + .kj-skeleton-line {
+  margin-top: 10px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-line.is-value {
+  width: 112px;
+  height: 34px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-line.is-short {
+  width: 36px;
+  height: 12px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-line.is-note {
+  width: 132px;
+  height: 10px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-line.is-label {
+  width: 48px;
+  height: 10px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-line.is-medium {
+  width: 75%;
+  height: 18px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-line.is-control {
+  width: 80px;
+  height: 30px;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton[data-kind="weather"] {
+  min-height: 106px;
+}
+:is(.dsh-kujira-root, .kj-usage-root)
+  .kj-skeleton[data-kind="weather"]
+  .kj-skeleton-columns {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+:is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton[data-kind="settings"] {
+  padding-top: 12px;
+}
+:is(.dsh-kujira-root, .kj-usage-root)
+  .kj-skeleton[data-kind="settings"]
+  .kj-skeleton-row {
+  margin-bottom: 16px;
+}
+
+@keyframes kj-skeleton-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (width <= 600px) {
+  .dsh-kujira-root .dsh-kujira-panel[data-panel] {
+    height: auto;
+    min-height: 0;
+    max-height: min(520px, 78dvh);
+  }
+  .dsh-kujira-root .dsh-kujira-panel > .kj-footer {
+    flex-basis: 56px;
+    height: 56px;
+    padding: 6px 12px;
+  }
+  .dsh-kujira-root .dsh-kujira-panel > .kj-footer .kj-action {
+    min-height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.dsh-kujira-root, .kj-usage-root) .kj-skeleton-line {
+    animation: none;
+  }
+  .dsh-kujira-root .dsh-kujira-panel > .kj-footer .kj-action {
+    transition: none;
+  }
+}
+
+.dsh-kujira-root .kj-head svg,
+.dsh-kujira-root .kj-back svg,
+.dsh-kujira-root .kj-action svg {
+  display: block;
+  flex: none;
+}
+.dsh-kujira-root .kj-head .kj-ico {
+  align-self: center;
+  line-height: 0;
+}
+.dsh-kujira-root .kj-balance-content,
+.dsh-kujira-root .kj-body .kj-skeleton[data-kind="balance"] {
+  min-height: 156px;
+  box-sizing: border-box;
+}
+.dsh-kujira-root [data-panel="growth"] > .kj-body > div {
+  min-height: 314px;
+  box-sizing: border-box;
+}
+
+@media (height <= 300px) {
+  .dsh-kujira-root .dsh-kujira-panel > .kj-head {
+    flex-basis: 40px;
+    height: 40px;
+    padding-block: 4px;
+  }
+  .dsh-kujira-root .dsh-kujira-panel > .kj-footer {
+    flex-basis: 44px;
+    height: 44px;
+    padding-block: 4px;
+  }
+}

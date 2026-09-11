@@ -1,0 +1,240 @@
+/* Shared controls: structural rules consume the existing semantic theme. */
+.dsh-kujira-root .dsh-kujira-bubble {
+  position: fixed;
+  right: auto;
+  bottom: auto;
+  transform: none;
+  min-height: 0;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border-radius: 18px;
+  filter: none;
+  isolation: isolate;
+  animation: kj-feature-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  font-size: 12px;
+  line-height: 1.55;
+  z-index: 1;
+}
+.dsh-kujira-root .kj-select {
+  position: relative;
+  min-width: 0;
+  max-width: 60%;
+  font-size: 11px;
+}
+.dsh-kujira-root .kj-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 9px;
+  border: 1px solid var(--kj-line-strong);
+  border-radius: 7px;
+  background: var(--kj-surface-soft);
+  color: var(--kj-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+.dsh-kujira-root .kj-select-trigger span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root .kj-select-trigger svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  color: var(--kj-muted);
+  transition: transform 150ms ease;
+}
+.dsh-kujira-root .kj-select-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.dsh-kujira-root .kj-select-trigger:hover {
+  border-color: var(--kj-accent);
+  background: var(--kj-accent-soft);
+}
+.dsh-kujira-root .kj-select-trigger[aria-expanded="true"] {
+  border-color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-select-trigger:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 2px;
+}
+.dsh-kujira-root .kj-select-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.dsh-kujira-root .kj-select-trigger[aria-invalid="true"] {
+  border-color: currentcolor;
+}
+.dsh-kujira-root .kj-select-list {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 4px;
+  box-sizing: border-box;
+  border: 1px solid var(--kj-line-strong);
+  border-radius: 9px;
+  background: var(--kj-surface);
+  color: var(--kj-text);
+  box-shadow: 0 8px 24px #00000028;
+  font:
+    11px/1.5 -apple-system,
+    "PingFang SC",
+    sans-serif;
+  overflow: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+  animation: kj-list-in 130ms ease-out;
+}
+.dsh-kujira-root .kj-select-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 34px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 7px 9px;
+  cursor: pointer;
+}
+.dsh-kujira-root .kj-select-option[data-active="1"] {
+  background: var(--kj-accent-soft);
+  color: var(--kj-ink);
+}
+.dsh-kujira-root .kj-select-option[aria-selected="true"] {
+  color: var(--kj-accent);
+  font-weight: 600;
+}
+.dsh-kujira-root .kj-select-option svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+.dsh-kujira-root .kj-tooltip,
+.kj-usage-root .kj-tooltip {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 5px 9px;
+  box-sizing: border-box;
+  max-width: min(240px, calc(100vw - 16px));
+  border: 1px solid var(--kj-line-strong);
+  border-radius: 6px;
+  background: var(--kj-surface);
+  color: var(--kj-text);
+  box-shadow: 0 4px 12px #00000020;
+  font:
+    11px/1.5 -apple-system,
+    "PingFang SC",
+    sans-serif;
+  pointer-events: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root .kj-select:has(.kj-select-list:popover-open) {
+  z-index: 1;
+}
+.dsh-kujira-root .kj-city-form + .kj-action {
+  margin-top: 8px;
+}
+
+@keyframes kj-list-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (width <= 600px) {
+  .dsh-kujira-root .kj-select-trigger {
+    min-height: 40px;
+  }
+  .dsh-kujira-root .kj-select-option {
+    min-height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root .dsh-kujira-bubble,
+  .dsh-kujira-root .kj-select-list {
+    animation: none;
+  }
+  .dsh-kujira-root .kj-select-trigger,
+  .dsh-kujira-root .kj-select-trigger svg {
+    transition: none;
+  }
+}
+.dsh-kujira-root .kj-number {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--kj-line-strong);
+  border-radius: 7px;
+  background: var(--kj-surface-soft);
+  max-width: 120px;
+  height: 30px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.dsh-kujira-root .kj-number button {
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--kj-text);
+  cursor: pointer;
+}
+.dsh-kujira-root .kj-number button svg {
+  width: 12px;
+  height: 12px;
+}
+.dsh-kujira-root .kj-number button:hover {
+  background: var(--kj-accent-soft);
+}
+.dsh-kujira-root .kj-number button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.dsh-kujira-root .kj-number input[type="text"] {
+  appearance: textfield;
+  box-sizing: border-box;
+  height: 28px;
+  min-height: 0;
+  width: 44px;
+  min-width: 0;
+  max-width: 44px;
+  text-align: center;
+  background: transparent;
+  color: var(--kj-text);
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.dsh-kujira-root .kj-number:focus-within {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 2px;
+}
+.dsh-kujira-root .kj-number :focus-visible {
+  outline: none;
+}

@@ -1,0 +1,264 @@
+{
+  "_readme": [
+    "=== dsh-kujira 行为配置 ===",
+    "改完存盘 → 浏览器刷新即生效（宿主实时读盘，不缓存）。不用重装、不用重启 dsh。",
+    "",
+    "【外观】",
+    "  size        宠物显示边长（px，80-600）。素材原生 360×360，超过 360 就是放大，会发虚。",
+    "  corner      默认停靠角落：bottom-right / bottom-left。拖拽过之后以拖拽位置为准。",
+    "  offset      角落定位偏移 {x, y}（px）。",
+    "  facing      朝向：left / right。只做 CSS 水平镜像，不换素材。",
+    "  startAnim   启动先播哪一段。",
+    "",
+    "【空闲动画链】",
+    "  gapMs       两段动画之间的随机停顿区间 [最小, 最大]（毫秒）。",
+    "  weights     下一个动作从哪个池抽：idle / action / long，权重和应为 1。",
+    "  pools       动作池。名字必须与 assets/anim/<名字>.webm 完全一致（含空格和全角括号）。",
+    "              idle 安静待机 · action 小动作 · long 少见搞怪",
+    "              click 左键点击时随机播 · sleep 睡着三连 · tool 天气/余额按钮动作",
+    "              work 状态联动用（见下面 state.map）",
+    "  dragAnim    开始拖拽时播的那一段。",
+    "",
+    "【状态联动 state】",
+    "  enabled     总开关。",
+    "  pollMs      轮询 /state 的间隔（毫秒，500-30000）。",
+    "  ttl         每个档位的存活期（毫秒）。0 = 不过期。超时自动回空闲。",
+    "              参考 Codex 官方值：工作中 3min / 出错 1h / 等你确认 24h。",
+    "  map         档位 → { anim 候选数组, label 标签文案, enterMs 进入动作时长 }",
+    "              候选数组 = 每次进入该档位时随机抽一个，避免总播同一段。",
+    "  enter       档位 → 进入时先播的那一段（比如开始工作）。播完自动切到循环动作。",
+    "",
+    "【界面 ui】",
+    "  buttons     总开关。关掉之后主按钮和四枚功能按钮都不出现。",
+    "  bubble      是否用气泡说话。",
+    "  showLabel   是否在脚下显示当前播放的动画名（调试用）。",
+    "  buttonSide  功能区在宠物的哪一侧：left / right。",
+    "  arc         —— 圆弧扩散（主按钮点开后，功能按钮沿弧线向外散开）——",
+    "    radius      弧半径（px）。0 = 自动：按宠物大小算，夹在 128~280 之间。",
+    "                宠物越大扇面越开；但也不能太大，否则小屏上会顶出视口。",
+    "    spanDeg     弧的总跨度（度）。4 个按钮扫 66° 时相邻约 22°，间距刚好；",
+    "                扫过 90° 就开始显松散。上限建议 100。",
+    "    centerDeg   弧的中心角。null = 自动：按宠物当前位置挑一个最不容易出界的朝向，",
+    "                候选优先度 左上 > 正上 > 右上 > 正下 > 正左，同分时取靠前的。",
+    "                角度用数学约定：0=右、90=上、180=左。所以左上=135、右上=45。",
+    "    staggerMs   展开时相邻两枚的出场间隔（ms）。太大会显得拖沓，建议 20~60。",
+    "    enterMs     单枚按钮的展开时长（ms）。",
+    "    fadeMs      展开时的淡入时长，通常比 enterMs 短 —— 元素起步就该可见，",
+    "                而不是等位移快到位了才浮现。",
+    "    exitMs      收起时长。比 enterMs 短：退场要利落，恋恋不舍会让人觉得卡。",
+    "    outStaggerMs 收起时的间隔。收起走的是**反向**顺序（最后出现的先走），",
+    "                两个方向同序会显得很机械。",
+    "    labels      是否在按钮外侧显示文字标签。图标单看容易认错方向，建议开着。",
+    "    hintOnce    首次使用时轻抖一下主按钮提示入口位置，只提示一次。",
+    "  buttons     是否显示右侧按钮组（天气 / 余额 / 养成 / 投喂）。",
+    "  bubble      是否用气泡说话。",
+    "  showLabel   是否在脚下显示当前播放的动画名（调试用）。",
+    "  buttonSide  按钮组在宠物的哪一侧：left / right。",
+    "",
+    "【养成 growth】",
+    "  enabled     总开关。数值存在浏览器 localStorage。",
+    "  rates       每小时衰减/回复速率。satiety 100/8 表示 8 小时见底。",
+    "  levels      好感度等级阈值（从 Lv1 起）。",
+    "",
+    "【主动关怀 care】",
+    "  greetBack   离开再回来时打招呼。",
+    "  longSit     久坐提醒（累计工作时长超过 longSitMs 提醒一次）。",
+    "  backAfterMs 离开多久才算「回来」（毫秒）。",
+    "  minGapMs    两条关怀之间的最小间隔（毫秒）—— 防止从陪伴变成骚扰。",
+    "",
+    "【debug】",
+    "  showLabel   同 ui.showLabel，放这里是为了单独调试时好找。"
+  ],
+  "size": 260,
+  "corner": "bottom-right",
+  "offset": {
+    "x": 24,
+    "y": 0
+  },
+  "facing": "left",
+  "startAnim": "待机呼吸休闲",
+  "gapMs": [
+    1200,
+    3600
+  ],
+  "weights": {
+    "idle": 0.5,
+    "action": 0.4,
+    "long": 0.1
+  },
+  "pools": {
+    "idle": [
+      "待机呼吸休闲",
+      "东张西望",
+      "悠闲哼歌",
+      "原地小憩沉眠",
+      "睡眼惺忪",
+      "空白举牌"
+    ],
+    "action": [
+      "超大伸懒腰",
+      "哈欠连天",
+      "喝奶茶",
+      "原地专心玩魔方",
+      "原地敲击桌面互动",
+      "原地重力下蹲压缩",
+      "原地蹲下玩玩具汽车",
+      "鲸鱼吐泡泡特效",
+      "女仆屈膝礼仪",
+      "被吓一跳（炸毛）",
+      "原地跳跃抓碎头顶物品",
+      "小幅度原地 360 度旋转展示",
+      "偷吃零食被抓住",
+      "打喷嚏",
+      "用鲸鱼尾巴拍打地面",
+      "打瞌睡被惊醒",
+      "偷吃Token",
+      "举牌不是大肥鱼",
+      "原地漂浮踏步",
+      "迷糊犯困"
+    ],
+    "long": [
+      "玩游戏气急败坏",
+      "闲得无聊打游戏",
+      "女仆扫除",
+      "螃蟹走路",
+      "吃盒饭"
+    ],
+    "click": [
+      "点击回应 - 开心跃动",
+      "点击回应 - 害羞惊讶",
+      "点击回应 - 傲娇生气（侧身展示）"
+    ],
+    "tool": [
+      "看天气",
+      "翻钱包",
+      "吃小鱼干"
+    ],
+    "sleep": [
+      "睡觉第一段",
+      "睡觉第二段",
+      "睡觉第三段"
+    ],
+    "workBreak": [
+      "工作摸鱼",
+      "摸鱼被抓",
+      "认真工作"
+    ]
+  },
+  "dragAnim": "被鼠标拖拽悬空反馈",
+  "debug": {
+    "showLabel": false
+  },
+  "state": {
+    "enabled": true,
+    "pollMs": 1500,
+    "ttl": {
+      "thinking": 180000,
+      "working": 180000,
+      "result": 180000,
+      "success": 10000,
+      "error": 3600000,
+      "waiting": 86400000,
+      "idle": 0
+    },
+    "map": {
+      "thinking": {
+        "anim": [
+          "工作思考"
+        ],
+        "label": "思考中",
+        "enterMs": 10000
+      },
+      "working": {
+        "anim": [
+          "认真工作"
+        ],
+        "label": "工作中",
+        "enterMs": 10000
+      },
+      "result": {
+        "anim": [
+          "工作思考"
+        ],
+        "label": "整理中",
+        "enterMs": 10000
+      },
+      "waiting": {
+        "anim": [
+          "工作被打扰",
+          "看表叹气"
+        ],
+        "label": "等你确认",
+        "enterMs": 10000
+      },
+      "success": {
+        "anim": [
+          "工作结束"
+        ],
+        "label": "完成",
+        "enterMs": 10000
+      },
+      "error": {
+        "anim": [
+          "长时间工作看表"
+        ],
+        "label": "出错了",
+        "enterMs": 10000
+      }
+    },
+    "enter": {
+      "thinking": [
+        "开始工作"
+      ],
+      "working": [
+        "开始工作"
+      ],
+      "success": [
+        "工作结束"
+      ]
+    }
+  },
+  "ui": {
+    "buttons": true,
+    "bubble": true,
+    "showLabel": false,
+    "buttonSide": "left",
+    "arc": {
+      "radius": 0,
+      "spanDeg": 66,
+      "centerDeg": null,
+      "staggerMs": 32,
+      "enterMs": 285,
+      "fadeMs": 155,
+      "exitMs": 190,
+      "outStaggerMs": 24,
+      "labels": true,
+      "hintOnce": true
+    }
+  },
+  "growth": {
+    "enabled": true,
+    "rates": {
+      "satietyPerHour": 12.5,
+      "moodPerHour": 16.67,
+      "energyWorkPerHour": 25,
+      "energyIdlePerHour": 8
+    },
+    "levels": [
+      0,
+      60,
+      200,
+      500,
+      1100,
+      2200,
+      4000
+    ]
+  },
+  "care": {
+    "greetBack": true,
+    "longSit": true,
+    "longSitMs": 1500000,
+    "minGapMs": 900000,
+    "backAfterMs": 180000
+  }
+}

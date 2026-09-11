@@ -1,0 +1,313 @@
+@media (hover: hover) {
+  .dsh-kujira-root .kj-task-panel .kj-disclosure > summary:hover,
+  .dsh-kujira-root .kj-task-operation-head:hover,
+  .dsh-kujira-root .kj-task-link:not(:disabled):hover {
+    background: var(--kj-task-hover);
+    color: var(--kj-ink);
+  }
+  .dsh-kujira-root .kj-task-link:not(:disabled):hover .kj-task-link-copy {
+    text-decoration-color: currentcolor;
+  }
+  .dsh-kujira-root .kj-task-link:not(:disabled):hover .kj-task-link-icon {
+    opacity: 1;
+  }
+}
+.dsh-kujira-root .kj-task-panel .kj-disclosure > summary:active,
+.dsh-kujira-root .kj-task-operation-head:active,
+.dsh-kujira-root .kj-task-link:not(:disabled):active {
+  background: var(--kj-task-pressed);
+}
+.dsh-kujira-root .kj-task-panel button:focus-visible,
+.dsh-kujira-root .kj-task-panel summary:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 2px;
+  background: var(--kj-task-hover);
+}
+.dsh-kujira-root .kj-task-bubble[data-stage="waiting"] .kj-task-symbol,
+.dsh-kujira-root .kj-task-overview[data-stage="waiting"] .kj-task-phase {
+  color: #94601f;
+}
+.dsh-kujira-root[data-theme="dark"]
+  .kj-task-bubble[data-stage="waiting"]
+  .kj-task-symbol,
+.dsh-kujira-root[data-theme="dark"]
+  .kj-task-overview[data-stage="waiting"]
+  .kj-task-phase {
+  color: #e2bc82;
+}
+.dsh-kujira-root .kj-task-bubble[data-stage="done"] .kj-task-symbol,
+.dsh-kujira-root .kj-task-overview[data-stage="done"] .kj-task-phase,
+.dsh-kujira-root .kj-task-child[data-stage="done"] > div:first-child > svg {
+  color: var(--kj-task-success);
+}
+.dsh-kujira-root .kj-task-bubble[data-stage="error"] .kj-task-symbol,
+.dsh-kujira-root .kj-task-overview[data-stage="error"] .kj-task-phase,
+.dsh-kujira-root .kj-task-child[data-stage="error"] > div:first-child > svg,
+.dsh-kujira-root
+  .kj-task-operation[data-status="error"]
+  .kj-task-operation-head
+  > svg {
+  color: var(--kj-task-error);
+}
+.kj-task-located {
+  outline: 2px solid #789ab6;
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+.dsh-kujira-root .kj-duration {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--kj-muted);
+  flex: none;
+}
+
+@media (width <= 600px) {
+  .dsh-kujira-root .kj-task-panel .kj-disclosure > summary,
+  .dsh-kujira-root .kj-task-link,
+  .dsh-kujira-root .kj-task-file .kj-task-link {
+    min-height: 44px;
+  }
+  .dsh-kujira-root .kj-task-operation-head strong,
+  .dsh-kujira-root .kj-task-child strong,
+  .dsh-kujira-root .kj-task-child p,
+  .dsh-kujira-root .kj-task-result p,
+  .dsh-kujira-root .kj-task-plan li {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root .kj-task-panel * {
+    transition: none !important;
+  }
+}
+.dsh-kujira-root[data-motion="reduced"] .kj-task-panel * {
+  transition: none !important;
+}
+
+/* A shared 12 px outer gutter and 8 px inner hit-area gutter. */
+.dsh-kujira-root .kj-task-current {
+  margin-inline: -8px;
+}
+.dsh-kujira-root .kj-task-current > .kj-task-section-label {
+  margin: 12px 8px 4px;
+  font-size: 11px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-phase .kj-field-caption {
+  color: inherit;
+  font-size: 11px;
+}
+.dsh-kujira-root .kj-task-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dsh-kujira-root .kj-task-progress-heading .kj-field-caption {
+  font-size: 11px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-panel .kj-label-text {
+  padding-right: 17px;
+}
+.dsh-kujira-root .kj-task-panel .kj-help {
+  top: -3px;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  min-height: 0;
+}
+.dsh-kujira-root .kj-task-panel .kj-help-copy {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsh-kujira-root .kj-task-child .kj-field-caption {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kj-ink);
+  min-width: 0;
+  max-width: 100%;
+}
+.dsh-kujira-root .kj-task-child .kj-label-text {
+  display: block;
+  max-width: 100%;
+}
+.dsh-kujira-root .kj-task-child .kj-help-copy {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.dsh-kujira-root .kj-task-operation-detail > .kj-field-caption {
+  margin-bottom: 8px;
+  color: var(--kj-muted);
+  font-size: 11px;
+}
+.dsh-kujira-root .kj-task-panel .kj-help:focus-visible {
+  outline-offset: 2px;
+}
+.dsh-kujira-root .kj-task-plan {
+  padding-inline: 8px;
+}
+.dsh-kujira-root .kj-task-result,
+.dsh-kujira-root .kj-task-empty {
+  padding-inline: 8px;
+}
+.dsh-kujira-root .kj-task-result p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.dsh-kujira-root .kj-task-panel:lang(ko) h3,
+.dsh-kujira-root .kj-task-panel:lang(ko) .kj-task-result p,
+.dsh-kujira-root .kj-task-panel:lang(ko) .kj-task-plan li {
+  word-break: keep-all;
+}
+.dsh-kujira-root .kj-task-operation-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.dsh-kujira-root .kj-task-operation-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 7px;
+  min-width: 0;
+}
+.dsh-kujira-root .kj-task-tool {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--kj-muted);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root .kj-task-path {
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--kj-muted);
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root .kj-task-detail-meta {
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-detail-meta .kj-field-caption {
+  font-size: 11px;
+  color: inherit;
+}
+.dsh-kujira-root .kj-task-result-preview {
+  padding: 0;
+  margin: 0 0 8px;
+}
+.dsh-kujira-root .kj-task-result-preview p {
+  font-size: 13px;
+  line-height: 1.75;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root .kj-task-result-preview > .kj-task-link,
+.dsh-kujira-root .kj-task-result > .kj-task-link {
+  margin-inline-start: -8px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-caption {
+  font-size: 11px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-child-heading > .kj-status-icon {
+  margin-top: 2px;
+}
+.dsh-kujira-root
+  .kj-task-operation[data-status="done"]
+  .kj-task-operation-head
+  > .kj-status-icon {
+  color: var(--kj-task-success);
+}
+.dsh-kujira-root .kj-task-panel .kj-task-plan li {
+  font-size: 13px;
+}
+.dsh-kujira-root .kj-status-icon[data-active="true"] {
+  animation: kj-task-live 2s ease-in-out infinite;
+}
+
+@keyframes kj-task-live {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root .kj-status-icon[data-active="true"] {
+    animation: none;
+  }
+}
+.dsh-kujira-root[data-focus="1"] .kj-status-icon[data-active="true"] {
+  animation: none;
+}
+
+.dsh-kujira-root .kj-task-operation-detail .kj-task-actions {
+  margin-inline-start: -8px;
+}
+
+.dsh-kujira-root .kj-task-phase > .kj-status-icon,
+.dsh-kujira-root .kj-task-operation-head > .kj-status-icon {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.dsh-kujira-root .kj-task-phase > span,
+.dsh-kujira-root .kj-task-operation-title strong {
+  line-height: 20px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root .kj-task-operation-head {
+  align-items: center;
+}
+.dsh-kujira-root .kj-task-tool-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-task-goal {
+  padding: 4px 8px 8px;
+}
+.dsh-kujira-root .kj-task-goal p {
+  margin: 0 0 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.dsh-kujira-root .kj-task-goal > .kj-task-link {
+  margin-inline-start: -8px;
+}
+.dsh-kujira-root .kj-task-more {
+  margin: 4px 8px;
+}
+.dsh-kujira-root .kj-task-path,
+.dsh-kujira-root .kj-task-child .kj-help-copy {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-result p {
+  max-height: none;
+}

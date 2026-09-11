@@ -1,0 +1,82 @@
+.dsh-kujira-root .dsh-kujira-panel,
+.dsh-kujira-root[data-btns="right"] .dsh-kujira-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 18px;
+  filter: none;
+  isolation: isolate;
+  font-size: 12px;
+  line-height: 1.55;
+  max-height: min(520px, calc(100dvh - 24px));
+  animation: kj-feature-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: right var(--kj-anchor-y, 75%);
+}
+.dsh-kujira-root[data-btns="right"] .dsh-kujira-panel {
+  transform-origin: left var(--kj-anchor-y, 75%);
+}
+.dsh-kujira-root .kj-shell {
+  position: absolute;
+  left: -12px;
+  top: -1px;
+  width: calc(100% + 24px);
+  height: calc(100% + 2px);
+  overflow: visible;
+  z-index: -1;
+  pointer-events: none;
+  filter: drop-shadow(var(--kj-elevation));
+}
+.dsh-kujira-root .kj-outline {
+  fill: var(--kj-surface);
+  stroke: var(--kj-outline-color);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-head {
+  gap: 8px;
+  padding: 14px 16px 0;
+  min-height: 28px;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-ico {
+  width: 16px;
+  height: 20px;
+  color: var(--kj-muted);
+  background: none;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-ico svg {
+  width: 16px;
+  height: 16px;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-titles {
+  flex: 1;
+  gap: 1px;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--kj-text);
+  letter-spacing: 0;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-sub {
+  font-size: 10px;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-head-action,
+.dsh-kujira-root .dsh-kujira-panel .kj-back {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  color: var(--kj-muted);
+  margin-left: 0;
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-head-action:hover,
+.dsh-kujira-root .dsh-kujira-panel .kj-back:hover {
+  background: var(--kj-surface-soft);
+  color: var(--kj-ink);
+}
+.dsh-kujira-root .dsh-kujira-panel .kj-body {
+  padding: 16px 20px 14px;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--kj-line-strong) transparent;
+}
