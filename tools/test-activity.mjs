@@ -61,7 +61,7 @@ test('switching sessions rejects late responses and clears old progress',async t
  const {createActivityRuntime}=await import('../lib/shared/activity-ui.js');
  const previousDocument=globalThis.document;globalThis.document={hidden:false};
  const pending=[];t.mock.method(globalThis,'fetch',async url=>new Promise(resolve=>pending.push({url,resolve})));
- let cleanup;const React={createElement:()=>null,useEffect:fn=>{cleanup=fn();},useState:()=>[null,()=>{}],useRef:()=>({current:null})};
+ let cleanup;const React={Component:class {},createElement:()=>null,useEffect:fn=>{cleanup=fn();},useState:()=>[null,()=>{}],useRef:()=>({current:null})};
  const runtime=createActivityRuntime(React);
  try {
   runtime.Bridge({sessionId:'old'});const cleanupOld=cleanup;

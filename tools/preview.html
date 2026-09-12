@@ -279,10 +279,7 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
     function makeFakeContext()
     {
         const mounted = [];
-        return {
-            mounted,
-            ctx: {
-                previewNavigation: async target => {
+        const previewNavigation = async target => {
                     const dialog=document.createElement('dialog');
                     dialog.style.cssText='max-width:480px;width:calc(100vw - 64px);background:#27292e;color:#e5e7eb;border:1px solid #4c515a;border-radius:14px;padding:20px;font:13px/1.7 system-ui';
                     const title=document.createElement('strong');title.textContent='模拟导航 · '+(target.kind==='child'?'子代理会话':target.kind==='file'?target.path:'对应会话步骤');
@@ -290,7 +287,15 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
                     content.textContent=target.kind==='file'?'文件入口已连接。在 DSH 中会打开当前会话的文件预览。':'会话定位入口已连接。在 DSH 中会打开对应的会话内容。';
                     if(target.kind==='child') {const response=await fetch('/dsh-kujira/activity?sessionId='+encodeURIComponent(target.id));const value=await response.json();content.textContent=value.activity?.summary || '子代理正在执行回归验证。';}
                     const close=document.createElement('button');close.textContent='关闭预览';close.onclick=()=>dialog.close();dialog.append(title,content,close);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();return true;
-                },
+                };
+        const services = {
+            sessions: { openSubagent: value => previewNavigation({kind:'child',id:value.childSessionId}) },
+            sidebarRight: { openResource: address => previewNavigation({kind:'file',path:decodeURIComponent(address.split('/').slice(5).join('/'))}) }
+        };
+        return {
+            mounted,
+            ctx: {
+                get: name => services[name],
                 slots: {
                     inject(slotName, generatorFactory)
                     {

@@ -15,6 +15,7 @@ import { configure, translate } from "../lib/shared/i18n.js";
 import { messages } from "../lib/shared/messages.js";
 
 const React = {
+  Component: class { constructor(props) { this.props=props; } setState(update) { this.state={...this.state,...update}; } },
   createElement: (type, props, ...children) => ({
     type,
     props: props || {},
@@ -372,12 +373,47 @@ test('task overview excludes cancelled plan items and prioritizes children needi
 });
 test('task navigation only exposes supported file and child destinations and guards session changes',async()=>{
  const {createNavigation}=await import('../lib/shared/client/navigation.js');let selected='parent';const calls=[];
- const ctx={sessions:{openSubagent:async value=>calls.push(['child',value])},sidebarRight:{openResource:async value=>calls.push(['file',value])}};
+ const services={sessions:{openSubagent:async value=>calls.push(['child',value])},sidebarRight:{openResource:async value=>calls.push(['file',value])}};
+ const ctx=new Proxy({get:name=>services[name]},{get(target,key){if(key in target)return target[key];throw new Error(`cannot get property "${key}" without inject`);}});
  const go=createNavigation({ctx,taskRuntime:{snapshot:()=>({sessionId:selected})}}).navigateTask;
  assert.equal(go.canOpen({kind:'turn',turn:1}),false);assert.equal(go.canOpen({kind:'child',id:'c',mode:'unknown'}),false);
  assert.equal(await go({kind:'file',path:'src/a b.ts',sessionId:'parent'}),true);assert.equal(calls[0][1],'dsh-resource://file/session/parent/src/a%20b.ts');
  assert.equal(await go({kind:'child',id:'c',mode:'one-shot',parentId:'parent',sessionId:'parent'}),true);assert.equal(calls[1][1].childSessionId,'c');
  selected='other';assert.equal(await go({kind:'file',path:'a',sessionId:'parent'}),false);
- const missing=createNavigation({ctx:{},taskRuntime:{snapshot:()=>({sessionId:selected})}}).navigateTask;
+ const missing=createNavigation({ctx:new Proxy({get:()=>undefined},{get(target,key){if(key in target)return target[key];throw new Error(`undeclared service ${key}`);}}),taskRuntime:{snapshot:()=>({sessionId:selected})}}).navigateTask;
  assert.equal(missing.canOpen({kind:'file',path:'a'}),false);
+});
+
+test('completed run_code results render with the strict host service context', async () => {
+  const { createNavigation } = await import('../lib/shared/client/navigation.js');
+  const { createMarkdown } = await import('../lib/shared/task/markdown.js');
+  const reads = [];
+  const ctx = new Proxy({get(name) { reads.push(name); return undefined; }}, {
+    get(target, key) { if (key in target) return target[key]; throw new Error(`cannot get property "${key}" without inject`); },
+  });
+  const navigate = createNavigation({ctx,taskRuntime:{snapshot:()=>({sessionId:'parent'})}}).navigateTask;
+  const Markdown = createMarkdown(React);
+  const rows = createTaskRows({React,icon:()=>null,detail:'code-1',setDetail:()=>{},busy:false,
+    canOpen:navigate.canOpen,open:navigate,sessionId:'parent',
+    markdown:text=>Markdown({text,onOpenFile:navigate.canOpen({kind:'file',path:'.'})?()=>{}:undefined}),
+  });
+  const nodes = walk(rows.operation({id:'code-1',name:'run_code',stage:'working',status:'done',result:'## Done\n\n```json\n{"ok":true}\n```\n\n[file](src/a.js)'}));
+  assert(nodes.some(node=>node.type==='pre'));
+  assert(nodes.some(node=>node.props.className==='kj-markdown'));
+  assert(!nodes.some(node=>node.props.className==='kj-md-file'));
+  assert.deepEqual(reads,['sidebarRight']);
+});
+
+test('task detail boundary retains a recoverable panel and supports retry and close', async () => {
+  const {createTaskBoundary}=await import('../lib/shared/task/panel.js');
+  const Boundary=createTaskBoundary(React);let closed=0;
+  const view=new Boundary({children:'healthy',onClose:()=>closed++,shell:'shell'});
+  assert.equal(view.render(),'healthy');
+  view.state=Boundary.getDerivedStateFromError(new Error('render failed'));
+  const nodes=walk(view.render());
+  assert(nodes.some(node=>node.props.role==='dialog'));
+  nodes.find(node=>node.type==='button' && node.props.autoFocus).props.onClick();
+  assert.equal(view.render(),'healthy');
+  nodes.find(node=>node.type==='button' && !node.props.autoFocus).props.onClick();
+  assert.equal(closed,1);
 });
