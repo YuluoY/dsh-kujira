@@ -28,6 +28,16 @@ export function activityPreview(mode='working', now=Date.now()) {
     if(mode==='abort')add('turn/end',{reason:{kind:'aborted'}},120000);
     if(mode==='retry')add('llm/retry-started',{},115000);
     if(mode==='success'){add('assistant/message',{message:{content:text('### 会话费用\n\n已完成 **费用面板** 优化。\n\n- 底栏只保留峰谷标记与当前会话金额。\n- 悬浮只显示下次切换时间。\n- 保留原币种，人民币显示 ¥，美元显示 $。\n\n验证：8 项国际化测试通过；峰谷合计校验通过。\n\n\n| 检查项 | 结果 |\n| --- | --- |\n| 国际化 | 通过 |\n| 峰谷合计 | 通过 |\n\n```bash\nnpm test\n```\n\n修改文件：[usage-ui.js](lib/shared/usage-ui.js)。')}},118000);add('turn/end',{reason:{kind:'completed'}},120000);}
+    if(mode==='cross-turn') {
+        result('test-1','Earlier check passed.',95000);
+        add('turn/end',{reason:{kind:'completed'}},100000);
+        add('turn/start',{turn:2},121000);
+        add('tool/call',{turn:2,callId:'ptc-outer',name:'run_code',arguments:'{}'},122000);
+        const dispatch={rootCallId:'ptc-outer',parentCallId:'ptc-outer',subCallId:'ptc-write',name:'edit',arguments:{file_path:'lib/shared/usage-ui.js'}};
+        add('tool/ptc-dispatch-start',{...dispatch,turn:2},123000);
+        add('tool/ptc-dispatch',{...dispatch,turn:2,isError:false,content:text('### Updated\n\nThe file was updated successfully.')},124000);
+        add('tool/ptc-dispatch-start',{turn:2,rootCallId:'ptc-outer',parentCallId:'ptc-outer',subCallId:'ptc-test',name:'bash',arguments:{command:'npm test'}},125000);
+    }
     if(mode==='extreme') {
         add('user/message',{source:{kind:'human'},content:text('检查跨语言、超长文本和大量子任务。\n'+('长任务目标 LongTask목표ДлиннаяЗадача🐳 ').repeat(80))},121000);
         add('todo/write',{todos:Array.from({length:50},(_,i)=>({content:'任务 '+(i+1)+' · '+('LongUnbrokenText_长内容_다국어_Подробности_').repeat(10),status:i<12?'completed':'pending'}))},122000);

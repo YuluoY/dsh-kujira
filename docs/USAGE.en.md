@@ -49,3 +49,7 @@ Set “Cost decimal places” under Settings → Usage & privacy. Choose 0–6 p
 The task overview stays visible above Team, Plan, Files and Activity tabs. Empty categories are omitted. Each category keeps its scroll position and expanded list length; arrow keys and Home/End switch tabs. Results remain available inside the panel.
 
 The default plugin makes no extra model calls, but it uses local resources. See [performance and measurement notes](PERFORMANCE.md).
+
+Task categories have explicit scopes: Team includes children still running or awaiting input across turns, plus children started or finished during this turn. Plan retains this session's latest `todo/write`; a new list, including an empty list, replaces it. Earlier plans are labeled “Latest plan”. Files keeps the 20 most recently verified changed files in the session; Activity shows this turn's tool operations. Inherited events from another session are excluded.
+
+PTC activity reads `tool/ptc-dispatch-start` and `tool/ptc-dispatch`, showing operations inside `run_code` while preserving outer errors. File changes require successful `write`, `edit`, `write_file`, `edit_file`, or a mutating `str_replace_editor` operation. Reads, failures, unknown tools and Bash output do not establish file changes. Empty categories stay hidden.

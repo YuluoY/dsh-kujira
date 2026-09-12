@@ -78,3 +78,60 @@ test('long tool results remain bounded and are explicitly marked as excerpts',()
  const output='x'.repeat(7000),event=result('a');event.data.message.content[0].content[0].text=output;
  const a=sessionActivity([e('turn/start'),call('a'),event]);assert.equal(a.current.result.length,6000);assert.equal(a.current.truncated,true);
 });
+
+const ptc=(id,name,args={},extra={})=>({parentCallId:'outer',rootCallId:'outer',subCallId:id,name,arguments:args,...extra});
+const ptcStart=(id,name,args={})=>e('tool/ptc-dispatch-start',ptc(id,name,args),120);
+const ptcEnd=(id,name,args={},isError=false)=>e('tool/ptc-dispatch',ptc(id,name,args,{isError,content:[{type:'text',text:isError?'Failed':'Written'}]}),150);
+test('plans and verified files survive turns; explicit plan replacement and clearing win',()=>{
+ const history=[e('turn/start',{turn:1}),e('user/message',{content:[{type:'text',text:'User task'}]}),e('todo/write',{todos:[{content:'Carry me',status:'pending'}]}),call('edit','write',{path:'a.js'}),result('edit'),e('turn/end',{turn:1,reason:{kind:'completed'}}),e('turn/start',{turn:2},300)];
+ const view=sessionActivity(history);
+ assert.equal(view.todos[0].label,'Carry me');assert.equal(view.planTurn,1);assert.equal(view.turn,2);assert.equal(view.title,'User task');assert.equal(view.artifacts[0].path,'a.js');assert.equal(view.operations.length,0);
+ assert.equal(sessionActivity([...history,e('todo/write',{todos:[]})]).todos.length,0);
+ assert.equal(sessionActivity([...history,e('todo/write',{todos:[{content:'New',status:'completed'},{content:'Dropped',status:'cancelled'}]})]).tasks.total,1);
+ const fork=sessionActivity([...history,e('turn/start',{turn:3})],history.length);assert.equal(fork.todos.length,0);assert.equal(fork.artifacts.length,0);assert.equal(fork.title,'');
+});
+test('PTC subcalls pair independently, expose successful edits and retain outer failures',()=>{
+ const history=[e('turn/start',{turn:1}),call('outer','run_code'),ptcStart('w','write',{path:'new.js'}),ptcStart('r','read',{path:'input.js'}),ptcEnd('w','write',{path:'new.js'})];
+ const view=sessionActivity(history);assert.equal(view.current.id,'ptc:r');assert.equal(view.stage,'reading');assert.deepEqual(view.artifacts.map(x=>x.path),['new.js']);assert.equal(view.operations.length,2);
+ const failed=sessionActivity([...history,ptcEnd('r','read',{path:'input.js'},true),result('outer',true)]);assert.equal(failed.operations.find(x=>x.id==='outer').status,'error');assert.equal(failed.operations.find(x=>x.id==='ptc:r').status,'error');
+ const legacy=sessionActivity([e('turn/start',{turn:1}),call('outer','run_code'),ptcEnd('w','write',{file_path:'legacy.js'})]);assert.equal(legacy.artifacts[0].path,'legacy.js');
+});
+test('PTC duplicates, missing results, failed writes and late previous-turn events cannot fabricate file changes',()=>{
+ const start=[e('turn/start',{turn:1}),call('outer','run_code')];
+ const failed=ptcEnd('f','write',{path:'failed.js'},true);
+ const view=sessionActivity([...start,ptcStart('f','write',{path:'failed.js'}),failed,failed,ptcEnd('r','read',{path:'read.js'}),ptcStart('p','write',{path:'pending.js'}),e('turn/end',{turn:1,reason:{kind:'aborted'}})]);
+ assert.equal(view.artifacts.length,0);assert.equal(view.operations.filter(x=>x.id==='ptc:f').length,1);assert.equal(view.operations.find(x=>x.id==='ptc:p').status,'stopped');
+ const late=sessionActivity([...start,e('turn/start',{turn:2},300),ptcEnd('old','write',{path:'old.js'})]);assert.equal(late.operations.length,0);assert.equal(late.artifacts.length,0);
+ const malformed=sessionActivity([...start,ptcStart('n','write',null),e('tool/result',{callId:'outer',message:{content:{}}})]);assert.equal(malformed.artifacts.length,0);
+});
+test('PTC execution cannot override pending approval or terminal turn status',()=>{
+ const events=[e('turn/start',{turn:1}),call('outer','run_code'),e('approval/asked',{id:'approval'}),ptcStart('w','write',{path:'a.js'})];
+ assert.equal(sessionActivity(events).stage,'waiting');
+ const stopped=sessionActivity([...events,e('turn/end',{turn:1,reason:{kind:'aborted'}},140),ptcEnd('w','write',{path:'a.js'},true)]);assert.equal(stopped.stage,'stopped');assert.equal(stopped.artifacts.length,0);
+});
+test('running and waiting children survive parent turns; finishing now stays visible; older completed children stay out',()=>{
+ const events=[e('turn/start',{turn:1},10),e('subagent/catalog',{childId:'child',mode:'continuable'},20),e('turn/start',{turn:2},100)];
+ let childEvents=[e('turn/start',{turn:1},20)];
+ const child={header:{id:'child',origin:'subagent',parentSession:'parent'},snapshotEvents:()=>childEvents};
+ const parent={snapshotEvents:()=>events};const reader=createActivityReader(()=>new Map([['parent',parent],['child',child]]));
+ assert.equal(reader.read('parent').activity.children.length,1);
+ childEvents=[...childEvents,e('turn/end',{reason:{kind:'blocked'}},30)];assert.equal(reader.read('parent').activity.children[0].stage,'waiting');
+ childEvents=[e('turn/start',{},20),e('turn/end',{reason:{kind:'completed'}},120)];assert.equal(reader.read('parent').activity.children[0].stage,'done');
+ childEvents=[e('turn/start',{},20),e('turn/end',{reason:{kind:'completed'}},30)];assert.equal(reader.read('parent').activity.children.length,0);
+});
+test('bounded operation history retains a long-running tool amid many settled PTC calls',()=>{
+ const history=[e('turn/start',{turn:1}),call('outer','run_code'),ptcStart('long','bash')];
+ for(let i=0;i<65;i++)history.push(ptcEnd('read'+i,'read',{path:'a.js'}));
+ const view=sessionActivity(history);assert(view.operations.some(x=>x.id==='ptc:long'&&x.status==='running'));assert.equal(view.current.id,'ptc:long');assert(view.operations.length<=41);
+});
+
+test('editor view, unknown tool paths and todo_write never count as file mutations',()=>{
+ const events=[e('turn/start',{turn:1}),call('outer','run_code'),ptcEnd('v','str_replace_editor',{command:'view',path:'view.js'}),ptcEnd('t','todo_write',{path:'not-a-file'}),ptcEnd('x','write_database',{path:'not-a-file'}),ptcEnd('w','str_replace_editor',{command:'str_replace',path:'real.js'})];
+ const view=sessionActivity(events);assert.deepEqual(view.artifacts.map(x=>x.path),['real.js']);assert.equal(view.operations.find(x=>x.id==='ptc:v').stage,'reading');
+});
+test('cross-turn preview exercises retained plan, earlier active child and PTC records',()=>{
+ const f=activityPreview('cross-turn');const sessions=new Map([['p',{snapshotEvents:()=>f.events}]]);
+ for(const c of f.children)sessions.set(c.id,{header:{origin:'subagent',parentSession:'p'},snapshotEvents:()=>c.events});
+ const view=createActivityReader(()=>sessions).read('p').activity;
+ assert.equal(view.todos.length,3);assert.equal(view.planTurn,1);assert.equal(view.turn,2);assert.equal(view.children.length,1);assert.equal(view.artifacts.length,1);assert.deepEqual(view.operations.map(x=>x.name),['edit','bash']);
+});
