@@ -448,3 +448,22 @@
   grid-column: 4;
   grid-row: 1;
 }
+
+.dsh-kujira-root .kj-file-extension {
+  flex: 0 0 auto;
+  max-width: 6em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid var(--kj-line);
+  border-radius: 4px;
+  padding: 0 4px;
+  color: var(--kj-muted);
+  font-size: 10px;
+  line-height: 16px;
+}
+.dsh-kujira-root
+  .kj-task-operation:has(.kj-task-status.kj-visually-hidden)
+  .kj-task-operation-copy
+  > strong {
+  grid-column: 2 / 4;
+}

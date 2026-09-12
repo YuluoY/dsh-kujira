@@ -90,6 +90,17 @@ const routes = [];
 const sessionHandlers = [];
 const agentHandlers = [];
 let supplyDemoSerial=0, supplyClock=0, previewRunning=false;
+try {
+    const previous=JSON.parse(readFileSync(join(homedir(),'.dsh','dsh-kujira-preview',String(PORT),'inventory.json'),'utf8'));
+    supplyClock=Math.max(0,(Number(previous.lastAction)||0)-Date.now());
+} catch {}
+usagePreviewMode=rateAt(Date.now()+supplyClock);
+function advancePreviewClock(mode) {
+    let now=Math.max(Date.now(),Date.now()+supplyClock);
+    for(let i=0;i<336 && rateAt(now)!==mode;i++)now+=1800000;
+    supplyClock=now-Date.now();
+    return now;
+}
 const previewEvents = [];
 let previewEventSnapshot=null;
 const previewChildren=new Map();
@@ -133,7 +144,7 @@ const ctx = {
     }
 };
 
-apply(ctx, { size: 260, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { now:()=>supplyClock || Date.now(), directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
+apply(ctx, { size: 260, realtime:{enabled:false,cacheDir:join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT))}, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { now:()=>Date.now() + supplyClock, directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
 
 // ============================================================================
 // 模拟会话事件
@@ -191,13 +202,11 @@ const server = createServer(async (req, res) =>
 
     if(pathname==='/__preview/rewards' && req.method==='POST') {
         previewRunning=true;
-        const requested=url.searchParams.get('mode') || usagePreviewMode;
-        let now=Date.now();
-        for(let i=0;i<336 && rateAt(now)!==requested;i++) now+=1800000;
-        supplyClock=now;
+        const requested=url.searchParams.get('mode') || rateAt(Date.now()+supplyClock);
+        const now=advancePreviewClock(requested==='peak'?'peak':'offpeak');
         const id='preview-supply-'+now+'-'+(++supplyDemoSerial);
         const events=[{type:'request/header',time:now,data:{header:{config:{provider:'deepseek-official',model:'deepseek-flash'}}}},
-          {type:'assistant/message',time:now,seq:1,data:{turn:1,step:1,usage:{inputTokens:0,outputTokens:125000}}}];
+          {type:'assistant/message',time:now,seq:1,data:{turn:1,step:1,usage:{inputTokens:0,outputTokens:url.searchParams.has("step")?5000:125000}}}];
         const session={id,header:{id},snapshotEvents:()=>events,inheritedEventCount:0};
         for(const handler of sessionHandlers)handler(session,events[1]);
         for(const handler of agentHandlers)handler({agent:{id,session:{id,header:{id},snapshotEvents:()=>[]}},status:'running'});
@@ -218,7 +227,7 @@ const server = createServer(async (req, res) =>
     }
     // Preview-only usage fixtures never pass through reward settlement.
     if(pathname==='/dsh-kujira/usage' && url.searchParams.get('sessionId')==='preview-session') {
-        res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(previewUsage(usagePreviewMode,Date.now(),usageExtraTokens)));return;
+        res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(previewUsage(usagePreviewMode,Date.now(),usageExtraTokens,rateAt(Date.now()+supplyClock))));return;
     }
     if(pathname==='/__preview/plan' && req.method==='POST') {
         const previous=previewEvents.findLast(e=>e.type==='todo/write');
@@ -231,6 +240,7 @@ const server = createServer(async (req, res) =>
     if(pathname==='/__preview/usage' && req.method==='POST') {
         const mode=url.searchParams.get('mode');
         if(!['peak','offpeak','empty'].includes(mode)){res.writeHead(400);res.end();return;}
+        if(mode!=='empty')advancePreviewClock(mode);
         usagePreviewMode=mode;res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({ok:true,mode}));return;
     }
     // ---- 0. 预览专用接口 ----

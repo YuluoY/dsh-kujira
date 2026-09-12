@@ -18,7 +18,7 @@ test('automatic checks are cached across restarts and never call model by defaul
  const cacheDir=await mkdtemp(join(tmpdir(),'kujira-live-'));let calls=0, keys=0;
  try {
  const options={cacheDir,getKey:async()=>{keys++;return 'fake';},fetch:async()=>{calls++;return response(html);}};
- const first=createRealtime(options);await first.refresh();await first.refresh(true);
+ const first=createRealtime(options);await first.ready;assert.equal(first.status().settings.automatic,false);await first.configure({automatic:true});await first.refresh();await first.refresh(true);
  assert.equal(calls,1);assert.equal(keys,0);assert.ok(first.status().checkedAt);
  const second=createRealtime(options);await second.refresh();assert.equal(calls,1);
  await second.configure({automatic:false});
@@ -31,14 +31,14 @@ test('manual mode blocks startup fetch but permits one explicit sync',async()=>{
 });
 test('new prices append history and source failure keeps last good price',async()=>{
  const cacheDir=await mkdtemp(join(tmpdir(),'kujira-live-'));
- try {const rt=createRealtime({cacheDir,fetch:async()=>response(html.replace('0.02元','0.03元').replace('0.04元','0.06元'))});await rt.refresh();const history=rt.pricing().prices['deepseek-flash'].history;assert.equal(history[0].hit,.02);assert.equal(history.at(-1).hit,.03);
+ try {const rt=createRealtime({cacheDir,fetch:async()=>response(html.replace('0.02元','0.03元').replace('0.04元','0.06元'))});await rt.refresh(true);const history=rt.pricing().prices['deepseek-flash'].history;assert.equal(history[0].hit,.02);assert.equal(history.at(-1).hit,.03);
  const file=join(cacheDir,'realtime.json'), data=JSON.parse(await readFile(file,'utf8'));data.attemptedAt=0;await writeFile(file,JSON.stringify(data));
- const offline=createRealtime({cacheDir,fetch:async()=>{throw Error('offline');}});await offline.refresh();assert.equal(offline.pricing().prices['deepseek-flash'].history.at(-1).hit,.03);
+ const offline=createRealtime({cacheDir,fetch:async()=>{throw Error('offline');}});await offline.refresh(true);assert.equal(offline.pricing().prices['deepseek-flash'].history.at(-1).hit,.03);
  }finally{await rm(cacheDir,{recursive:true,force:true});}
 });
 test('unknown source does not spend model tokens unless explicitly enabled',async()=>{
  const cacheDir=await mkdtemp(join(tmpdir(),'kujira-live-'));let keys=0;
- try{const rt=createRealtime({cacheDir,getKey:async()=>{keys++;return 'fake';},fetch:async()=>response('<html>changed</html>')});await rt.refresh();assert.equal(keys,0);assert.match(rt.status().summary,/保留/);}finally{await rm(cacheDir,{recursive:true,force:true});}
+ try{const rt=createRealtime({cacheDir,getKey:async()=>{keys++;return 'fake';},fetch:async()=>response('<html>changed</html>')});await rt.refresh(true);assert.equal(keys,0);assert.match(rt.status().summary,/保留/);}finally{await rm(cacheDir,{recursive:true,force:true});}
 });
 test('weather uses automatic IP mode, deduplicates, caches and keeps stale results',async()=>{
  let calls=0,fail=false,lastUrl='';const query=createWeatherClient(()=>'',{fetch:async url=>{calls++;lastUrl=url;if(fail)throw Error();return response({city:'杭州市',weather:'小雨',temperature:21,humidity:94,wind_direction:'东北风',wind_power:'4级'});}});
@@ -57,7 +57,7 @@ test('model assistance requires opt-in and persists a 24-hour paid-call limit',a
   if(url.includes('chat/completions')) {paid++;const body=JSON.parse(init.body);assert.equal(body.model,'deepseek-flash');assert.ok(!body.messages.some(m=>m.content.includes('private session')));return response({choices:[{message:{content:'待核对摘要'}}]});}
   return response('<html>官网结构变化</html>');
  }};
- try{const rt=createRealtime(options);await rt.configure({modelAssist:true});await rt.refresh();assert.equal(paid,1);assert.match(rt.status().summary,/待核对摘要/);
+ try{const rt=createRealtime(options);await rt.configure({modelAssist:true,automatic:true});await rt.refresh();assert.equal(paid,1);assert.match(rt.status().summary,/待核对摘要/);
  const path=join(cacheDir,'realtime.json'), saved=JSON.parse(await readFile(path,'utf8'));saved.attemptedAt=0;await writeFile(path,JSON.stringify(saved));const again=createRealtime(options);await again.refresh();assert.equal(paid,1);
  }finally{await rm(cacheDir,{recursive:true,force:true});}
 });

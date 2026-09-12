@@ -503,3 +503,17 @@ test('message return restores the original anchor offset and refuses a missing a
   assert.equal(restoreChatPosition({key:'missing',offset:0},doc),false);
  }finally{globalThis.getComputedStyle=old;}
 });
+
+test('Markdown file navigation preserves host viewer selection and safely encodes the original path',async()=>{
+ const {createNavigation}=await import('../lib/shared/client/navigation.js');const calls=[];
+ const go=createNavigation({ctx:{get:name=>name==='sidebarRight'?{openResource:(...args)=>calls.push(args)}:undefined},taskRuntime:{snapshot:()=>({sessionId:'s'})}}).navigateTask;
+ assert.equal(await go({kind:'file',sessionId:'s',path:'docs/说明 #1.MD'}),true);
+ assert.equal(calls[0].length,1);assert.equal(calls[0][0],'dsh-resource://file/session/s/docs/%E8%AF%B4%E6%98%8E%20%231.MD');
+});
+
+test('file labels separate extension tags without losing dotfiles or compound filenames',async()=>{
+ const {fileLabel}=await import('../lib/shared/task/text.js');
+ assert.deepEqual(fileLabel('src/a.test.tsx'),{name:'a.test.tsx',stem:'a.test',extension:'tsx'});
+ assert.deepEqual(fileLabel('C:\\work\\.gitignore'),{name:'.gitignore',stem:'.gitignore',extension:''});
+ assert.equal(fileLabel('README.MD').extension,'MD');assert.equal(fileLabel('LICENSE').stem,'LICENSE');
+});

@@ -41,3 +41,6 @@
 The default plugin makes no additional model calls, adds no prompt content, and does not proxy the token stream. It still uses local CPU/GPU, HTTP polling and disk I/O. Peak scheduling intentionally waits when enabled; optional model-assisted pricing summaries can incur usage. Both options default to off.
 
 Accounting now processes appended events incrementally; duplicate notifications are coalesced, unchanged activity uses conditional HTTP responses, and only the active task tab mounts its content. The benchmark above is synthetic local work, not an end-to-end model throughput test.
+
+
+Parent-session totals read verified descendant sessions only when the footer queries usage. Reads coalesce per parent and use four-way concurrency. Completed child summaries contain costs and child IDs rather than retained transcript text; they expire after 60 seconds and are invalidated by session events. Traversal deduplicates IDs and is bounded at 256 descendants and 24 levels. Unreadable or bounded-out branches mark totals as partial. The footer supply ring subscribes to the existing inventory source and starts no additional inventory polling.

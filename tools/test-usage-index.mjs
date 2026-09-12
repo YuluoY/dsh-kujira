@@ -52,3 +52,46 @@ test('unchanged host activity responds with 304, and new events invalidate the r
  const first=await request();assert.equal(first.code,200);const same=await request(first.headers.ETag);assert.equal(same.code,304);assert.equal(same.body,'');
  events=[...events,{type:'turn/end',seq:1,time:2,data:{turn:1,reason:{kind:'completed'}}}];const changed=await request(first.headers.ETag);assert.equal(changed.code,200);assert.notEqual(changed.headers.ETag,first.headers.ETag);
 });
+
+test('footer aggregates verified descendants, excludes inherited usage and deduplicates references',async()=>{
+ const {createUsageReader}=await import('../lib/host/usage.js');
+ const catalog=id=>({type:'subagent/catalog',data:{childId:id,mode:'one-shot'}});
+ const parentEvents=[header,event(1),catalog('child'),catalog('child')];
+ let childEvents=[header,event(2),catalog('grand')];
+ const inherited=[header,event(9)];
+ const sessions=new Map([
+  ['parent',{header:{id:'parent'},snapshotEvents:()=>parentEvents}],
+  ['child',{header:{id:'child',origin:'subagent',parentSession:'parent'},snapshotEvents:()=>childEvents}],
+  ['grand',{header:{id:'grand',origin:'subagent',parentSession:'child'},inheritedEventCount:2,snapshotEvents:()=>[...inherited,event(3),catalog('parent')]}],
+ ]);
+ const read=createUsageReader(()=>sessions,()=>PRICING);
+ const a=await read.tree('parent');
+ assert.equal(a.requests,3);assert.equal(a.children.count,2);assert.equal(a.children.requests,2);
+ assert(Math.abs(a.totals.total-(read('parent').totals.total+read('child').totals.total+read('grand').totals.total))<1e-12);
+ assert(Math.abs(a.children.total-(a.totals.total-a.selfTotal))<1e-12);
+ const before=a.totals.total;childEvents=[...childEvents,event(4)];const b=await read.tree('parent');assert.equal(b.requests,4);assert(b.totals.total>before);
+});
+test('released child sessions load read-only; unrelated or inaccessible children make totals partial',async()=>{
+ const {createUsageReader}=await import('../lib/host/usage.js');
+ const parent={snapshotEvents:()=>[header,event(1),...['saved','other','missing'].map(childId=>({type:'subagent/catalog',data:{childId,mode:'continuable'}}))]};
+ const access={get:id=>id==='parent'?parent:undefined,prepare:async id=>id==='missing'?undefined:{header:{origin:'subagent',parentSession:id==='saved'?'parent':'elsewhere'},snapshotEvents:()=>[header,event(2)]}};
+ const read=createUsageReader(()=>access,()=>PRICING),a=await read.tree('parent');
+ assert.equal(a.children.count,1);assert.equal(a.children.unavailable,2);assert.equal(a.requests,2);assert.equal(a.complete,false);
+});
+test('concurrent tree requests coalesce and inherited child catalogs never attach to a new fork',async()=>{
+ const {createUsageReader}=await import('../lib/host/usage.js');let calls=0;
+ const session={inheritedEventCount:1,snapshotEvents:()=>[{type:'subagent/catalog',data:{childId:'old-child',mode:'one-shot'}},header,event(1)]};
+ const access={get:()=>undefined,prepare:async()=>{calls++;return session;}};
+ const read=createUsageReader(()=>access,()=>PRICING);
+ const a=read.tree('fork'),b=read.tree('fork');assert.equal(a,b);
+ const result=await a;assert.equal(calls,1);assert.equal(result.children.count,0);assert.equal(result.requests,1);
+});
+
+test('released completed children reuse small summaries and late settlements invalidate them',async()=>{
+ const {createUsageReader}=await import('../lib/host/usage.js');let loads=0;
+ const parent={snapshotEvents:()=>[header,{type:'subagent/catalog',data:{childId:'child',mode:'one-shot'}}]};
+ let events=[header,event(1),{type:'turn/end'}];
+ const access={get:id=>id==='parent'?parent:undefined,prepare:async()=>{loads++;return {header:{origin:'subagent',parentSession:'parent'},snapshotEvents:()=>events};}};
+ const read=createUsageReader(()=>access,()=>PRICING);const a=await read.tree('parent');await read.tree('parent');assert.equal(loads,1);
+ events=[...events,event(2)];read.invalidate('child');const b=await read.tree('parent');assert.equal(loads,2);assert(b.totals.total>a.totals.total);
+});

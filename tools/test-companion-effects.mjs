@@ -72,7 +72,7 @@ test('greeting names respect explicit preference and survive unavailable account
  const t=(s,args={})=>s.replace(/\{(\w+)\}/g,(_,k)=>args[k]);
  assert.equal(personalGreeting('早上好','小鲸','account',t),'小鲸，早上好');
  assert.equal(personalGreeting('早上好','','account',t),'account，早上好');
- assert.equal(personalGreeting('早上好','','',t),'朋友，早上好');
+ assert.equal(personalGreeting('早上好','','',t),'小可爱，早上好');
  assert.equal(personalGreeting(null,'A','B',t),null);
  assert.equal(systemNickname(()=>{throw Error('unavailable');}),'');
  assert.equal(systemNickname(()=>'root'),'');
@@ -114,4 +114,27 @@ test('balance refresh and waiting state cannot loop decorative reactions',()=>{
  assert.equal(observe({...input,balance:{...input.balance,total:300}}),null);
  assert.equal(observe({...input,activity:{stage:'waiting'},balance:{...input.balance,total:1}}),null);
  now+=200000;assert.equal(observe({...input,balance:{...input.balance,total:1}}),null);
+});
+
+test('supply progress wraps forward, coalesces reward bursts and skips animation for reduced motion',async()=>{
+ const {createSupplyProgress}=await import('../lib/shared/client/reward-scatter.js');
+ const frames=[],timers=[];const motion=createSupplyProgress(v=>frames.push(v),{schedule:fn=>{timers.push(fn);return timers.length;},cancel:()=>{}});
+ motion.update(.8);assert.equal(frames.at(-1).animate,false);
+ motion.update(.9);assert.equal(frames.at(-1).value,.9);assert.equal(frames.at(-1).tone,1);
+ motion.update(1.1);assert.equal(frames.at(-1).value,1);
+ motion.update(4.6);timers.shift()();assert.equal(frames.at(-1).value,0);assert.equal(frames.at(-1).animate,false);
+ timers.shift()();assert(Math.abs(frames.at(-1).value-.6)<1e-8);
+ motion.update(5.2,true);assert.equal(frames.at(-1).animate,false);
+ motion.update(0);assert.equal(frames.at(-1).value,0);motion.dispose();
+});
+
+test('care actions preserve the panel, prevent concurrent consumption and retain idempotent receipt state',async t=>{
+ const {useCareActions}=await import('../lib/shared/client/use-care-actions.js');let closes=0,requests=0,finish,busy=false;
+ const saved=new Map(['fetch','sessionStorage','localStorage'].map(k=>[k,globalThis[k]]));t.after(()=>{for(const[k,v]of saved)v===undefined?delete globalThis[k]:globalThis[k]=v;});
+ globalThis.sessionStorage={setItem(){},removeItem(){}};globalThis.localStorage={setItem(){}};
+ globalThis.fetch=()=>{requests++;return new Promise(resolve=>{finish=()=>resolve({ok:true,json:async()=>({ok:true,receiptId:'one',gain:{},cooldownMs:8000})});});};
+ const G={migrate:()=>({satiety:20}),tick:n=>({state:n}),applyGain:n=>({state:n})};
+ const actions=useCareActions({useCallback:fn=>fn,useEffect(){},inventoryBusyRef:{current:false},GROWRef:{current:G},cfgRef:{current:{growth:{enabled:true,rates:{}},pools:{click:[]}}},closeOrb:()=>closes++,speak(){},pendingResource:{current:null},readStore:()=>({}),GROW_KEY:'test',busyRef:{current:false},setInventoryBusy:v=>{busy=v;},ASSET_BASE:'/test',acceptInventory(){},pick:()=>'',play(){},loadGrowth(){},prefsRef:{current:{playful:true}},t:s=>s});
+ const pending=actions.feed({keepOpen:true});assert.equal(busy,true);await actions.feed({keepOpen:true});assert.equal(requests,1);assert.equal(closes,0);finish();await pending;assert.equal(busy,false);
+ const radial=actions.feed();assert.equal(closes,1);finish();await radial;
 });

@@ -68,6 +68,17 @@ The feature menu includes a Task progress shortcut, enabled by default. Hide it 
 
 A single category uses a small heading; multiple categories use tabs. Paths and plan items fill the available width before a one-line ellipsis; messages keep two lines. Full-text tooltips appear only for actual clipping and are remeasured after container, font-size or font-loading changes. Lists expand on demand and Chat loads 30 messages per page.
 
-Set a preferred name under Companion & motion → Name. This overrides the account name of the system running DSH. Missing or generic service accounts fall back to the localized word “friend”; Git authors are not consulted. Remote installations see the server account, so a custom name is recommended there. Names stay in the local UI and are never sent to the model. The limit is 24 graphemes.
+Set a preferred name under Companion & motion → Name. This overrides the account name of the system running DSH. Missing or generic service accounts fall back to an affectionate localized nickname (“sweetie” in English); Git authors are not consulted. Remote installations see the server account, so a custom name is recommended there. Names stay in the local UI and are never sent to the model. The limit is 24 graphemes.
 
 Context reactions add occasional balance, task-duration and idle feedback. Balance bands use the API's original currency, with no conversion or high/low inference for unknown currencies. Quick completion gets a happy jump; a long task ending gets a stretch. Disable Context reactions, enable focus/static mode, or hide the page to suppress these effects. Historical completions never replay celebrations. Reactions make no model calls and do not affect charges or supplies.
+
+
+### Continuous care and inclusive session costs
+
+All four care actions keep the growth panel open. Buttons share an eight-second countdown, without queuing extra consumption. They become available automatically. Empty stock, satiety and busy-task restrictions remain visible. Network retries retain the original request ID. Growth values refresh while open; balance and weather refresh through their caches without replacing the panel.
+
+The footer ring sits beside the session amount and uses settled supply progress from all sessions. Its progress eases forward, changing tone with each gain; a wrap completes before continuing. Bursts coalesce, while hidden and reduced-motion views update immediately. Unlimited interactions still earn supplies.
+
+The footer total includes the current session and its recursive subagents. Peak and off-peak rows also include subagents. “Subagents included” is a subtotal already in the total. Inherited history and duplicate child references are excluded. Released children load through read-only history; unavailable records mark totals as partial. The host accounting update activates after a normal DSH restart.
+
+Automatic price synchronization defaults to off; explicitly saved preferences remain intact. Files display a name, extension tag and opening arrow, with the original path on hover. The installed DSH already renders `.md` and `.markdown`. The plugin uses the host's viewer selection instead of registering a competing Markdown viewer or overriding another plugin or user choice.
