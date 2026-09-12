@@ -93,7 +93,7 @@ let supplyDemoSerial=0, supplyClock=0, previewRunning=false;
 const previewEvents = [];
 let previewEventSnapshot=null;
 const previewChildren=new Map();
-const previewSession = { header: { id: 'preview-session' }, inheritedEventCount: 0, snapshotEvents: () => (previewEventSnapshot ||= Object.freeze(previewEvents.slice())) };
+const previewSession = { header: { id: 'preview-session', cwd: '/workspace/kujira' }, inheritedEventCount: 0, snapshotEvents: () => (previewEventSnapshot ||= Object.freeze(previewEvents.slice())) };
 
 const ctx = {
     inject(deps, callback) { callback(this); },
@@ -210,6 +210,7 @@ const server = createServer(async (req, res) =>
         res.end(JSON.stringify({ok:true,available:true,...account,balances:[account],fetchedAt:Date.now()}));return;
     }
     if(pathname==='/dsh-kujira/activity') {
+        if(url.searchParams.has('messagesBefore')) {const value=previewActivityReader.messages(url.searchParams.get('sessionId'),Number(url.searchParams.get('messagesBefore')));res.writeHead(value.ok?200:400,{'content-type':'application/json'});res.end(JSON.stringify(value));return;}
         const value=previewActivityReader.read(url.searchParams.get('sessionId'));
         const etag='"'+value.epoch+'-'+value.revision+'"';
         if(req.headers['if-none-match']===etag){res.writeHead(304,{'ETag':etag,'cache-control':'no-store'});res.end();return;}
@@ -218,6 +219,11 @@ const server = createServer(async (req, res) =>
     // Preview-only usage fixtures never pass through reward settlement.
     if(pathname==='/dsh-kujira/usage' && url.searchParams.get('sessionId')==='preview-session') {
         res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(previewUsage(usagePreviewMode,Date.now(),usageExtraTokens)));return;
+    }
+    if(pathname==='/__preview/plan' && req.method==='POST') {
+        const previous=previewEvents.findLast(e=>e.type==='todo/write');
+        if(previous){const todos=previous.data.todos.map(x=>({...x}));const next=todos.find(x=>x.status!=='completed');if(next)next.status='completed';previewEvents.push({type:'todo/write',seq:previewEvents.length,time:Date.now(),data:{turn:previewEvents.findLast(e=>e.type==='turn/start')?.data.turn,todos}});previewEventSnapshot=null;}
+        res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({ok:true}));return;
     }
     if(pathname==='/__preview/cost' && req.method==='POST') {
         usageExtraTokens+=10000;res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({ok:true}));return;

@@ -417,3 +417,52 @@ test('task detail boundary retains a recoverable panel and supports retry and cl
   nodes.find(node=>node.type==='button' && !node.props.autoFocus).props.onClick();
   assert.equal(closed,1);
 });
+
+test('project path labels respect root boundaries, external files and Windows separators', async()=>{
+ const {projectPath}=await import('../lib/shared/task/text.js');
+ assert.equal(projectPath('/work/app/src/a.js','/work/app'),'src/a.js');
+ assert.equal(projectPath('/work/app-other/a.js','/work/app'),'/work/app-other/a.js');
+ assert.equal(projectPath('/work/app/../outside.js','/work/app'),'/work/app/../outside.js');
+ assert.equal(projectPath('C:\\Work\\App\\src\\a.ts','c:\\work\\app'),'src/a.ts');
+ assert.equal(projectPath('./src/a.js','/work/app'),'src/a.js');
+ assert.equal(projectPath('/src/a.js','/'),'src/a.js');
+ assert.equal(projectPath('/work/app/.hidden/file','/work/app'),'.hidden/file');
+});
+test('message pages use durable identities, deduplicate updates, preserve roles and exclude hidden context',async()=>{
+ const {messagePage}=await import('../lib/shared/task/messages.js');
+ const e=(type,seq,data={})=>({type,seq,data});
+ const events=[e('turn/start',0,{turn:1}),e('user/message',1,{id:'a',source:{kind:'user'},content:[{type:'text',text:'Same'}]}),e('step/start',2,{step:1}),e('assistant/message',3,{turn:1,step:1,message:{content:[{type:'reasoning',text:'secret'}]}}),e('assistant/message',4,{turn:1,step:1,message:{content:[{type:'text',text:'First'}]}}),e('assistant/message',5,{turn:1,step:1,message:{content:[{type:'text',text:'Updated'}]}}),e('user/message',6,{source:{kind:'plugin'},content:[{type:'text',text:'hidden'}]}),e('turn/start',7,{turn:2}),e('user/message',8,{id:'b',source:{kind:'user'},content:[{type:'text',text:'Same'}]})];
+ const page=messagePage(events,0,{limit:2});assert.equal(page.total,3);assert(page.hasMore);assert.deepEqual(page.items.map(x=>x.key),['13:input-messageb','14:assistant-step1:1']);assert.equal(page.items[1].text,'Updated');
+ assert.equal(messagePage(events,0,{before:page.before}).items[0].key,'13:input-messagea');assert.equal(messagePage(events,7).total,1);assert(!JSON.stringify(page).includes('secret'));
+});
+test('message location is exact, releases host turn following and cancels after a session switch',async()=>{
+ const {revealMessage}=await import('../lib/shared/client/message-navigation.js');
+ const old=globalThis.matchMedia;globalThis.matchMedia=()=>({matches:true});
+ try {
+  const calls=[];let current=true,loaded=false;
+  const node={dataset:{chatAnchorKey:'exact'},getClientRects:()=>[{}],scrollIntoView:()=>calls.push('scroll'),setAttribute:()=>{},focus:()=>calls.push('focus')};
+  const nav={getAttribute:()=> '跳转到第 2 轮',click:()=>calls.push('native')};
+  const doc={querySelectorAll:selector=>selector.startsWith('nav')?[nav]:loaded?[node]:[]};
+  const target={sessionId:'s',key:'exact',seq:10,startSeq:8,turn:2};
+  const sessions={binding:()=>({session:{loadThrough:async seq=>{assert.equal(seq,8);loaded=true;}}})};
+  assert.equal(await revealMessage(target,{sessions,isCurrent:()=>current,document:doc}),true);assert.deepEqual(calls,['native','scroll','focus']);
+  loaded=false;calls.length=0;sessions.binding=()=>({session:{loadThrough:async()=>{current=false;loaded=true;}}});
+  assert.equal(await revealMessage(target,{sessions,isCurrent:()=>current,document:doc}),false);assert.deepEqual(calls,[]);
+ }finally{globalThis.matchMedia=old;}
+});
+
+test('message history pages are session-scoped and reject invalid cursors',async()=>{
+ const {createActivityReader}=await import('../lib/host/activity.js');
+ const events=Array.from({length:65},(_,seq)=>({type:'user/message',seq,data:{id:'m'+seq,source:{kind:'user'},content:[{type:'text',text:'Message '+seq}]}}));
+ const sessions=new Map([['a',{header:{cwd:'/work/a'},snapshotEvents:()=>events}],['b',{header:{cwd:'/work/b'},snapshotEvents:()=>[]}]]);
+ const reader=createActivityReader(()=>sessions),first=reader.read('a').activity;
+ assert.equal(first.cwd,'/work/a');assert.equal(first.messages.length,30);assert.equal(first.messageCount,65);
+ const next=reader.messages('a',first.messageBefore);assert.equal(next.items.length,30);assert(next.items.every(x=>x.seq<first.messageBefore));
+ assert.equal(reader.messages('b',first.messageBefore).items.length,0);assert.equal(reader.messages('a',NaN).ok,false);assert.equal(reader.messages('a',-1).ok,false);assert.equal(reader.messages('missing',2).ok,false);
+});
+
+test('attachment-only user messages remain locatable without revealing hidden reasoning',async()=>{
+ const {messagePage}=await import('../lib/shared/task/messages.js');
+ const page=messagePage([{type:'user/message',seq:1,data:{id:'image',source:{kind:'user'},content:[{type:'image',data:'private-binary'}]}},{type:'assistant/message',seq:2,data:{turn:1,step:1,message:{content:[{type:'reasoning',text:'hidden'}]}}}]);
+ assert.equal(page.total,1);assert.equal(page.items[0].key,'13:input-messageimage');assert.equal(page.items[0].text,'附件消息');assert(!JSON.stringify(page).includes('private-binary'));
+});

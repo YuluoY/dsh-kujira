@@ -84,7 +84,7 @@
   border-radius: 9px;
   background: var(--kj-surface);
   color: var(--kj-text);
-  box-shadow: 0 8px 24px #00000028;
+  box-shadow: var(--kj-control-shadow);
   font:
     11px/1.5 -apple-system,
     "PingFang SC",
@@ -130,7 +130,7 @@
   border-radius: 6px;
   background: var(--kj-surface);
   color: var(--kj-text);
-  box-shadow: 0 4px 12px #00000020;
+  box-shadow: var(--kj-tooltip-shadow);
   font:
     11px/1.5 -apple-system,
     "PingFang SC",
@@ -182,7 +182,7 @@
   border: 1px solid var(--kj-line-strong);
   border-radius: 7px;
   background: var(--kj-surface-soft);
-  max-width: 120px;
+  max-width: min(120px, 100%);
   height: 30px;
   box-sizing: border-box;
   overflow: hidden;
@@ -219,7 +219,7 @@
   min-height: 0;
   width: 44px;
   min-width: 0;
-  max-width: 44px;
+  max-width: min(44px, 100%);
   text-align: center;
   background: transparent;
   color: var(--kj-text);
@@ -237,4 +237,14 @@
 }
 .dsh-kujira-root .kj-number :focus-visible {
   outline: none;
+}
+
+.dsh-kujira-root .kj-tooltip[data-scrollable="true"] {
+  pointer-events: auto;
+  user-select: text;
+  max-height: min(280px, 50vh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

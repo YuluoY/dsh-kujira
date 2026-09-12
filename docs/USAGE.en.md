@@ -53,3 +53,9 @@ The default plugin makes no extra model calls, but it uses local resources. See 
 Task categories have explicit scopes: Team includes children still running or awaiting input across turns, plus children started or finished during this turn. Plan retains this session's latest `todo/write`; a new list, including an empty list, replaces it. Earlier plans are labeled “Latest plan”. Files keeps the 20 most recently verified changed files in the session; Activity shows this turn's tool operations. Inherited events from another session are excluded.
 
 PTC activity reads `tool/ptc-dispatch-start` and `tool/ptc-dispatch`, showing operations inside `run_code` while preserving outer errors. File changes require successful `write`, `edit`, `write_file`, `edit_file`, or a mutating `str_replace_editor` operation. Reads, failures, unknown tools and Bash output do not establish file changes. Empty categories stay hidden.
+
+File labels are relative to the session working directory; external paths remain explicit and navigation uses the original path. Plan items, files and message previews use two-line limits, with full text available on hover or keyboard focus and scrollable long tooltips. Loading icons express active work without repeating a visible running label.
+
+The latest public message links to its original position. Chat provides an index of 30 messages per page, with older history loaded on demand. Navigation uses exact message identities and durable event positions, loads host history when needed, and cancels subsequent navigation when the session changes or the panel closes. Missing host capabilities produce a notice rather than an approximate text match.
+
+Plan counts and the progress bar share one row and reflect actual `todo/write` data. Open panels refresh about every 1.5 seconds; hidden pages suspend polling. Updates retain the selected category, loaded message pages and per-category scroll positions.

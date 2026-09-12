@@ -8,8 +8,21 @@ export function activityPreview(mode='working', now=Date.now()) {
     const text=value=>[{type:'text',text:value}];
     const tool=(callId,name,args,offset)=>add('tool/call',{callId,name,arguments:JSON.stringify(args)},offset);
     const result=(callId,output,offset,isError=false)=>add('tool/result',{message:{source:{kind:'tool',callId},content:[{type:'tool-result',isError,content:text(output)}]}},offset);
+    if(mode==='message-ui') {
+        for(let i=1;i<=35;i++) {
+            add('turn/start',{turn:i},i*4000);
+            add('user/message',{turn:i,id:'message-'+i,source:{kind:'user'},content:text('消息 '+i+' · '+('请核对长文本、项目路径与国际化布局。').repeat(6))},i*4000+100);
+            add('step/start',{turn:i,step:1},i*4000+200);
+            add('assistant/message',{turn:i,step:1,message:{content:text('已完成第 '+i+' 次检查。'+('This is a detailed result with long content. ').repeat(8))}},i*4000+300);
+            if(i<35)add('turn/end',{turn:i,reason:{kind:'completed'}},i*4000+500);
+        }
+        add('todo/write',{turn:35,todos:[{content:'正在校验 '+('长内容 LongContent 한국어 Русский ').repeat(15),status:'in_progress'},{content:'核对进度数字',status:'completed'}]},141000);
+        add('tool/call',{turn:35,callId:'path-test',name:'edit',arguments:JSON.stringify({file_path:'/workspace/kujira/src/features/task-progress/components/VeryLongComponentNameForTruncationVerification.tsx'})},141100);
+        add('tool/result',{turn:35,message:{source:{callId:'path-test'},content:[{type:'tool-result',content:text('Updated')}] }},141200);
+        return {events,children:[]};
+    }
     if(mode==='idle')return {events:[],children:[]};
-    add('turn/start');add('user/message',{source:{kind:'human'},content:text('完善会话费用展示，并验证不同语言下的交互效果。')},1000);
+    add('turn/start');add('user/message',{id:'preview-prompt',source:{kind:'human'},content:text('完善会话费用展示，并验证不同语言下的交互效果。')},1000);
     add('todo/write',{todos:[{content:'检查费用统计与展示逻辑',status:'completed'},{content:'调整面板与峰谷提示',status:mode==='success'?'completed':'in_progress'},{content:'回归测试与交付',status:mode==='success'?'completed':'pending'}]},2000);
     if(mode==='thinking')return {events,children:[]};
     tool('read-1','read',{path:'lib/shared/usage-ui.js'},5000);result('read-1','已读取费用组件，确认峰谷费用按请求发生时段累计。',10000);

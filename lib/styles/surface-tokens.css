@@ -1,8 +1,15 @@
+.dsh-kujira-root,
+.kj-usage-root {
+  --kj-control-shadow: 0 8px 24px #00000028;
+  --kj-tooltip-shadow: 0 4px 12px #00000020;
+}
+
 /* Feature popovers. Neutral surfaces, one accent, one continuous SVG outline.
    The character and radial menu deliberately keep their own existing skin. */
 .dsh-kujira-root .dsh-kujira-panel[data-panel],
 .dsh-kujira-root .dsh-kujira-bubble,
 .kj-usage-root {
+  --kj-task-waiting: #94601f;
   --kj-task-success: #287366;
   --kj-task-error: #b64442;
   --kj-surface: #fcfcfd;
@@ -25,6 +32,7 @@
 .dsh-kujira-root[data-theme="dark"] .dsh-kujira-panel[data-panel],
 .dsh-kujira-root[data-theme="dark"] .dsh-kujira-bubble,
 .kj-usage-root[data-theme="dark"] {
+  --kj-task-waiting: #e2bc82;
   --kj-task-success: #88cbbb;
   --kj-task-error: #f19e96;
   --kj-surface: #27292e;

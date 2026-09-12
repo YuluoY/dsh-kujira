@@ -221,6 +221,7 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
         <button id="demo-rewards">模拟新会话与补给</button>
         <button data-k="extreme">长内容与多任务</button>
         <button data-k="cross-turn">跨轮次与 PTC</button>
+        <button data-k="message-ui">消息定位与长文本</button><button id="demo-plan">计划 +1</button>
     </div>
     <div class="row" aria-label="费用模拟数据"><span>费用示例：</span><button data-usage="offpeak">模拟谷价</button><button data-usage="peak">模拟峰价</button><button data-usage="empty">暂无用量</button><button id="demo-cost">费用 +0.04</button><span id="usage-mode">点击切换示例</span></div>
 
@@ -290,7 +291,18 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
                     const close=document.createElement('button');close.textContent='关闭预览';close.onclick=()=>dialog.close();dialog.append(title,content,close);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();return true;
                 };
         const services = {
-            sessions: { openSubagent: value => previewNavigation({kind:'child',id:value.childSessionId}) },
+            sessions: {
+                openSubagent: value => previewNavigation({kind:'child',id:value.childSessionId}),
+                binding: () => ({session:{loadThrough: async seq => {
+                    let value=await (await fetch('/dsh-kujira/activity?sessionId=preview-session')).json();
+                    let items=value.activity.messages,hasMore=value.activity.hasMoreMessages,before=value.activity.messageBefore;
+                    while(hasMore && before>seq){value=await(await fetch('/dsh-kujira/activity?sessionId=preview-session&messagesBefore='+before)).json();items=[...items,...value.items];hasMore=value.hasMore;before=value.before;}
+                    document.getElementById('preview-message-log')?.remove();
+                    const log=document.createElement('section');log.id='preview-message-log';log.setAttribute('data-chat-flow','');
+                    log.style.cssText='position:fixed;left:24px;top:270px;width:min(420px,40vw);height:350px;overflow:auto;padding:12px;background:#202126;border-radius:12px;color:#dedee5;font:13px/1.6 system-ui';
+                    for(const item of items.reverse()){const row=document.createElement('p');row.dataset.chatAnchorKey=item.key;row.dataset.chatTurn=item.turn;row.textContent=item.text;log.appendChild(row);}document.body.appendChild(log);
+                }}})
+            },
             sidebarRight: { openResource: address => previewNavigation({kind:'file',path:decodeURIComponent(address.split('/').slice(5).join('/'))}) }
         };
         return {
@@ -363,6 +375,7 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
         document.getElementById('usage-mode').textContent='当前：'+button.textContent+'（最多 5 秒更新）';
     });
     // 状态模拟按钮
+    document.getElementById('demo-plan').onclick=()=>fetch('/__preview/plan',{method:'POST'});
     document.querySelectorAll('#sim button[data-k]').forEach((btn) =>
     {
         btn.onclick = async () =>

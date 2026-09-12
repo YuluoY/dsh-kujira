@@ -224,13 +224,3 @@
     font-size: 13px;
   }
 }
-
-
-.dsh-kujira-root .kj-task-plan li > span {
-  min-width: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-}

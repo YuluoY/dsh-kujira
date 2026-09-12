@@ -25,7 +25,7 @@
 }
 .dsh-kujira-root .kj-task-bubble[data-stage="waiting"] .kj-task-symbol,
 .dsh-kujira-root .kj-task-overview[data-stage="waiting"] .kj-task-phase {
-  color: #94601f;
+  color: var(--kj-task-waiting);
 }
 .dsh-kujira-root[data-theme="dark"]
   .kj-task-bubble[data-stage="waiting"]
@@ -33,7 +33,7 @@
 .dsh-kujira-root[data-theme="dark"]
   .kj-task-overview[data-stage="waiting"]
   .kj-task-phase {
-  color: #e2bc82;
+  color: var(--kj-task-waiting);
 }
 .dsh-kujira-root .kj-task-bubble[data-stage="done"] .kj-task-symbol,
 .dsh-kujira-root .kj-task-overview[data-stage="done"] .kj-task-phase,
@@ -49,11 +49,7 @@
   > svg {
   color: var(--kj-task-error);
 }
-.kj-task-located {
-  outline: 2px solid #789ab6;
-  outline-offset: 4px;
-  border-radius: 6px;
-}
+
 .dsh-kujira-root .kj-duration {
   display: flex;
   align-items: center;
@@ -295,4 +291,116 @@
 }
 .dsh-kujira-root .kj-task-panel .kj-task-result p {
   max-height: none;
+}
+
+/* Shared text limits preserve the full accessible text and measured tooltips. */
+.dsh-kujira-root .kj-clamped-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--kj-text-lines, 2);
+  white-space: normal;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  max-width: 100%;
+  text-align: start;
+}
+.dsh-kujira-root .kj-task-plan > li {
+  align-items: start;
+}
+.dsh-kujira-root .kj-task-plan > li > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  flex: 0 0 16px;
+}
+.dsh-kujira-root .kj-task-plan .kj-clamped-text {
+  line-height: 20px;
+}
+.dsh-kujira-root .kj-task-message-preview {
+  width: 100%;
+  border: 0;
+  padding: 4px;
+  border-radius: 5px;
+  color: var(--kj-ink);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+}
+.dsh-kujira-root button.kj-task-message-preview {
+  cursor: pointer;
+}
+.dsh-kujira-root button.kj-task-message-preview:hover {
+  background: var(--kj-task-hover);
+}
+.dsh-kujira-root .kj-task-progress-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.dsh-kujira-root .kj-task-progress-inline .kj-field-caption {
+  flex: none;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.dsh-kujira-root .kj-task-progress-inline [role="progressbar"] {
+  flex: 1;
+  min-width: 16px;
+  margin: 0;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-progress-inline [role="progressbar"] {
+  margin-top: 0;
+}
+.dsh-kujira-root .kj-task-progress-count {
+  flex: none;
+  white-space: nowrap;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.dsh-kujira-root .kj-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.dsh-kujira-root .kj-loading-icon[data-active="true"] {
+  animation: kj-loading-spin 1.1s linear infinite;
+  transform-origin: center;
+  opacity: 1;
+}
+.dsh-kujira-root .kj-task-message-row {
+  padding: 7px 8px;
+}
+.dsh-kujira-root .kj-task-message-row .kj-task-link {
+  width: 100%;
+  margin-top: 2px;
+}
+.dsh-kujira-root .kj-task-message-row > .kj-task-caption {
+  font-size: 10px;
+}
+
+@keyframes kj-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root .kj-loading-icon[data-active="true"] {
+    animation: none;
+  }
+}
+.dsh-kujira-root[data-motion="reduced"] .kj-loading-icon[data-active="true"] {
+  animation: none;
+}
+.dsh-kujira-root .kj-clamped-text[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
