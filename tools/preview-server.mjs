@@ -91,8 +91,9 @@ const sessionHandlers = [];
 const agentHandlers = [];
 let supplyDemoSerial=0, supplyClock=0, previewRunning=false;
 const previewEvents = [];
+let previewEventSnapshot=null;
 const previewChildren=new Map();
-const previewSession = { header: { id: 'preview-session' }, inheritedEventCount: 0, snapshotEvents: () => previewEvents.slice() };
+const previewSession = { header: { id: 'preview-session' }, inheritedEventCount: 0, snapshotEvents: () => (previewEventSnapshot ||= Object.freeze(previewEvents.slice())) };
 
 const ctx = {
     inject(deps, callback) { callback(this); },
@@ -142,7 +143,7 @@ function emit(kind, sessionId)
 {
     previewRunning=!["idle","abort","success","error"].includes(kind);
     const fixture=activityPreview(kind);
-    previewEvents.splice(0,previewEvents.length,...fixture.events);
+    previewEvents.splice(0,previewEvents.length,...fixture.events);previewEventSnapshot=null;
     previewChildren.clear();
     for(const child of fixture.children)previewChildren.set(child.id,{header:{id:child.id,parentSession:'preview-session',origin:'subagent'},inheritedEventCount:0,snapshotEvents:()=>child.events});
     return {ok:true,kind,sessionId:'preview-session',events:previewEvents.length};
@@ -210,7 +211,9 @@ const server = createServer(async (req, res) =>
     }
     if(pathname==='/dsh-kujira/activity') {
         const value=previewActivityReader.read(url.searchParams.get('sessionId'));
-        res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify({...value,preview:true}));return;
+        const etag='"'+value.epoch+'-'+value.revision+'"';
+        if(req.headers['if-none-match']===etag){res.writeHead(304,{'ETag':etag,'cache-control':'no-store'});res.end();return;}
+        res.writeHead(200,{'content-type':'application/json','cache-control':'no-store','ETag':etag});res.end(JSON.stringify({...value,preview:true}));return;
     }
     // Preview-only usage fixtures never pass through reward settlement.
     if(pathname==='/dsh-kujira/usage' && url.searchParams.get('sessionId')==='preview-session') {

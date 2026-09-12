@@ -1,0 +1,173 @@
+/* Structure: one fixed strip and one bounded, lazy content pane. */
+.dsh-kujira-root .kj-task-panel > .kj-body:not([data-detail]) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-overview {
+  flex: none;
+}
+.dsh-kujira-root .kj-task-tabs {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+}
+.dsh-kujira-root .kj-tablist {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  border-bottom: 1px solid var(--kj-line);
+  padding-bottom: 3px;
+}
+.dsh-kujira-root .kj-tablist [role="tab"] {
+  flex: 1 0 auto;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--kj-muted);
+  font: inherit;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+.dsh-kujira-root .kj-tab-count {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.dsh-kujira-root .kj-tablist [role="tab"][aria-selected="true"] {
+  color: var(--kj-ink);
+  font-weight: 550;
+}
+.dsh-kujira-root .kj-tablist [role="tab"]:hover {
+  background: var(--kj-task-hover);
+  color: var(--kj-ink);
+}
+.dsh-kujira-root .kj-tablist [role="tab"]:active {
+  background: var(--kj-task-pressed);
+}
+.dsh-kujira-root .kj-tablist [role="tab"]:focus-visible {
+  outline-offset: -2px;
+}
+.dsh-kujira-root .kj-tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--kj-accent);
+  border-radius: 2px;
+  pointer-events: none;
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 180ms ease;
+}
+.dsh-kujira-root .kj-tab-alert {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--kj-task-error);
+  flex: none;
+}
+.dsh-kujira-root .kj-tabpanel:not([hidden]) {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  padding: 8px 0 2px;
+  animation: kj-tab-reveal 130ms ease-out both;
+}
+.dsh-kujira-root .kj-tabpanel:focus-visible {
+  outline: 1px solid var(--kj-accent);
+  outline-offset: -1px;
+  border-radius: 4px;
+}
+
+@keyframes kj-tab-reveal {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (width <= 600px) {
+  .dsh-kujira-root .kj-tablist [role="tab"] {
+    min-height: 44px;
+  }
+}
+
+@media (height <= 500px) {
+  .dsh-kujira-root .kj-task-panel .kj-task-goal-brief {
+    display: none;
+  }
+  .dsh-kujira-root .kj-task-panel .kj-task-overview {
+    padding-bottom: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsh-kujira-root .kj-tab-indicator {
+    transition: none;
+  }
+  .dsh-kujira-root .kj-tabpanel {
+    animation: none !important;
+  }
+}
+
+.dsh-kujira-root .kj-task-phase .kj-task-team-progress {
+  margin-inline-start: auto;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--kj-muted);
+  white-space: nowrap;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-goal-brief {
+  margin-bottom: 8px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-progress {
+  margin-top: 8px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-progress [role="progressbar"] {
+  margin-top: 6px;
+}
+.dsh-kujira-root .kj-tabpanel .kj-task-child {
+  padding: 8px;
+}
+.dsh-kujira-root .kj-tabpanel .kj-task-actions {
+  margin-top: 0;
+}
+.dsh-kujira-root .kj-tabpanel .kj-task-link {
+  min-height: 28px;
+  padding-block: 3px;
+}
+.dsh-kujira-root .kj-task-overview .kj-task-attention {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (width <= 600px) {
+  .dsh-kujira-root .kj-tabpanel .kj-task-link {
+    min-height: 44px;
+  }
+}

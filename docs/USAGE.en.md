@@ -43,3 +43,9 @@ Supplies accrue from unique settled usage records. Pausing, refreshing, duplicat
 ## Session-cost display
 
 Set “Cost decimal places” under Settings → Usage & privacy. Choose 0–6 places; the default is 4. The dock and breakdown share this precision without changing accounting or supply rewards. Only changed digits roll vertically. Initial loading, session changes, locale changes and precision changes display immediately; reduced-motion and focus modes stay static. The breakdown leads with the total, followed by off-peak and peak costs. Hovering the dock shows only the next tariff switch.
+
+## Task detail tabs
+
+The task overview stays visible above Team, Plan, Files and Activity tabs. Empty categories are omitted. Each category keeps its scroll position and expanded list length; arrow keys and Home/End switch tabs. Results remain available inside the panel.
+
+The default plugin makes no extra model calls, but it uses local resources. See [performance and measurement notes](PERFORMANCE.md).
