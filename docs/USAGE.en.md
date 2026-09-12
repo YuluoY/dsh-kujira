@@ -61,3 +61,13 @@ The latest public message links to its original position. Chat provides an index
 The Plan tab shows completed/total from actual `todo/write` data, excluding cancelled items from the total. There is no separate progress-bar row. Open panels refresh about every 1.5 seconds; hidden pages suspend polling. Updates retain the selected category, loaded message pages and per-category scroll positions.
 
 Opening a child from the task panel keeps the panel open. Its back button returns to the parent and restores the prior category and browsing position. After a message jump, reopen the task panel to return to the previous reading position. Missing anchors produce a notice rather than an approximate jump. Return history belongs to the current page; unrelated session selections do not reuse stale routes.
+
+### Task shortcut, long text and greetings
+
+The feature menu includes a Task progress shortcut, enabled by default. Hide it under Feature menu → Task shortcut. It respects the saved button limit and moves into More when necessary. The mascot's hover status bubble remains available.
+
+A single category uses a small heading; multiple categories use tabs. Paths and plan items fill the available width before a one-line ellipsis; messages keep two lines. Full-text tooltips appear only for actual clipping and are remeasured after container, font-size or font-loading changes. Lists expand on demand and Chat loads 30 messages per page.
+
+Set a preferred name under Companion & motion → Name. This overrides the account name of the system running DSH. Missing or generic service accounts fall back to the localized word “friend”; Git authors are not consulted. Remote installations see the server account, so a custom name is recommended there. Names stay in the local UI and are never sent to the model. The limit is 24 graphemes.
+
+Context reactions add occasional balance, task-duration and idle feedback. Balance bands use the API's original currency, with no conversion or high/low inference for unknown currencies. Quick completion gets a happy jump; a long task ending gets a stretch. Disable Context reactions, enable focus/static mode, or hide the page to suppress these effects. Historical completions never replay celebrations. Reactions make no model calls and do not affect charges or supplies.

@@ -31,3 +31,18 @@ Task state takes priority over idle and sleep sequences. Dragging and urgent sta
 ## 功能与启动反馈 / Feature and startup reactions
 
 `ui.featureAnimations` configures first-session eating (`偷吃Token`) and the default menu actions. Feed hover combines the eating clip with a separate SVG drool overlay; wallet and weather use `翻钱包` and `看天气`. Hover waits for a deliberate dwell and observes cooldowns. Reactions play to their natural end, with a 320 ms crossfade. A pending hover is replaced by the latest one and discarded when the pointer leaves. Peak rewards use `ui.featureAnimations.reward` (`点击回应 - 开心跃动`) with bounded SVG fish scatter and drool. Inventory gains use SVG symbols shared with the growth panel.
+
+## 情境回应 / Context reactions
+
+| 条件 / Condition | 反馈 / Reaction |
+|---|---|
+| 打开余额，低于 CNY 10 / USD 2（含零） | 翻钱包；零钱回应 / wallet gesture |
+| 打开余额，至少 CNY 100 / USD 20 | 开心跃动 / happy jump |
+| 已观察到本轮执行，30 秒内完成 | 开心跃动；不重播历史完成 / quick completion |
+| 当前页面累计观察执行 10 分钟 | 喝奶茶；每轮一次 / long-work companionship |
+| 已观察到本轮执行，至少 10 分钟后完成 | 超大伸懒腰 / stretch after long completion |
+| 无结束记录的空闲状态，每 10 分钟以 35% 概率 | 鲸鱼吐泡泡特效 / occasional idle bubbles |
+
+情境回应共享 2 分钟冷却，余额同一档位不因刷新重播。暂停、后台与专注时间不累计为执行时间。等待输入、错误、暂停状态抑制反馈，排队动作播放前重新检查当前状态。用户主动动作优先；“情境回应”开关也控制工作摸鱼序列。余额档位只用于动画，不是理财建议，也不改变库存或记账。
+
+Context reactions share a two-minute cooldown. Repeated balance refreshes in the same band do not replay them. Paused, hidden and focus time does not count as observed execution. Waiting, error and paused states suppress reactions; queued clips recheck the current state before playback. Deliberate interactions take priority. The setting also controls playful work-break sequences. Balance bands are decorative and do not alter inventory or accounting.

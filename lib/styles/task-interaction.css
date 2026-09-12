@@ -412,3 +412,39 @@
 .dsh-kujira-root .kj-task-return {
   flex: none;
 }
+
+.dsh-kujira-root .kj-clamped-text[data-lines="1"] {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.dsh-kujira-root .kj-task-link-copy,
+.dsh-kujira-root .kj-task-plan .kj-clamped-text {
+  flex: 1;
+}
+.dsh-kujira-root .kj-task-operation-head {
+  row-gap: 3px;
+}
+.dsh-kujira-root .kj-task-operation-copy {
+  display: contents;
+}
+.dsh-kujira-root .kj-task-operation-copy > strong {
+  grid-column: 2;
+  grid-row: 1;
+}
+.dsh-kujira-root .kj-task-operation-copy > .kj-task-path {
+  grid-column: 2 / -1;
+  grid-row: 2;
+}
+.dsh-kujira-root .kj-task-operation-head > .kj-status-icon {
+  grid-column: 1;
+  grid-row: 1;
+}
+.dsh-kujira-root .kj-task-operation-head > .kj-task-status {
+  grid-column: 3;
+  grid-row: 1;
+}
+.dsh-kujira-root .kj-task-operation-head > .kj-task-row-chevron {
+  grid-column: 4;
+  grid-row: 1;
+}

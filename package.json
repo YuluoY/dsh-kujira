@@ -1,6 +1,6 @@
 {
     "name": "dsh-kujira",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "private": true,
     "description": "DeepSeek 鲸鱼娘桌宠 —— 独立重写的 DeepSeek Harness Web 插件。零构建依赖：lib/ 里的 JS 就是源码，改完刷新即生效。",
     "keywords": [

@@ -162,3 +162,9 @@
     min-height: 44px;
   }
 }
+
+.dsh-kujira-root .kj-single-heading {
+  padding: 4px;
+  color: var(--kj-muted);
+  font-size: 11px;
+}

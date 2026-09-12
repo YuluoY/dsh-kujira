@@ -89,7 +89,7 @@ test("client composition renders with the host React instance after module extra
     assert.equal(
       walk(root).filter((node) => node.props.className === "dsh-kujira-orb")
         .length,
-      6,
+      7,
     );
     assert.equal(typeof client.UsageMount, "function");
   } finally {

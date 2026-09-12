@@ -230,6 +230,7 @@
       "hintOnce": true
     },
     "featureAnimations": {
+      "activity": "工作思考",
       "session": "偷吃Token",
       "reward": "点击回应 - 开心跃动",
       "feed": "偷吃Token",
