@@ -13,21 +13,21 @@ DeepSeek Harness Web 桌宠插件。查看任务进度、会话费用和账户�
 
 ## 安装
 
-需要 Node.js 22+ 和可正常运行的 DeepSeek Harness Web。
+需要 Node.js 22+、pnpm 和可正常运行的 DeepSeek Harness Web，`dsh` 与 `pnpm` 命令须在 PATH 中。
 
-```bash
-git clone https://github.com/YuluoY/dsh-kujira.git
-cd dsh-kujira
-npm run setup
+在任意目录执行这一行，macOS、Linux 和 Windows 通用：
+
+```sh
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.15/dsh-kujira-0.1.15.tgz
 ```
 
-重启 DSH Web 并刷新页面。也可以解压 [Release 安装包](https://github.com/YuluoY/dsh-kujira/releases)，在解压目录执行 `node scripts/dsh-plugin.mjs install`。链接安装依赖这个目录，请保留它。
+DSH 自动下载、安装并注册插件，无需 Git、手动解压或进入项目目录。等正在执行的会话完成后，正常重启 DSH Web 并刷新页面。命令固定到明确版本，重复执行可安装该版本；升级时使用新版发布包地址。
 
-```bash
-npm run unlink   # 卸载后重启 DSH Web
+```sh
+dsh plugin --profile web remove dsh-kujira
 ```
 
-支持 macOS / Linux 的 `sh scripts/install.sh` 和 Windows 的 `scripts/install.ps1`。可先运行 `npm run doctor` 检查环境；参见[安装、更新与卸载](docs/INSTALL.md)。
+开发者需要链接本地源码时，可使用 `npm run setup`。更多选项见[安装、更新与卸载](docs/INSTALL.md)。
 
 已在 DSH **0.1.5-rc.1** 验证安装、真实余额与历史会话读取；调度使用该版本的 Agent 事件分发器验证。
 

@@ -13,21 +13,21 @@ A desktop companion for DeepSeek Harness Web. Track agent tasks, session costs a
 
 ## Installation
 
-Requires Node.js 22+ and a working DeepSeek Harness Web installation.
+Requires Node.js 22+, pnpm and a working DeepSeek Harness Web installation, with `dsh` and `pnpm` on PATH.
 
-```bash
-git clone https://github.com/YuluoY/dsh-kujira.git
-cd dsh-kujira
-npm run setup
+Run one command from any directory on macOS, Linux or Windows:
+
+```sh
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.15/dsh-kujira-0.1.15.tgz
 ```
 
-Restart DSH Web and refresh the page. Alternatively, extract a [release archive](https://github.com/YuluoY/dsh-kujira/releases) and run `node scripts/dsh-plugin.mjs install` from its directory. Keep the directory: the installation links to it.
+DSH downloads, installs and registers the plugin. No Git clone, manual extraction or project directory is needed. Let active sessions finish, then restart DSH Web and refresh the page. The URL pins an explicit version; use a newer release URL when upgrading.
 
-```bash
-npm run unlink   # Restart DSH Web after removing the plugin
+```sh
+dsh plugin --profile web remove dsh-kujira
 ```
 
-Use `sh scripts/install.sh` on macOS/Linux or `scripts/install.ps1` on Windows. Run `npm run doctor` to check prerequisites. See [installation, updates and removal](docs/INSTALL.md).
+For local source development, `npm run setup` remains available. See [installation, updates and removal](docs/INSTALL.md).
 
 Installation, live balances and historical session reads were verified with DSH **0.1.5-rc.1**. Scheduling was tested through that version’s agent event dispatcher.
 

@@ -4,7 +4,32 @@
 
 Requires Node.js 22+, `dsh` and `pnpm` on PATH. No frontend build or development dependencies are needed.
 
-## 快速安装 / Quick install
+## 一行安装 / One-command installation
+
+在任意目录执行 / Run from any directory:
+
+```sh
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.15/dsh-kujira-0.1.15.tgz
+```
+
+macOS、Linux、Windows 使用相同命令。DSH 通过自己的包管理器下载、解包并注册插件，文件由 DSH 管理，不需要保留下载目录，也不需要运行其他安装脚本。命令不自动重启 DSH；等会话完成后正常重启，再刷新浏览器。
+
+The same command works on macOS, Linux and Windows. DSH downloads, extracts and registers the plugin through its package manager. DSH owns the installed files; there is no download folder to keep or extra installer to run. It does not restart DSH: finish active sessions, restart normally, then refresh the browser.
+
+地址固定到 v0.1.15，避免同一个“latest”下载地址被包管理器缓存成旧版本。更新时，复制新 Release 的版本化 `.tgz` 地址重复执行 `add`，无需先卸载。自定义 Web profile 将 `web` 替换为对应名称。
+
+The URL pins v0.1.15 so a mutable “latest” URL cannot silently reuse a cached old package. To update, use the next release's versioned `.tgz` URL with `add`; no uninstall is needed. Replace `web` for a custom Web profile.
+
+```sh
+# 卸载 / Remove
+dsh plugin --profile web remove dsh-kujira
+```
+
+需要能访问 GitHub Releases。网络受限时，可从能访问 GitHub 的设备下载安装包，再按下方方式本地安装。
+
+GitHub Releases must be reachable. If access is restricted, download the archive on another device and follow the local installation steps below.
+
+## 本地源码或离线安装 / Local-source or offline installation
 
 下载并解压 [最新 Release](https://github.com/YuluoY/dsh-kujira/releases/latest) 的 `.tgz` 安装包，进入解压后的 `package` 目录：
 
@@ -58,6 +83,8 @@ node scripts/dsh-plugin.mjs install --profile my-web
 `doctor` checks executables and package files without reading private configuration. `--dry-run` prints the command without installing. A custom profile must already support the Web UI; this script does not configure a full Web environment for it.
 
 ## 更新 / Update
+
+一行命令安装请使用新版本发布包 URL 重新执行 `dsh plugin --profile web add <URL>`。以下为本地链接安装的更新方式：
 
 Git 安装可以在目录内 `git pull --ff-only`，然后执行 `npm run setup`。Release 安装请将新版解压到稳定目录并重新执行安装脚本。重跑安装会更新链接，不先卸载现有插件。
 
