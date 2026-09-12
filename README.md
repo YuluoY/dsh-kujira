@@ -18,14 +18,16 @@ DeepSeek Harness Web 桌宠插件。查看任务进度、会话费用和账户�
 ```bash
 git clone https://github.com/YuluoY/dsh-kujira.git
 cd dsh-kujira
-npm run link
+npm run setup
 ```
 
-重启 DSH Web 并刷新页面。也可以解压 [Release 安装包](https://github.com/YuluoY/dsh-kujira/releases)，在解压目录执行 `npm run link`。链接安装依赖这个目录，请保留它。
+重启 DSH Web 并刷新页面。也可以解压 [Release 安装包](https://github.com/YuluoY/dsh-kujira/releases)，在解压目录执行 `node scripts/dsh-plugin.mjs install`。链接安装依赖这个目录，请保留它。
 
 ```bash
 npm run unlink   # 卸载后重启 DSH Web
 ```
+
+支持 macOS / Linux 的 `sh scripts/install.sh` 和 Windows 的 `scripts/install.ps1`。可先运行 `npm run doctor` 检查环境；参见[安装、更新与卸载](docs/INSTALL.md)。
 
 已在 DSH **0.1.5-rc.1** 验证安装、真实余额与历史会话读取；调度使用该版本的 Agent 事件分发器验证。
 
@@ -33,9 +35,9 @@ npm run unlink   # 卸载后重启 DSH Web
 
 - **任务进展**：显示当前操作、计划和子代理状态，展开查看结果与文件，通过入口跳转到对应会话。
 - **峰谷调度**：同一 DSH 服务中的主代理和子代理，峰价暂停、谷价续跑。默认关闭，在设置中开启。
-- **费用与余额**：输入框右下方显示峰谷状态和本次会话费用；余额读取 DSH 已配置的 DeepSeek 账户。
-- **互动养成**：50 段动画覆盖待机、工作、睡眠和互动。使用 DeepSeek 获得随机补给，也可开启无限互动。
-- **个性化**：调整位置、大小、气泡停留时间和菜单数量；支持中、英、韩、俄，以及跟随系统。
+- **费用与余额**：输入框右下方显示峰谷状态和当前会话与嵌套子代理的合计费用；余额读取 DSH 已配置的 DeepSeek 账户。
+- **互动养成**：50 段动画覆盖待机、工作、睡眠和互动。连续使用物品无冷却；消费按可配置概率掉落 1–多件物品，也可开启无限互动。
+- **个性化**：调整位置、大小、气泡停留时间和菜单数量；设置自动保存，连续调整防抖；支持中、英、韩、俄，以及跟随系统。
 - **扩展**：天气、GitHub 快捷入口，以及供外部插件注册功能的 [扩展 API](docs/EXTENSIONS.md)。
 
 <img src="docs/images/balance.zh.png" width="600" alt="余额面板与鲸鱼娘" />
@@ -46,7 +48,7 @@ npm run unlink   # 卸载后重启 DSH Web
 
 金额保留 DeepSeek 返回的币种，切换语言不会换汇。充值余额是尚未用完的充值部分，不是历史充值总额；会话费用是用量估算，不是官方账单。
 
-[调度与补给规则](docs/USAGE.md) · [全部动画及触发条件](docs/ANIMATIONS.md)
+[调度与补给规则](docs/USAGE.md) · [数据与隐私](docs/PRIVACY.md) · [全部动画及触发条件](docs/ANIMATIONS.md)
 
 ## 开发
 

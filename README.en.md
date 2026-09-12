@@ -18,14 +18,16 @@ Requires Node.js 22+ and a working DeepSeek Harness Web installation.
 ```bash
 git clone https://github.com/YuluoY/dsh-kujira.git
 cd dsh-kujira
-npm run link
+npm run setup
 ```
 
-Restart DSH Web and refresh the page. Alternatively, extract a [release archive](https://github.com/YuluoY/dsh-kujira/releases) and run `npm run link` from its directory. Keep the directory: the installation links to it.
+Restart DSH Web and refresh the page. Alternatively, extract a [release archive](https://github.com/YuluoY/dsh-kujira/releases) and run `node scripts/dsh-plugin.mjs install` from its directory. Keep the directory: the installation links to it.
 
 ```bash
 npm run unlink   # Restart DSH Web after removing the plugin
 ```
+
+Use `sh scripts/install.sh` on macOS/Linux or `scripts/install.ps1` on Windows. Run `npm run doctor` to check prerequisites. See [installation, updates and removal](docs/INSTALL.md).
 
 Installation, live balances and historical session reads were verified with DSH **0.1.5-rc.1**. Scheduling was tested through that version’s agent event dispatcher.
 
@@ -33,9 +35,9 @@ Installation, live balances and historical session reads were verified with DSH 
 
 - **Task progress** — current operations, plans and subagents, with expandable results, files and links to their sessions.
 - **Tariff scheduling** — pause main agents and subagents during peak hours and resume off-peak within the same DSH service. Off by default; enable in settings.
-- **Costs and balances** — tariff status and session costs at the bottom right of the composer; balances from your configured DSH DeepSeek account.
-- **Pet interactions** — 50 animations for idle, work, sleep and interactions. DeepSeek usage earns random supplies; unlimited interaction is also available.
-- **Preferences** — position, size, bubble duration and menu size. Chinese, English, Korean and Russian, or follow the system.
+- **Costs and balances** — tariff status and combined parent/subagent costs at the bottom right of the composer; balances from your configured DSH DeepSeek account.
+- **Pet interactions** — 50 animations for idle, work, sleep and interactions. Continuous use has no cooldown. Configurable spending thresholds and probabilities award random bundles; unlimited mode is available.
+- **Preferences** — position, size, bubble duration and menu size. Changes autosave with debouncing. Chinese, English, Korean and Russian, or follow the system.
 - **Extensions** — weather, a GitHub shortcut and an [API for external menu actions](docs/EXTENSIONS.md).
 
 <img src="docs/images/balance.en.png" width="600" alt="Balance panel beside Kujira" />
@@ -46,7 +48,7 @@ Scheduling takes effect at **agent step boundaries**. An issued model request or
 
 Amounts retain the currency returned by DeepSeek. Language selection does not convert currencies. Paid credit means remaining deposited funds, not lifetime deposits; session costs are usage estimates, not an official invoice.
 
-[Scheduling and supply rules](docs/USAGE.en.md) · [Animation triggers](docs/ANIMATIONS.md)
+[Scheduling and supply rules](docs/USAGE.en.md) · [Data and privacy](docs/PRIVACY.md) · [Animation triggers](docs/ANIMATIONS.md)
 
 ## Development
 

@@ -14,3 +14,11 @@ DESIGN.md
 visual-preview.html
 docs/UI-UPDATE.md
 docs/看板娘交互设计研究.md
+
+# Machine-specific runtime data and secret material
+.credentials.yaml
+*.pem
+*.key
+inventory.json
+realtime.json
+peak-scheduler.json

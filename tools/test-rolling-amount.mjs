@@ -37,7 +37,7 @@ test('decimal-place control commits whole numbers and clamps typed values withou
  let draft,committed=4;
  const React={createElement:(type,props,...children)=>({type,props,children}),useId:()=>'',useRef:()=>({current:null}),useState:fn=>{draft ??= typeof fn==='function'?fn():fn;return[draft,v=>{draft=v;}];},useEffect:()=>{},useLayoutEffect:()=>{}};
  const {NumberField}=createControls(React);
- const render=()=>NumberField({label:'Precision',value:committed,min:0,max:6,integer:true,onChange:v=>{committed=v;}}).children.find(c=>c.type==='input');
+ const render=()=>NumberField({label:'Precision',value:committed,min:0,max:6,integer:true,onChange:v=>{committed=v;}}).children.flatMap(c=>c?.children||[]).find(c=>c?.type==='input');
  render().props.onChange({currentTarget:{value:'4.6'}});assert.equal(committed,5);render().props.onBlur();assert.equal(draft,'5');
  render().props.onChange({currentTarget:{value:'99'}});render().props.onBlur();assert.equal(committed,6);assert.equal(draft,'6');
  render().props.onChange({currentTarget:{value:'0'}});render().props.onBlur();assert.equal(committed,0);

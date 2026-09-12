@@ -86,8 +86,10 @@ Automatic price synchronization defaults to off; explicitly saved preferences re
 
 ### Random-drop settings
 
-Settings → Random drops provides spend per roll (CNY 0.01–100; default 0.10), success probability (0–100%; default 25%), minimum and maximum items (1–20; default 1–3), fish share (0–100%; default 50%), and peak bonus (on by default). Use Apply drop rules to save the group.
+Settings → Random drops provides spend per roll (CNY 0.01–100; default 0.10), success probability (0–100%; default 25%), minimum and maximum items (1–20; default 1–3), fish share (0–100%; default 50%), and peak bonus (on by default). Edits show immediately and autosave about 400 ms after the last adjustment. Inputs stay editable while saving; late replies preserve newer edits. Invalid ranges and failures are shown with an error-only retry action.
 
 Rolls are independent and may miss, without a guaranteed fallback. A success first chooses bundle size, then draws each item type independently. Within the size range, each additional item halves its relative weight. Changing rules preserves fractional progress and stock, applies to future settlements, and never rerolls past spending. Conflicting edits from another window require reviewing the latest settings. The ring tracks the next chance rather than a guaranteed reward.
 
 Continuous use has no timed restriction. Requests serialize with up to 20 pending clicks; failures cancel unsent clicks and retries retain the original request ID. Animation playback coalesces repeated actions into at most one pending reaction.
+
+Local appearance changes apply immediately; storage writes debounce for 200 ms and flush on page exit. Settings use a consistent control column with units inside numeric inputs. See [installation](INSTALL.md) and [data handling](PRIVACY.md).
