@@ -39,3 +39,7 @@ Peak hours are Monday–Friday, 09:00–12:00 and 14:00–18:00 Beijing time. We
 The task panel shows status, goal, plan and outcome. Child tasks needing attention come first; files and tool records stay collapsed until needed. Results render as Markdown. File and child-session links appear only when supported by the host. Imprecise step-location links have been removed.
 
 Supplies accrue from unique settled usage records. Pausing, refreshing, duplicate events, tariff-clock transitions and historical repricing do not generate rewards. Real usage delivered after cancellation still settles, and other running sessions or subagents can keep earning. Pending reward animations clear when no agents remain active; inventory is preserved. Upgrades do not reissue historical rewards.
+
+## Session-cost display
+
+Set “Cost decimal places” under Settings → Usage & privacy. Choose 0–6 places; the default is 4. The dock and breakdown share this precision without changing accounting or supply rewards. Only changed digits roll vertically. Initial loading, session changes, locale changes and precision changes display immediately; reduced-motion and focus modes stay static. The breakdown leads with the total, followed by off-peak and peak costs. Hovering the dock shows only the next tariff switch.

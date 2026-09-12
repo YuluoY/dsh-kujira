@@ -42,7 +42,7 @@ import {createActivityReader} from '../lib/host/activity.js';
 import { activityPreview } from './fixtures/activity-preview.mjs';
 import {rateAt} from '../lib/shared/billing.js';
 import { previewUsage } from './fixtures/usage-preview.mjs';
-let usagePreviewMode='offpeak';
+let usagePreviewMode='offpeak',usageExtraTokens=0;
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PREVIEW_PORT || 8792);
@@ -214,7 +214,10 @@ const server = createServer(async (req, res) =>
     }
     // Preview-only usage fixtures never pass through reward settlement.
     if(pathname==='/dsh-kujira/usage' && url.searchParams.get('sessionId')==='preview-session') {
-        res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(previewUsage(usagePreviewMode)));return;
+        res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(previewUsage(usagePreviewMode,Date.now(),usageExtraTokens)));return;
+    }
+    if(pathname==='/__preview/cost' && req.method==='POST') {
+        usageExtraTokens+=10000;res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({ok:true}));return;
     }
     if(pathname==='/__preview/usage' && req.method==='POST') {
         const mode=url.searchParams.get('mode');
