@@ -44,3 +44,6 @@ Accounting now processes appended events incrementally; duplicate notifications 
 
 
 Parent-session totals read verified descendant sessions only when the footer queries usage. Reads coalesce per parent and use four-way concurrency. Completed child summaries contain costs and child IDs rather than retained transcript text; they expire after 60 seconds and are invalidated by session events. Traversal deduplicates IDs and is bounded at 256 descendants and 24 levels. Unreadable or bounded-out branches mark totals as partial. The footer supply ring subscribes to the existing inventory source and starts no additional inventory polling.
+
+
+Random loot uses binomial counts for successes, bundle sizes and item types rather than iterating once per earned chance. The beta subdivision follows the order-statistic construction in [Devroye, Chapter X §4.5](https://luc.devroye.org/chapter_ten.pdf). Gamma proposals use the shape-greater-than-one method also documented in [NumPy's distribution implementation](https://github.com/numpy/numpy/blob/main/numpy/random/src/distributions/distributions.c). Tests check small and large sample means/variances and bound random calls for a billion-chance batch. Inventory writes remain serialized and unsuccessful rolls are persisted to prevent replay.

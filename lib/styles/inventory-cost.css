@@ -223,19 +223,6 @@
   position: relative;
   min-height: 44px;
 }
-.dsh-kujira-root .kj-care-cooldown {
-  position: absolute;
-  right: 3px;
-  bottom: 2px;
-  color: var(--kj-muted);
-  font-size: 9px;
-  font-variant-numeric: tabular-nums;
-}
-.dsh-kujira-root .kj-care-actions .kj-action[data-cooling="true"] {
-  opacity: 0.65;
-  cursor: wait;
-}
-
 .kj-footer-supply {
   position: relative;
   display: inline-flex;
@@ -301,4 +288,10 @@
 .kj-usage-root[data-motion="reduced"] .kj-footer-supply,
 .kj-usage-root[data-motion="reduced"] .kj-ring-value {
   transition: none;
+}
+
+.dsh-kujira-root .kj-reward-settings .kj-duration > span {
+  flex: 0 0 12px;
+  width: 12px;
+  text-align: center;
 }

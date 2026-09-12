@@ -128,13 +128,24 @@ test('supply progress wraps forward, coalesces reward bursts and skips animation
  motion.update(0);assert.equal(frames.at(-1).value,0);motion.dispose();
 });
 
-test('care actions preserve the panel, prevent concurrent consumption and retain idempotent receipt state',async t=>{
+test('care actions preserve the panel and serialize distinct rapid clicks without a time cooldown',async t=>{
  const {useCareActions}=await import('../lib/shared/client/use-care-actions.js');let closes=0,requests=0,finish,busy=false;
  const saved=new Map(['fetch','sessionStorage','localStorage'].map(k=>[k,globalThis[k]]));t.after(()=>{for(const[k,v]of saved)v===undefined?delete globalThis[k]:globalThis[k]=v;});
  globalThis.sessionStorage={setItem(){},removeItem(){}};globalThis.localStorage={setItem(){}};
  globalThis.fetch=()=>{requests++;return new Promise(resolve=>{finish=()=>resolve({ok:true,json:async()=>({ok:true,receiptId:'one',gain:{},cooldownMs:8000})});});};
  const G={migrate:()=>({satiety:20}),tick:n=>({state:n}),applyGain:n=>({state:n})};
- const actions=useCareActions({useCallback:fn=>fn,useEffect(){},inventoryBusyRef:{current:false},GROWRef:{current:G},cfgRef:{current:{growth:{enabled:true,rates:{}},pools:{click:[]}}},closeOrb:()=>closes++,speak(){},pendingResource:{current:null},readStore:()=>({}),GROW_KEY:'test',busyRef:{current:false},setInventoryBusy:v=>{busy=v;},ASSET_BASE:'/test',acceptInventory(){},pick:()=>'',play(){},loadGrowth(){},prefsRef:{current:{playful:true}},t:s=>s});
- const pending=actions.feed({keepOpen:true});assert.equal(busy,true);await actions.feed({keepOpen:true});assert.equal(requests,1);assert.equal(closes,0);finish();await pending;assert.equal(busy,false);
+ const actions=useCareActions({useCallback:fn=>fn,useRef:v=>({current:v}),useEffect(){},inventoryBusyRef:{current:false},GROWRef:{current:G},cfgRef:{current:{growth:{enabled:true,rates:{}},pools:{click:[]}}},closeOrb:()=>closes++,speak(){},pendingResource:{current:null},readStore:()=>({}),GROW_KEY:'test',busyRef:{current:false},setInventoryBusy:v=>{busy=v;},ASSET_BASE:'/test',acceptInventory(){},pick:()=>'',play(){},loadGrowth(){},prefsRef:{current:{playful:true}},t:s=>s});
+ const pending=actions.feed({keepOpen:true});assert.equal(busy,true);const second=actions.feed({keepOpen:true});assert.equal(requests,1);assert.equal(closes,0);finish();await pending;assert.equal(requests,2);finish();await second;assert.equal(busy,false);
  const radial=actions.feed();assert.equal(closes,1);finish();await radial;
+});
+
+test('uncertain care requests stop unsent clicks and reuse the receipt ID on explicit retry',async t=>{
+ const {useCareActions}=await import('../lib/shared/client/use-care-actions.js');
+ const saved=new Map(['fetch','sessionStorage','localStorage'].map(k=>[k,globalThis[k]]));t.after(()=>{for(const[k,v]of saved)v===undefined?delete globalThis[k]:globalThis[k]=v;});
+ globalThis.sessionStorage={setItem(){},removeItem(){}};globalThis.localStorage={setItem(){}};
+ const ids=[];globalThis.fetch=async(_url,options)=>{ids.push(JSON.parse(options.body).requestId);throw Error('offline');};
+ const G={migrate:()=>({satiety:100}),tick:n=>({state:n}),applyGain:n=>({state:n})};
+ const pending={current:null};const actions=useCareActions({useCallback:fn=>fn,useRef:v=>({current:v}),useEffect(){},inventoryBusyRef:{current:false},GROWRef:{current:G},cfgRef:{current:{growth:{enabled:true,rates:{}},pools:{click:[]}}},closeOrb(){},speak(){},pendingResource:pending,readStore:()=>({}),GROW_KEY:'test',busyRef:{current:false},setInventoryBusy(){},ASSET_BASE:'/test',acceptInventory(){},pick:()=>'',play(){},loadGrowth(){},prefsRef:{current:{playful:true}},t:s=>s});
+ const first=actions.feed({keepOpen:true}),second=actions.feed({keepOpen:true});assert.equal(await first,false);assert.equal(await second,false);assert.equal(ids.length,1);assert.equal(pending.current.requestId,ids[0]);
+ await actions.feed({keepOpen:true});assert.equal(ids.length,2);assert.equal(ids[0],ids[1]);
 });

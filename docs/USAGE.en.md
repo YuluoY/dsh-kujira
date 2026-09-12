@@ -21,7 +21,7 @@ Local preview has no real DSH agents and is labelled accordingly. The installed 
 
 `total_balance` is available credit, `topped_up_balance` is remaining paid credit, and `granted_balance` is granted credit. None is a lifetime deposit total. Country selection changes formatting, **not account currency**. Session costs are estimates from verifiable usage records and prices, not an official invoice.
 
-Each CNY 0.10 of eligible off-peak usage estimates earns one supply; peak usage earns one per CNY 0.05. This doubles rewards for the same amount spent without changing the displayed bill. Each randomized five-drop bag contains two fish snacks and one pat, play and stretch action. Interactions share a cooldown. Free mode preserves inventory; preview usage never earns real supplies.
+By default, each CNY 0.10 of eligible usage earns a roll with a 25% chance of 1–3 items. Smaller bundles are more common. Peak bonus doubles roll progress without changing the bill. Items have no time cooldown. Unlimited mode preserves stock and still earns random drops; preview usage never awards real inventory.
 
 
 ## Reactions and supplies
@@ -75,10 +75,19 @@ Context reactions add occasional balance, task-duration and idle feedback. Balan
 
 ### Continuous care and inclusive session costs
 
-All four care actions keep the growth panel open. Buttons share an eight-second countdown, without queuing extra consumption. They become available automatically. Empty stock, satiety and busy-task restrictions remain visible. Network retries retain the original request ID. Growth values refresh while open; balance and weather refresh through their caches without replacing the panel.
+All four care actions keep the growth panel open. There is no time cooldown or wait for animation completion. Clicks are processed in order; feeding remains possible at full satiety. Empty stock, busy-task restrictions and network failures stop unsent actions. Network retries retain the original request ID. Growth values refresh while open; balance and weather refresh through their caches without replacing the panel.
 
 The footer ring sits beside the session amount and uses settled supply progress from all sessions. Its progress eases forward, changing tone with each gain; a wrap completes before continuing. Bursts coalesce, while hidden and reduced-motion views update immediately. Unlimited interactions still earn supplies.
 
 The footer total includes the current session and its recursive subagents. Peak and off-peak rows also include subagents. “Subagents included” is a subtotal already in the total. Inherited history and duplicate child references are excluded. Released children load through read-only history; unavailable records mark totals as partial. The host accounting update activates after a normal DSH restart.
 
 Automatic price synchronization defaults to off; explicitly saved preferences remain intact. Files display a name, extension tag and opening arrow, with the original path on hover. The installed DSH already renders `.md` and `.markdown`. The plugin uses the host's viewer selection instead of registering a competing Markdown viewer or overriding another plugin or user choice.
+
+
+### Random-drop settings
+
+Settings → Random drops provides spend per roll (CNY 0.01–100; default 0.10), success probability (0–100%; default 25%), minimum and maximum items (1–20; default 1–3), fish share (0–100%; default 50%), and peak bonus (on by default). Use Apply drop rules to save the group.
+
+Rolls are independent and may miss, without a guaranteed fallback. A success first chooses bundle size, then draws each item type independently. Within the size range, each additional item halves its relative weight. Changing rules preserves fractional progress and stock, applies to future settlements, and never rerolls past spending. Conflicting edits from another window require reviewing the latest settings. The ring tracks the next chance rather than a guaranteed reward.
+
+Continuous use has no timed restriction. Requests serialize with up to 20 pending clicks; failures cancel unsent clicks and retries retain the original request ID. Animation playback coalesces repeated actions into at most one pending reaction.
