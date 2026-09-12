@@ -140,15 +140,6 @@
   color: var(--kj-muted);
   white-space: nowrap;
 }
-.dsh-kujira-root .kj-task-panel .kj-task-goal-brief {
-  margin-bottom: 8px;
-}
-.dsh-kujira-root .kj-task-panel .kj-task-progress {
-  margin-top: 8px;
-}
-.dsh-kujira-root .kj-task-panel .kj-task-progress [role="progressbar"] {
-  margin-top: 6px;
-}
 .dsh-kujira-root .kj-tabpanel .kj-task-child {
   padding: 8px;
 }

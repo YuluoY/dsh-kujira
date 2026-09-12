@@ -54,8 +54,10 @@ Task categories have explicit scopes: Team includes children still running or aw
 
 PTC activity reads `tool/ptc-dispatch-start` and `tool/ptc-dispatch`, showing operations inside `run_code` while preserving outer errors. File changes require successful `write`, `edit`, `write_file`, `edit_file`, or a mutating `str_replace_editor` operation. Reads, failures, unknown tools and Bash output do not establish file changes. Empty categories stay hidden.
 
-File labels are relative to the session working directory; external paths remain explicit and navigation uses the original path. Plan items, files and message previews use two-line limits, with full text available on hover or keyboard focus and scrollable long tooltips. Loading icons express active work without repeating a visible running label.
+File labels are relative to the session working directory; external paths remain explicit and navigation uses the original path. Plan items and file paths use one-line limits; message previews use two-line limits, with full text available on hover or keyboard focus and scrollable long tooltips. Loading icons express active work without repeating a visible running label.
 
 The latest public message links to its original position. Chat provides an index of 30 messages per page, with older history loaded on demand. Navigation uses exact message identities and durable event positions, loads host history when needed, and cancels subsequent navigation when the session changes or the panel closes. Missing host capabilities produce a notice rather than an approximate text match.
 
-Plan counts and the progress bar share one row and reflect actual `todo/write` data. Open panels refresh about every 1.5 seconds; hidden pages suspend polling. Updates retain the selected category, loaded message pages and per-category scroll positions.
+The Plan tab shows completed/total from actual `todo/write` data, excluding cancelled items from the total. There is no separate progress-bar row. Open panels refresh about every 1.5 seconds; hidden pages suspend polling. Updates retain the selected category, loaded message pages and per-category scroll positions.
+
+Opening a child from the task panel keeps the panel open. Its back button returns to the parent and restores the prior category and browsing position. After a message jump, reopen the task panel to return to the previous reading position. Missing anchors produce a notice rather than an approximate jump. Return history belongs to the current page; unrelated session selections do not reuse stale routes.

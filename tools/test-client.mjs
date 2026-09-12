@@ -466,3 +466,40 @@ test('attachment-only user messages remain locatable without revealing hidden re
  const page=messagePage([{type:'user/message',seq:1,data:{id:'image',source:{kind:'user'},content:[{type:'image',data:'private-binary'}]}},{type:'assistant/message',seq:2,data:{turn:1,step:1,message:{content:[{type:'reasoning',text:'hidden'}]}}}]);
  assert.equal(page.total,1);assert.equal(page.items[0].key,'13:input-messageimage');assert.equal(page.items[0].text,'附件消息');assert(!JSON.stringify(page).includes('private-binary'));
 });
+
+test('task navigation returns through nested child sessions and ignores unrelated routes',async()=>{
+ const {createNavigation}=await import('../lib/shared/client/navigation.js');
+ let current='root';const history=[],addresses=new Map();
+ const sessions={list:{getSnapshot:()=>({current})},subagentAddress:id=>addresses.get(id),open:id=>{current=id;},openSubagent:address=>{addresses.set(address.childSessionId,address);current=address.childSessionId;}};
+ const runtime={snapshot:()=>({sessionId:current})};
+ const make=()=>createNavigation({taskRuntime:runtime,ctx:{get:()=>sessions},history}).navigateTask;
+ const go=make();await go({kind:'child',sessionId:'root',parentId:'root',id:'child',mode:'continuable'});
+ assert.equal(make().backTarget().from,'root');
+ await make()({kind:'child',sessionId:'child',parentId:'child',id:'grandchild',mode:'one-shot'});
+ await make()({kind:'back',sessionId:'grandchild'});assert.equal(current,'child');
+ await make()({kind:'back',sessionId:'child'});assert.equal(current,'root');assert.equal(history.length,0);
+ current='unrelated';assert.equal(make().backTarget(),null);
+ current='child';assert.equal(make().backTarget().from,'root'); // Native navigation/refresh can recover the parent address.
+});
+test('failed and stale child navigation never invents a return route',async()=>{
+ const {createNavigation}=await import('../lib/shared/client/navigation.js');const history=[];
+ const sessions={openSubagent:async()=>{throw Error('not found');},open:()=>{}};
+ const go=createNavigation({taskRuntime:{snapshot:()=>({sessionId:'s'})},ctx:{get:()=>sessions},history}).navigateTask;
+ assert.equal(await go({kind:'child',sessionId:'s',parentId:'wrong',id:'child',mode:'one-shot'}),false);
+ await assert.rejects(go({kind:'child',sessionId:'s',parentId:'s',id:'child',mode:'one-shot'}));
+ assert.equal(history.length,0);assert.equal(go.backTarget(),null);
+ assert.equal(await go({kind:'back',sessionId:'other'}),false);
+});
+test('message return restores the original anchor offset and refuses a missing anchor',async()=>{
+ const {captureChatPosition,restoreChatPosition}=await import('../lib/shared/client/message-navigation.js');
+ const old=globalThis.getComputedStyle;globalThis.getComputedStyle=()=>({overflowY:'auto'});
+ try {
+  const scroller={scrollTop:200,scrollHeight:2000,clientHeight:200,getBoundingClientRect:()=>({top:0})};
+  const anchor={dataset:{chatAnchorKey:'old-message'},parentElement:scroller,getClientRects:()=>[{}],getBoundingClientRect:()=>({top:250-scroller.scrollTop,bottom:350-scroller.scrollTop}),setAttribute:()=>{},focus:()=>{}};
+  const flow={...scroller,querySelectorAll:()=>[anchor]};
+  const doc={querySelector:()=>flow,querySelectorAll:()=>[anchor]};
+  const position=captureChatPosition(doc);assert.equal(position.offset,50);
+  scroller.scrollTop=600;assert.equal(restoreChatPosition(position,doc),true);assert.equal(scroller.scrollTop,200);
+  assert.equal(restoreChatPosition({key:'missing',offset:0},doc),false);
+ }finally{globalThis.getComputedStyle=old;}
+});

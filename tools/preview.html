@@ -281,6 +281,9 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
     function makeFakeContext()
     {
         const mounted = [];
+        const sessionListeners = new Set(), addresses = new Map();
+        let selectedSession = 'preview-session';
+        const openSession = id => {selectedSession=id;for(const listener of sessionListeners)listener(id);};
         const previewNavigation = async target => {
                     const dialog=document.createElement('dialog');
                     dialog.style.cssText='max-width:480px;width:calc(100vw - 64px);background:#27292e;color:#e5e7eb;border:1px solid #4c515a;border-radius:14px;padding:20px;font:13px/1.7 system-ui';
@@ -292,7 +295,10 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
                 };
         const services = {
             sessions: {
-                openSubagent: value => previewNavigation({kind:'child',id:value.childSessionId}),
+                openSubagent: value => {addresses.set(value.childSessionId,value);openSession(value.childSessionId);},
+                open: openSession,
+                subagentAddress: id => addresses.get(id),
+                list: {getSnapshot:()=>({current:selectedSession})},
                 binding: () => ({session:{loadThrough: async seq => {
                     let value=await (await fetch('/dsh-kujira/activity?sessionId=preview-session')).json();
                     let items=value.activity.messages,hasMore=value.activity.hasMoreMessages,before=value.activity.messageBefore;
@@ -325,7 +331,11 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
                     },
                     register(meta, Component)
                     {
-                        return React.createElement(Component, { sessionId: galleryMode && galleryOptions.get('gallery')!=='task' ? null : 'preview-session', useProjection: () => undefined });
+                        return React.createElement(function PreviewEntry(){
+                            const [sessionId,setSessionId]=React.useState(selectedSession);
+                            React.useEffect(()=>{sessionListeners.add(setSessionId);return()=>sessionListeners.delete(setSessionId);},[]);
+                            return React.createElement(Component,{sessionId:galleryMode && galleryOptions.get('gallery')!=='task'?null:sessionId,useProjection:()=>undefined});
+                        });
                     }
                 }
             }

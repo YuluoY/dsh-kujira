@@ -81,16 +81,6 @@
   color: inherit;
   font-size: 11px;
 }
-.dsh-kujira-root .kj-task-progress-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.dsh-kujira-root .kj-task-progress-heading .kj-field-caption {
-  font-size: 11px;
-  color: var(--kj-muted);
-}
 .dsh-kujira-root .kj-task-panel .kj-label-text {
   padding-right: 17px;
 }
@@ -334,31 +324,6 @@
 .dsh-kujira-root button.kj-task-message-preview:hover {
   background: var(--kj-task-hover);
 }
-.dsh-kujira-root .kj-task-progress-inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.dsh-kujira-root .kj-task-progress-inline .kj-field-caption {
-  flex: none;
-  font-size: 11px;
-  white-space: nowrap;
-}
-.dsh-kujira-root .kj-task-progress-inline [role="progressbar"] {
-  flex: 1;
-  min-width: 16px;
-  margin: 0;
-}
-.dsh-kujira-root .kj-task-panel .kj-task-progress-inline [role="progressbar"] {
-  margin-top: 0;
-}
-.dsh-kujira-root .kj-task-progress-count {
-  flex: none;
-  white-space: nowrap;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
 .dsh-kujira-root .kj-visually-hidden {
   position: absolute;
   width: 1px;
@@ -403,4 +368,47 @@
   outline: 2px solid var(--kj-accent);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Task panel spacing: 16px outer gutter, 8px groups, 4px related content. */
+.dsh-kujira-root .dsh-kujira-panel[data-panel="activity"] > .kj-head {
+  flex: none;
+  height: auto;
+  min-height: 36px;
+  padding: 8px 16px 0;
+  align-items: center;
+}
+.dsh-kujira-root .dsh-kujira-panel[data-panel="activity"] > .kj-body {
+  padding: 2px 12px 10px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-overview {
+  display: grid;
+  gap: 4px;
+  padding: 0 4px 8px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-phase > span:first-child {
+  display: inline-flex;
+  align-items: center;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-goal-brief {
+  margin: 0;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-message-preview {
+  padding: 4px 0;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-result-preview {
+  margin: 0;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-plan {
+  padding-inline: 4px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-plan li {
+  padding-block: 6px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-file .kj-task-link {
+  min-height: 32px;
+  padding-inline: 4px;
+}
+.dsh-kujira-root .kj-task-return {
+  flex: none;
 }

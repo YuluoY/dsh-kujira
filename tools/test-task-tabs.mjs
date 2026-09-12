@@ -15,3 +15,10 @@ test('tabs expose one focusable selection and mount content for only the visible
  assert.equal(tabs[1].props['aria-controls'],panels[1].props.id);assert.equal(panels[1].props['aria-labelledby'],tabs[1].props.id);
  tabs[0].props.onClick();assert.equal(selected,'team');
 });
+
+test('plan tabs display live completed/total while other category counts remain plain',()=>{
+ const React={createElement:(type,props,...children)=>({type,props,children}),useId:()=>':tabs:',useRef:()=>({current:null}),useState:v=>[v,()=>{}],useEffect:()=>{},useLayoutEffect:()=>{}};
+ const Tabs=createTaskTabs(React);
+ const render=completed=>Tabs({items:[{id:'plan',label:'Plan',count:3,progress:{completed,total:3}},{id:'files',label:'Files',count:8}],value:'plan',onChange:()=>{}}).children[0].children.filter(e=>e.props?.role==='tab').map(e=>e.children[1].children[0]);
+ assert.deepEqual(render(2),['2/3','8']);assert.deepEqual(render(3),['3/3','8']);
+});
