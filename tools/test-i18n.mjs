@@ -83,3 +83,27 @@ test('weather fails over between public providers and never converts missing dat
  const result=await query(true,{region:'global',locale:'ru-RU'});
  assert.equal(result.source,'UApiPro');assert.equal(result.fallback,true);assert.equal(result.now.temp,0);assert.equal(result.now.feelsLike,null);assert.equal(result.now.text,'小雨');assert.equal(calls,2);
 });
+
+test('domestic auto-location needs no credentials; a manual city overrides disabled auto-location',async()=>{
+ let city='',calls=0;
+ const query=createWeatherClient(()=>city,{fetch:async(url,options)=>{
+  calls++;assert(url.startsWith('https://uapis.cn/'));assert.equal(options.headers.Authorization,undefined);
+  if(city)assert(url.includes('city='+encodeURIComponent(city)));else assert(!url.includes('city='));
+  return response({city:city||'Hangzhou',weather:'晴',temperature:'23'});
+ }});
+ assert.equal((await query(false,{auto:false})).reason,'no-city');assert.equal(calls,0);
+ assert.equal((await query(false)).automatic,true);assert.equal(calls,1);
+ city='上海';const manual=await query(false,{auto:false});assert.equal(manual.automatic,false);assert.equal(manual.city,'上海');
+ city='';await query(false);assert.equal(calls,2);
+});
+
+test('weather outages return an explicit failure or stale data for the same location only',async()=>{
+ let city='Shanghai',offline=false;
+ const query=createWeatherClient(()=>city,{fetch:async()=>{
+  if(offline)throw Error('offline');return response({city:'Shanghai',weather:'晴',temperature:23});
+ }});
+ await query(false);offline=true;
+ const stale=await query(true);assert.equal(stale.ok,true);assert.equal(stale.stale,true);assert.equal(stale.now.temp,23);
+ city='Seoul';assert.equal((await query(true)).reason,'weather-unavailable');
+ city='';assert.equal((await query(true)).reason,'location-unavailable');
+});

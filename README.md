@@ -18,7 +18,7 @@ DeepSeek Harness Web 桌宠插件。查看任务进度、会话费用和账户�
 在任意目录执行这一行，macOS、Linux 和 Windows 通用：
 
 ```sh
-dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.16/dsh-kujira-0.1.16.tgz
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.17/dsh-kujira-0.1.17.tgz
 ```
 
 DSH 自动下载、安装并注册插件，无需 Git、手动解压或进入项目目录。等正在执行的会话完成后，正常重启 DSH Web 并刷新页面。命令固定到明确版本，重复执行可安装该版本；升级时使用新版发布包地址。
@@ -46,6 +46,10 @@ dsh plugin --profile web remove dsh-kujira
 
 调度在 **Agent 步骤边界** 生效：已经发出的模型请求或执行中的工具会先完成。手动取消的任务不会自动恢复，独立运行的其他 DSH 服务不受控制。
 
+余额查询复用 DSH 凭据服务中的 `DEEPSEEK_API_KEY`，需要有效的 DeepSeek 官方 API 密钥及可访问的官方接口；第三方中转账户或自定义凭据名不会自动识别。密钥只在宿主使用，不传给浏览器。
+
+天气无需单独配置密钥。城市留空时按 **DSH 服务的出口 IP** 定位，填写城市则使用该城市；远程部署或代理可能让定位偏离你所在的城市。内置国内、国际天气源及失败回退，公共服务可能限流或暂时不可用。
+
 金额保留 DeepSeek 返回的币种，切换语言不会换汇。充值余额是尚未用完的充值部分，不是历史充值总额；会话费用是用量估算，不是官方账单。
 
 [调度与补给规则](docs/USAGE.md) · [数据与隐私](docs/PRIVACY.md) · [全部动画及触发条件](docs/ANIMATIONS.md)
@@ -64,7 +68,13 @@ npm run typecheck
 
 预览提供状态、费用和长内容示例。任务与费用使用隔离的模拟数据；余额和天气可能访问真实接口。
 
-提交问题时请附 DSH 版本、复现步骤和必要截图。改动交互或样式时，请检查长文本、小窗口及四种语言；贡献新功能可先通过 Issue 讨论。
+## 参与与联系
+
+欢迎提交 [Issue](https://github.com/YuluoY/dsh-kujira/issues) 和 [PR](https://github.com/YuluoY/dsh-kujira/pulls)。Bug、功能建议、文档修正和代码改进都欢迎；较大的改动建议先开 Issue 讨论。
+
+反馈问题时请附 DSH 版本、复现步骤和必要截图，注意遮盖密钥及私人内容。修改界面时，请检查长文本、小窗口和四种语言。
+
+联系作者：[GitHub @YuluoY](https://github.com/YuluoY) · 个人博客：[uluo.cloud](https://uluo.cloud/)。项目相关问题请优先通过 Issue 沟通。
 
 ## 贡献者
 

@@ -18,7 +18,7 @@ Requires Node.js 22+, pnpm and a working DeepSeek Harness Web installation, with
 Run one command from any directory on macOS, Linux or Windows:
 
 ```sh
-dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.16/dsh-kujira-0.1.16.tgz
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.17/dsh-kujira-0.1.17.tgz
 ```
 
 DSH downloads, installs and registers the plugin. No Git clone, manual extraction or project directory is needed. Let active sessions finish, then restart DSH Web and refresh the page. The URL pins an explicit version; use a newer release URL when upgrading.
@@ -46,6 +46,10 @@ Installation, live balances and historical session reads were verified with DSH 
 
 Scheduling takes effect at **agent step boundaries**. An issued model request or running tool finishes first. Manually cancelled tasks stay cancelled. Other independently running DSH services are outside its scope.
 
+Balance queries reuse `DEEPSEEK_API_KEY` from DSH's credentials service. A valid official DeepSeek API key and access to the official endpoint are required; third-party relay accounts and custom credential names are not detected automatically. Credentials stay on the host and are never sent to the browser.
+
+Weather needs no separate API key. Leave the city blank to locate by the **DSH server's outbound IP**, or enter a city to override it. Remote hosting and proxies can affect location accuracy. Domestic and international providers include failover; public services can be rate-limited or temporarily unavailable.
+
 Amounts retain the currency returned by DeepSeek. Language selection does not convert currencies. Paid credit means remaining deposited funds, not lifetime deposits; session costs are usage estimates, not an official invoice.
 
 [Scheduling and supply rules](docs/USAGE.en.md) · [Data and privacy](docs/PRIVACY.md) · [Animation triggers](docs/ANIMATIONS.md)
@@ -64,7 +68,13 @@ No frontend build is required. Host services live in `lib/host`, UI in `lib/shar
 
 The preview includes task states, cost examples and long-content fixtures. Tasks and costs use isolated demo data; balance and weather panels may call real services.
 
-For bug reports, include your DSH version, reproduction steps and relevant screenshots. Check long text, small windows and all four languages when changing the UI. Open an issue to discuss larger contributions.
+## Contributing and contact
+
+[Issues](https://github.com/YuluoY/dsh-kujira/issues) and [pull requests](https://github.com/YuluoY/dsh-kujira/pulls) are welcome: bug reports, feature ideas, documentation fixes and code improvements. For larger changes, please open an issue first.
+
+Include your DSH version, reproduction steps and relevant screenshots in bug reports, with secrets and private content redacted. Check long text, small windows and all four languages when changing the UI.
+
+Contact the maintainer: [@YuluoY on GitHub](https://github.com/YuluoY) · Personal blog: [uluo.cloud](https://uluo.cloud/). Please use issues for project questions.
 
 ## Contributors
 
