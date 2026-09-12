@@ -47,3 +47,21 @@ test('inventory polling preserves event cursors and ignores stale or identical r
  assert.deepEqual(mergeInventoryView(old,{ok:true,revision:4,free:true}).activity,old.activity);
  assert.notEqual(mergeInventoryView(old,{...old,activity:{instance:'a',sequence:3}}),old);
 });
+
+test('pause state updates survive identical stock revisions and consumption replies',async()=>{
+ const {mergeInventoryView}=await import('../lib/shared/client/reward-queue.js');
+ const old={ok:true,revision:3,free:false,earned:{fish:2},execution:{active:1}};
+ const paused=mergeInventoryView(old,{...old,execution:{active:0}});
+ assert.notEqual(paused,old);assert.equal(paused.execution.active,0);
+ assert.equal(mergeInventoryView(paused,{ok:true,revision:4,free:true}).execution.active,0);
+});
+
+test('simultaneous badge and fish scatter have distinct React keys and no background shape',async()=>{
+ const {useCompanionEffects}=await import('../lib/shared/client/use-companion-effects.js');let cursor=0;
+ const states=[{kind:'fish',count:4,id:1,peak:true},{count:4,id:1},false];
+ const React={Fragment:'fragment',createElement:(type,props,...children)=>({type,props,children}),useRef:v=>({current:v}),useState:()=>[states[cursor++],()=>{}],useEffect:()=>{}};
+ const {overlay}=useCompanionEffects({React,prefs:{},cfgRef:{current:{}},playMoment:()=>{}});
+ const nodes=overlay.children.filter(Boolean),keys=nodes.map(n=>n.props.key).filter(Boolean);
+ assert.equal(new Set(keys).size,keys.length);assert.equal(keys.length,2);
+ const json=JSON.stringify(overlay);assert.ok(json.includes('×4'));assert.ok(!json.includes('"type":"rect"'));
+});

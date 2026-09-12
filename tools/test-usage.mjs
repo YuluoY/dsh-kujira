@@ -91,3 +91,17 @@ test('DSH official adapter costs the same usage while unrelated providers remain
     const proxy={type:'request/header',data:{header:{config:{provider:'deepseek-proxy',model:'deepseek-flash'}}}};
     assert.equal(sessionCost([proxy,usage(1,valley)]).skipped[0].reason,'unsupported-provider');
 });
+
+test('DSH v2 settlements on the same step are distinct, even without legacy retry events',()=>{
+ const sample={inputTokens:0,outputTokens:125000};
+ const failed={type:'assistant/attempt',seq:3,time:valley,data:{turn:1,step:1,stream:[{time:valley,chunk:{type:'usage',usage:sample}}]}};
+ const success={type:'assistant/message',seq:4,time:valley,data:{turn:1,step:1,stream:[],usage:sample,message:{source:{provider:'deepseek-official',model:'deepseek-flash'}}}};
+ const result=sessionCost([flash,failed,success,success]);
+ assert.equal(result.requests,2);assert.equal(result.totals.total,1);
+});
+test('settled message routing overrides a stale request header and unsafe token counts stay unpriced',()=>{
+ const e=usage(2,valley,{stream:[],message:{source:{provider:'other',model:'deepseek-flash'}}});
+ assert.equal(sessionCost([flash,e]).skipped[0].reason,'unsupported-provider');
+ assert.equal(normalizeUsage({inputTokens:Number.MAX_SAFE_INTEGER+1,outputTokens:2}),null);
+ assert.equal(normalizeUsage({inputTokens:1.5,outputTokens:2}),null);
+});

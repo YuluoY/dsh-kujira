@@ -33,3 +33,9 @@ Emergency safeguard also covers agents already running when enabled. In-flight m
 Button corners range from 0% (square) to 50% (circle) in settings. Hover reactions finish before returning to the current task animation; moving across several buttons keeps only the last hovered reaction. Peak rewards scatter up to 12 fish around the mascot’s feet, with additional quantities included in the reward counter. They clear automatically after a few seconds. Static and focus modes suppress the scatter animation.
 
 Peak hours are Monday–Friday, 09:00–12:00 and 14:00–18:00 Beijing time. Weekends are entirely off-peak. Switch times are displayed in the device’s local time zone. See [DeepSeek pricing](https://api-docs.deepseek.com/quick_start/pricing/).
+
+## Task overview and accounting
+
+The task panel shows status, goal, plan and outcome. Child tasks needing attention come first; files and tool records stay collapsed until needed. Results render as Markdown. File and child-session links appear only when supported by the host. Imprecise step-location links have been removed.
+
+Supplies accrue from unique settled usage records. Pausing, refreshing, duplicate events, tariff-clock transitions and historical repricing do not generate rewards. Real usage delivered after cancellation still settles, and other running sessions or subagents can keep earning. Pending reward animations clear when no agents remain active; inventory is preserved. Upgrades do not reissue historical rewards.

@@ -63,21 +63,6 @@
   flex: none;
 }
 
-@media (width <= 600px) {
-  .dsh-kujira-root .kj-task-panel .kj-disclosure > summary,
-  .dsh-kujira-root .kj-task-link,
-  .dsh-kujira-root .kj-task-file .kj-task-link {
-    min-height: 44px;
-  }
-  .dsh-kujira-root .kj-task-operation-head strong,
-  .dsh-kujira-root .kj-task-child strong,
-  .dsh-kujira-root .kj-task-child p,
-  .dsh-kujira-root .kj-task-result p,
-  .dsh-kujira-root .kj-task-plan li {
-    font-size: 13px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .dsh-kujira-root .kj-task-panel * {
     transition: none !important;

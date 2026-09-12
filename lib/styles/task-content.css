@@ -172,3 +172,65 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.dsh-kujira-root .kj-task-goal-brief {
+  margin: 4px 0 12px;
+}
+.dsh-kujira-root .kj-task-goal-brief .kj-field-caption {
+  display: block;
+  font-size: 13px;
+  line-height: 1.65;
+  font-weight: 500;
+  color: var(--kj-ink);
+}
+.dsh-kujira-root .kj-task-goal-brief .kj-label-text,
+.dsh-kujira-root .kj-task-goal-brief .kj-help-copy {
+  display: block;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.dsh-kujira-root .kj-task-child-heading strong {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  line-height: 20px;
+}
+.dsh-kujira-root .kj-task-operation-detail > .kj-task-tool {
+  display: block;
+  margin-bottom: 8px;
+}
+.dsh-kujira-root .kj-task-operation-detail > .kj-task-link {
+  margin-inline-start: -8px;
+}
+.dsh-kujira-root .kj-task-panel .kj-task-goal-brief .kj-help-copy {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dsh-kujira-root .kj-task-result h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+@media (width <= 600px) {
+  .dsh-kujira-root .kj-task-operation-head strong,
+  .dsh-kujira-root .kj-task-child strong,
+  .dsh-kujira-root .kj-task-child p,
+  .dsh-kujira-root .kj-task-result p,
+  .dsh-kujira-root .kj-task-plan li {
+    font-size: 13px;
+  }
+}
+
+
+.dsh-kujira-root .kj-task-plan li > span {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}

@@ -3,6 +3,8 @@
 .dsh-kujira-root .dsh-kujira-panel[data-panel],
 .dsh-kujira-root .dsh-kujira-bubble,
 .kj-usage-root {
+  --kj-task-success: #287366;
+  --kj-task-error: #b64442;
   --kj-surface: #fcfcfd;
   --kj-surface-soft: #f1f2f4;
   --kj-ink: #24262b;
@@ -23,6 +25,8 @@
 .dsh-kujira-root[data-theme="dark"] .dsh-kujira-panel[data-panel],
 .dsh-kujira-root[data-theme="dark"] .dsh-kujira-bubble,
 .kj-usage-root[data-theme="dark"] {
+  --kj-task-success: #88cbbb;
+  --kj-task-error: #f19e96;
   --kj-surface: #27292e;
   --kj-surface-soft: #303339;
   --kj-ink: #f3f4f6;

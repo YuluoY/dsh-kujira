@@ -364,3 +364,20 @@ test('short panels anchor beside the mascot without reserving the full maximum h
  const nearBottom=panelGeometry({top:530,height:260},{w:1100,h:807},360);
  assert.equal(nearBottom.top,435);assert.equal(nearBottom.maxHeight,360);
 });
+
+test('task overview excludes cancelled plan items and prioritizes children needing attention',async()=>{
+ const {taskPresentation}=await import('../lib/shared/task/presentation.js');
+ const view=taskPresentation({stage:'paused',todos:[{status:'completed'},{status:'cancelled'},{status:'pending'}],children:[{id:'done',stage:'done'},{id:'busy',stage:'working'},{id:'help',stage:'waiting'}],operations:[{id:'running',status:'running'}]});
+ assert.deepEqual(view.tasks,{total:2,completed:1});assert.deepEqual(view.children.map(c=>c.id),['help','busy','done']);assert.equal(view.records[0].status,'paused');
+});
+test('task navigation only exposes supported file and child destinations and guards session changes',async()=>{
+ const {createNavigation}=await import('../lib/shared/client/navigation.js');let selected='parent';const calls=[];
+ const ctx={sessions:{openSubagent:async value=>calls.push(['child',value])},sidebarRight:{openResource:async value=>calls.push(['file',value])}};
+ const go=createNavigation({ctx,taskRuntime:{snapshot:()=>({sessionId:selected})}}).navigateTask;
+ assert.equal(go.canOpen({kind:'turn',turn:1}),false);assert.equal(go.canOpen({kind:'child',id:'c',mode:'unknown'}),false);
+ assert.equal(await go({kind:'file',path:'src/a b.ts',sessionId:'parent'}),true);assert.equal(calls[0][1],'dsh-resource://file/session/parent/src/a%20b.ts');
+ assert.equal(await go({kind:'child',id:'c',mode:'one-shot',parentId:'parent',sessionId:'parent'}),true);assert.equal(calls[1][1].childSessionId,'c');
+ selected='other';assert.equal(await go({kind:'file',path:'a',sessionId:'parent'}),false);
+ const missing=createNavigation({ctx:{},taskRuntime:{snapshot:()=>({sessionId:selected})}}).navigateTask;
+ assert.equal(missing.canOpen({kind:'file',path:'a'}),false);
+});

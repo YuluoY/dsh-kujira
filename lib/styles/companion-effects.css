@@ -7,13 +7,8 @@
   z-index: 2;
   pointer-events: none;
   color: var(--kj-accent);
-  filter: drop-shadow(0 3px 6px var(--kj-line));
+  filter: drop-shadow(0 1px 2px var(--kj-surface));
   animation: kj-reward-rise 1350ms ease-out both;
-}
-.dsh-kujira-root .kj-reward-pill {
-  fill: var(--kj-surface);
-  stroke: var(--kj-line-strong);
-  stroke-width: 1;
 }
 .dsh-kujira-root .kj-reward-count {
   fill: var(--kj-ink);

@@ -105,3 +105,29 @@ test('delayed streamed usage before upgrade cannot earn a new peak bonus',async 
  const delayed={type:'assistant/message',time:peak+3000,seq:1,data:{turn:1,step:1,stream:[{time:peak,chunk:{type:'usage',usage:{inputTokens:0,outputTokens:125000}}}]}};
  const s=await createInventory(f.options).observe(f.session([header,delayed]));assert.equal(s.credited,.25);assert.equal(s.bonusCredited,0);assert.equal(s.drops,2);
 });
+
+test('paused clocks, duplicate settlement delivery and historical repricing never mint supplies',async t=>{
+ const f=await fixture(t);let pricing=config;
+ const wallet=createInventory({...f.options,getConfig:()=>pricing});
+ const session=f.session([header,usage(500000)]);
+ const earned=await wallet.observe(session);
+ f.advance(3*86400000);
+ for(let i=0;i<30;i++)await wallet.observe(session);
+ assert.deepEqual((await wallet.snapshot()).earned,earned.earned);
+ pricing={...config,prices:{'deepseek-flash':{history:[{from:'2026-01-01',hit:0,miss:0,out:10}]}}};
+ assert.equal((await wallet.observe(session)).credited,.5);
+ session.snapshotEvents=()=>[header,usage(500000),usage(100000,2,START+2)];
+ const next=await wallet.observe(session);assert.equal(next.credited,1.5);
+ assert.equal(next.drops,15);
+ assert.equal((await createInventory({...f.options,getConfig:()=>pricing}).observe(session)).drops,15);
+});
+test('upgrading old cumulative ledgers does not turn corrected retry history into new rewards',async t=>{
+ const {writeFile}=await import('node:fs/promises');const f=await fixture(t);
+ await f.wallet.observe(f.session([header,usage(500000)]));
+ const path=join(f.directory,'inventory.json'),old=JSON.parse(await readFile(path,'utf8'));
+ delete old.settlements;delete old.ledgerStartedAt;await writeFile(path,JSON.stringify(old));f.advance(5000);
+ const wallet=createInventory(f.options),session=f.session([header,usage(500000)]);
+ assert.equal((await wallet.observe(session)).drops,5);
+ session.snapshotEvents=()=>[header,usage(500000),usage(100000,2,START+6000)];
+ assert.equal((await wallet.observe(session)).drops,6);
+});

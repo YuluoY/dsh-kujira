@@ -1,17 +1,10 @@
 /* Task companion: one spacing and interaction contract, using the shared panel palette. */
 .dsh-kujira-root .kj-task-bubble,
 .dsh-kujira-root .kj-task-panel {
-  --kj-task-success: #287366;
-  --kj-task-error: #b64442;
   --kj-task-hover: color-mix(in srgb, var(--kj-ink) 5%, transparent);
   --kj-task-pressed: color-mix(in srgb, var(--kj-ink) 9%, transparent);
   --kj-task-radius: 7px;
   --kj-task-transition: 150ms ease;
-}
-.dsh-kujira-root[data-theme="dark"] .kj-task-bubble,
-.dsh-kujira-root[data-theme="dark"] .kj-task-panel {
-  --kj-task-success: #88cbbb;
-  --kj-task-error: #f19e96;
 }
 .dsh-kujira-root .kj-task-bubble {
   pointer-events: auto;
@@ -20,7 +13,7 @@
   text-align: start;
   font: inherit;
   gap: 9px;
-  max-width: 244px;
+  max-width: min(244px, calc(100vw - 24px));
   color: var(--kj-text);
 }
 .dsh-kujira-root .kj-task-bubble:focus-visible {
@@ -72,7 +65,7 @@
   display: block;
 }
 .dsh-kujira-root .kj-task-overview {
-  padding: 0 8px 16px;
+  padding: 0 8px 12px;
 }
 .dsh-kujira-root .kj-task-phase {
   display: flex;
@@ -81,7 +74,7 @@
   font-size: 13px;
   line-height: 20px;
   color: var(--kj-accent);
-  min-height: 36px;
+  min-height: 24px;
 }
 .dsh-kujira-root .kj-task-panel .kj-task-overview h3,
 .dsh-kujira-root .kj-task-result h3 {
@@ -217,4 +210,12 @@
 .dsh-kujira-root .kj-task-operation-detail p {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+@media (width <= 600px) {
+  .dsh-kujira-root .kj-task-panel .kj-disclosure > summary,
+  .dsh-kujira-root .kj-task-link,
+  .dsh-kujira-root .kj-task-file .kj-task-link {
+    min-height: 44px;
+  }
 }

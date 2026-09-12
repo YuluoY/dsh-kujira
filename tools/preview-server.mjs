@@ -89,14 +89,14 @@ const apiKey = loadApiKey();
 const routes = [];
 const sessionHandlers = [];
 const agentHandlers = [];
-let supplyDemoSerial=0, supplyClock=0;
+let supplyDemoSerial=0, supplyClock=0, previewRunning=false;
 const previewEvents = [];
 const previewChildren=new Map();
 const previewSession = { header: { id: 'preview-session' }, inheritedEventCount: 0, snapshotEvents: () => previewEvents.slice() };
 
 const ctx = {
     inject(deps, callback) { callback(this); },
-    agents: {},
+    agents: {list:()=>previewRunning?[{id:"preview-session",status:"running"}]:[]},
     sessions: { get(id) { return id === 'preview-session' ? previewSession : previewChildren.get(id); } },
     effect(fn)
     {
@@ -140,6 +140,7 @@ apply(ctx, { size: 260, scheduler:{preview:true,now:()=>Date.parse(usagePreviewM
 
 function emit(kind, sessionId)
 {
+    previewRunning=!["idle","abort","success","error"].includes(kind);
     const fixture=activityPreview(kind);
     previewEvents.splice(0,previewEvents.length,...fixture.events);
     previewChildren.clear();
@@ -188,6 +189,7 @@ const server = createServer(async (req, res) =>
     const pathname = url.pathname;
 
     if(pathname==='/__preview/rewards' && req.method==='POST') {
+        previewRunning=true;
         const requested=url.searchParams.get('mode') || usagePreviewMode;
         let now=Date.now();
         for(let i=0;i<336 && rateAt(now)!==requested;i++) now+=1800000;
