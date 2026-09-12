@@ -18,7 +18,7 @@ Requires Node.js 22+, pnpm and a working DeepSeek Harness Web installation, with
 Run one command from any directory on macOS, Linux or Windows:
 
 ```sh
-dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.15/dsh-kujira-0.1.15.tgz
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.16/dsh-kujira-0.1.16.tgz
 ```
 
 DSH downloads, installs and registers the plugin. No Git clone, manual extraction or project directory is needed. Let active sessions finish, then restart DSH Web and refresh the page. The URL pins an explicit version; use a newer release URL when upgrading.
@@ -66,14 +66,27 @@ The preview includes task states, cost examples and long-content fixtures. Tasks
 
 For bug reports, include your DSH version, reproduction steps and relevant screenshots. Check long text, small windows and all four languages when changing the UI. Open an issue to discuss larger contributions.
 
-## Contributors and credits
+## Contributors
 
-- [YuluoY](https://github.com/YuluoY) — maintenance and product design.
-- [OpenAI](https://openai.com/) · Codex — AI-assisted implementation, refactoring, testing and documentation.
+<table>
+  <tr>
+    <td align="center" width="180">
+      <a href="https://github.com/YuluoY"><img src="https://github.com/YuluoY.png?size=96" width="64" height="64" alt="YuluoY" /><br /><strong>YuluoY</strong></a><br />
+      <sub>Maintenance and product design</sub>
+    </td>
+    <td align="center" width="180">
+      <a href="https://github.com/openai"><img src="https://github.com/openai.png?size=96" width="64" height="64" alt="OpenAI" /><br /><strong>OpenAI · Codex</strong></a><br />
+      <sub>AI-assisted code, tests and documentation</sub>
+    </td>
+  </tr>
+</table>
+
+OpenAI / Codex is credited for AI development assistance. This community plugin is maintained by YuluoY.
+
+## Credits
+
 - [yanzwzz/dsh-whale-girl-pet](https://github.com/yanzwzz/dsh-whale-girl-pet) — animation assets.
 - [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet) — reference implementation.
-
-This is a community plugin. The OpenAI credit acknowledges Codex development assistance; it does not imply official maintenance, partnership or endorsement by OpenAI or DeepSeek.
 
 ## Star History
 

@@ -46,3 +46,26 @@ test('appearance edits react immediately while persistence is debounced and flus
  const p=usePreferences();p.update({size:200});p.update({size:220});assert.equal(writes,0);assert(values.some(v=>v?.size===220));timer();assert.equal(writes,1);assert.equal(stored.appearance.size,220);
  p.update({opacity:80});listeners.get('pagehide')();assert.equal(writes,2);assert.equal(stored.appearance.opacity,80);cleanups.forEach(fn=>fn?.());
 });
+
+test('automatic appearance follows live DSH palette, preserves overrides and releases observers',async t=>{
+ const {createPreferences,readHostTheme,observeHostTheme}=await import('../lib/shared/client/preferences.js');
+ const keys=['document','MutationObserver','window','navigator','matchMedia'];
+ const previous=new Map(keys.map(k=>[k,Object.getOwnPropertyDescriptor(globalThis,k)]));
+ t.after(()=>{for(const [k,v]of previous)v?Object.defineProperty(globalThis,k,v):delete globalThis[k];});
+ let dark=true;const observers=[];
+ globalThis.document={body:{hasAttribute:name=>name==='data-ds-dark-theme'&&dark}};
+ globalThis.MutationObserver=class{constructor(callback){this.callback=callback;observers.push(this);}observe(target,options){assert.equal(target,document.body);assert.deepEqual(options,{attributes:true,attributeFilter:['data-ds-dark-theme']});}disconnect(){this.closed=true;}};
+ globalThis.window={addEventListener(){},removeEventListener(){}};
+ Object.defineProperty(globalThis,'navigator',{configurable:true,value:{languages:['en'],language:'en'}});
+ globalThis.matchMedia=query=>{assert(!query.includes('color-scheme'),'must not subscribe to OS appearance');return {matches:false,addEventListener(){},removeEventListener(){}};};
+ let stored={},cursor=0,mounted=false;const values=[],cleanups=[];
+ const {usePreferences}=createPreferences({readStore:()=>stored,SET_KEY:'test',useState:initial=>{const i=cursor++;if(!(i in values))values[i]=typeof initial==='function'?initial():initial;return [values[i],v=>values[i]=v];},I18N:{configure:()=> 'en'},useEffect:fn=>{if(!mounted)cleanups.push(fn());},writeStore(){}});
+ const render=()=>{cursor=0;const result=usePreferences();mounted=true;return result;};
+ assert.equal(render().theme,'dark');
+ dark=false;observers.forEach(o=>o.callback());assert.equal(render().theme,'light');
+ values[0]={...values[0],theme:'dark'};assert.equal(render().theme,'dark');
+ dark=true;observers.forEach(o=>o.callback());values[0]={...values[0],theme:'light'};assert.equal(render().theme,'light');
+ values[0]={...values[0],theme:'system'};assert.equal(render().theme,'dark');
+ cleanups.forEach(fn=>fn());assert(observers.every(o=>o.closed));
+ delete globalThis.document;assert.equal(readHostTheme(),'light');assert.doesNotThrow(()=>observeHostTheme(()=>{})());
+});

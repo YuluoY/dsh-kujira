@@ -9,16 +9,16 @@ Requires Node.js 22+, `dsh` and `pnpm` on PATH. No frontend build or development
 在任意目录执行 / Run from any directory:
 
 ```sh
-dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.15/dsh-kujira-0.1.15.tgz
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.16/dsh-kujira-0.1.16.tgz
 ```
 
 macOS、Linux、Windows 使用相同命令。DSH 通过自己的包管理器下载、解包并注册插件，文件由 DSH 管理，不需要保留下载目录，也不需要运行其他安装脚本。命令不自动重启 DSH；等会话完成后正常重启，再刷新浏览器。
 
 The same command works on macOS, Linux and Windows. DSH downloads, extracts and registers the plugin through its package manager. DSH owns the installed files; there is no download folder to keep or extra installer to run. It does not restart DSH: finish active sessions, restart normally, then refresh the browser.
 
-地址固定到 v0.1.15，避免同一个“latest”下载地址被包管理器缓存成旧版本。更新时，复制新 Release 的版本化 `.tgz` 地址重复执行 `add`，无需先卸载。自定义 Web profile 将 `web` 替换为对应名称。
+地址固定到 v0.1.16，避免同一个“latest”下载地址被包管理器缓存成旧版本。更新时，复制新 Release 的版本化 `.tgz` 地址重复执行 `add`，无需先卸载。自定义 Web profile 将 `web` 替换为对应名称。
 
-The URL pins v0.1.15 so a mutable “latest” URL cannot silently reuse a cached old package. To update, use the next release's versioned `.tgz` URL with `add`; no uninstall is needed. Replace `web` for a custom Web profile.
+The URL pins v0.1.16 so a mutable “latest” URL cannot silently reuse a cached old package. To update, use the next release's versioned `.tgz` URL with `add`; no uninstall is needed. Replace `web` for a custom Web profile.
 
 ```sh
 # 卸载 / Remove

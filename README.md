@@ -18,7 +18,7 @@ DeepSeek Harness Web 桌宠插件。查看任务进度、会话费用和账户�
 在任意目录执行这一行，macOS、Linux 和 Windows 通用：
 
 ```sh
-dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.15/dsh-kujira-0.1.15.tgz
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.1.16/dsh-kujira-0.1.16.tgz
 ```
 
 DSH 自动下载、安装并注册插件，无需 Git、手动解压或进入项目目录。等正在执行的会话完成后，正常重启 DSH Web 并刷新页面。命令固定到明确版本，重复执行可安装该版本；升级时使用新版发布包地址。
@@ -66,14 +66,27 @@ npm run typecheck
 
 提交问题时请附 DSH 版本、复现步骤和必要截图。改动交互或样式时，请检查长文本、小窗口及四种语言；贡献新功能可先通过 Issue 讨论。
 
-## 贡献者与致谢
+## 贡献者
 
-- [YuluoY](https://github.com/YuluoY)：项目维护与产品设计。
-- [OpenAI](https://openai.com/) · Codex：AI 辅助实现、重构、测试与文档整理。
+<table>
+  <tr>
+    <td align="center" width="180">
+      <a href="https://github.com/YuluoY"><img src="https://github.com/YuluoY.png?size=96" width="64" height="64" alt="YuluoY" /><br /><strong>YuluoY</strong></a><br />
+      <sub>项目维护与产品设计</sub>
+    </td>
+    <td align="center" width="180">
+      <a href="https://github.com/openai"><img src="https://github.com/openai.png?size=96" width="64" height="64" alt="OpenAI" /><br /><strong>OpenAI · Codex</strong></a><br />
+      <sub>AI 辅助代码、测试与文档</sub>
+    </td>
+  </tr>
+</table>
+
+OpenAI / Codex 以 AI 开发辅助身份列入贡献者，项目由 YuluoY 维护。
+
+## 致谢
+
 - [yanzwzz/dsh-whale-girl-pet](https://github.com/yanzwzz/dsh-whale-girl-pet)：动画素材。
 - [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet)：参考实现。
-
-本项目为社区插件。OpenAI 贡献署名指 Codex 开发辅助，不代表 OpenAI 或 DeepSeek 官方维护、合作或背书。
 
 ## Star History
 

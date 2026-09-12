@@ -93,3 +93,8 @@ Rolls are independent and may miss, without a guaranteed fallback. A success fir
 Continuous use has no timed restriction. Requests serialize with up to 20 pending clicks; failures cancel unsent clicks and retries retain the original request ID. Animation playback coalesces repeated actions into at most one pending reaction.
 
 Local appearance changes apply immediately; storage writes debounce for 200 ms and flush on page exit. Settings use a consistent control column with units inside numeric inputs. See [installation](INSTALL.md) and [data handling](PRIVACY.md).
+
+
+### Appearance
+
+Theme defaults to **Auto**, matching the current DSH appearance and updating when it changes. Choose Light or Dark to override it for Kujira. Language and reduced-motion settings remain independent.
