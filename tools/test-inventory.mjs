@@ -1,6 +1,7 @@
+import {readInventory, seedLegacyInventory, rejectInventoryWrites} from './fixtures/inventory-storage.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,rm,readFile,mkdir,rename} from 'node:fs/promises';
+import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createInventory} from '../lib/host/inventory.js';
@@ -10,7 +11,7 @@ const config={...PRICING,prices:{'deepseek-flash':{history:[{from:'2026-01-01',h
 const header={type:'request/header',time:START,seq:0,data:{header:{config:{provider:'deepseek',model:'deepseek-flash'}}}};
 const usage=(tokens,seq=1,time=START+1)=>({type:'assistant/message',seq,time,data:{turn:1,step:seq,usage:{inputTokens:0,outputTokens:tokens},content:'must never persist conversation text'}});
 async function fixture(t) {
- const directory=await mkdtemp(join(tmpdir(),'kujira-inventory-'));t.after(()=>rm(directory,{recursive:true,force:true}));
+ const directory=await mkdtemp(join(tmpdir(),'kujira-inventory-'));t.after(async()=>{await wallet.dispose();await rm(directory,{recursive:true,force:true});});
  let clock=START,busy=false;
  const options={directory,now:()=>clock,random:n=>n-1,getConfig:()=>config,isBusy:()=>busy};
  const wallet=createInventory(options);const initial=await wallet.snapshot();await wallet.configureRules({...initial.rules,chance:100,min:1,max:1,fishWeight:100},initial.rulesRevision);
@@ -21,7 +22,7 @@ test('default empty inventory earns only verified spend; partial values carry un
  let s=await f.wallet.observe(session);assert.equal(s.free,false);assert.equal(s.drops,0);assert.ok(Math.abs(s.remaining-.01)<1e-8);
  session.snapshotEvents=()=>[header,usage(500000)];s=await f.wallet.observe(session);
  assert.equal(s.credited,.5);assert.equal(s.drops,5);assert.deepEqual(s.stock,{fish:5,pat:0,play:0,stretch:0});
- const data=await readFile(join(f.directory,'inventory.json'),'utf8');assert.ok(!data.includes('private-session'));assert.ok(!data.includes('conversation text'));
+ const data=JSON.stringify(readInventory(f.directory));assert.ok(!data.includes('private-session'));assert.ok(!data.includes('conversation text'));
 });
 test('duplicate/revised settlements and restarts never award twice; inherited and pre-install costs excluded',async t=>{
  const f=await fixture(t),session=f.session([header,usage(100000)]);
@@ -56,10 +57,10 @@ test('free mode persists, never consumes saved stock and turning it off preserve
 });
 test('failed persistence cannot commit a debit or issue a successful receipt',async t=>{
  const f=await fixture(t);await f.wallet.observe(f.session([header,usage(500000)]));f.advance(9000);
- const target=f.directory+'-moved';await rename(f.directory,target);await mkdir(f.directory);await mkdir(join(f.directory,'inventory.json.tmp'));
+ rejectInventoryWrites(f.directory);
  await assert.rejects(f.wallet.consume('fish','failed-write-00001'));
  assert.equal((await f.wallet.snapshot()).stock.fish,5);
- t.after(()=>rm(target,{recursive:true,force:true}));
+
 });
 
 test('unlimited mode keeps earning exact inventory and monotonic reward totals across concurrent sessions and restart',async t=>{
@@ -84,14 +85,14 @@ test('peak spend earns twice the supplies per yuan, with actual costs and mixed-
  s=await restarted.observe(mixed);assert.equal(s.drops,10);assert.equal(s.credited,.525);assert.equal(s.bonusCredited,.5);assert.equal(s.stock.fish,10);
 });
 test('legacy inventory migration never grants a bonus for historical usage, including after restart',async t=>{
- const {writeFile}=await import('node:fs/promises');const f=await fixture(t);
+ const f=await fixture(t);
  const peak=Date.parse('2026-09-14T09:00:00+08:00');
  f.advance(peak-START);const session=f.session([header,usage(125000,1,peak)]);
  await f.wallet.observe(session);
- const file=join(f.directory,'inventory.json'),legacy=JSON.parse(await readFile(file,'utf8'));
+ const legacy=readInventory(f.directory);
  delete legacy.bonusStartedAt;delete legacy.bonusCredited;delete legacy.bonusSessions;delete legacy.peakEarned;
  legacy.drops=2;legacy.stock={fish:0,pat:0,play:1,stretch:1};legacy.earned={...legacy.stock};
- await writeFile(file,JSON.stringify(legacy));f.advance(1000);
+ await seedLegacyInventory(f.directory,legacy);f.advance(1000);
  const migrated=createInventory(f.options);assert.equal((await migrated.observe(session)).drops,2);
  session.snapshotEvents=()=>[header,usage(125000,1,peak),usage(125000,2,peak+2000)];
  const after=await migrated.observe(session);assert.equal(after.credited,.5);assert.equal(after.bonusCredited,.25);assert.equal(after.drops,7);
@@ -100,8 +101,8 @@ test('legacy inventory migration never grants a bonus for historical usage, incl
 
 test('delayed streamed usage before upgrade cannot earn a new peak bonus',async t=>{
  const f=await fixture(t),peak=Date.parse('2026-09-14T09:00:00+08:00');f.advance(peak-START);
- const {writeFile}=await import('node:fs/promises');const file=join(f.directory,'inventory.json');
- const stored=JSON.parse(await readFile(file,'utf8'));stored.bonusStartedAt=peak+2000;await writeFile(file,JSON.stringify(stored));
+
+ const stored=readInventory(f.directory);stored.bonusStartedAt=peak+2000;await seedLegacyInventory(f.directory,stored);
  const delayed={type:'assistant/message',time:peak+3000,seq:1,data:{turn:1,step:1,stream:[{time:peak,chunk:{type:'usage',usage:{inputTokens:0,outputTokens:125000}}}]}};
  const s=await createInventory(f.options).observe(f.session([header,delayed]));assert.equal(s.credited,.25);assert.equal(s.bonusCredited,0);assert.equal(s.drops,2);
 });
@@ -122,10 +123,10 @@ test('paused clocks, duplicate settlement delivery and historical repricing neve
  assert.equal((await createInventory({...f.options,getConfig:()=>pricing}).observe(session)).drops,15);
 });
 test('upgrading old cumulative ledgers does not turn corrected retry history into new rewards',async t=>{
- const {writeFile}=await import('node:fs/promises');const f=await fixture(t);
+ const f=await fixture(t);
  await f.wallet.observe(f.session([header,usage(500000)]));
- const path=join(f.directory,'inventory.json'),old=JSON.parse(await readFile(path,'utf8'));
- delete old.settlements;delete old.ledgerStartedAt;await writeFile(path,JSON.stringify(old));f.advance(5000);
+ const old=readInventory(f.directory);
+ delete old.settlements;delete old.ledgerStartedAt;await seedLegacyInventory(f.directory,old);f.advance(5000);
  const wallet=createInventory(f.options),session=f.session([header,usage(500000)]);
  assert.equal((await wallet.observe(session)).drops,5);
  session.snapshotEvents=()=>[header,usage(500000),usage(100000,2,START+6000)];

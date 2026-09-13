@@ -57,7 +57,8 @@
 .dsh-kujira-video:active {
   cursor: grabbing;
 }
-.dsh-kujira-root[data-facing="right"] .dsh-kujira-video {
+.dsh-kujira-root[data-facing="right"]
+  .dsh-kujira-video:not([data-no-mirror="true"]) {
   transform: scaleX(-1);
 }
 .dsh-kujira-tag {

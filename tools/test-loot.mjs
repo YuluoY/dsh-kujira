@@ -1,6 +1,7 @@
+import {readInventory, seedLegacyInventory} from './fixtures/inventory-storage.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,rm,readFile,writeFile} from 'node:fs/promises';
+import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {rewardRules,rewardState,REWARD_DEFAULTS,rollRewards,createBinomial} from '../lib/host/inventory-rules.js';
@@ -10,7 +11,7 @@ const seeded=(seed=123456)=>n=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;re
 const start=Date.parse('2026-09-12T10:00:00+08:00');
 const config={...PRICING,prices:{'deepseek-flash':{history:[{from:'2026-01-01',hit:0,miss:0,out:1}]}}};
 const events=tokens=>[{type:'request/header',seq:0,data:{header:{config:{provider:'deepseek',model:'deepseek-flash'}}}},{type:'assistant/message',seq:1,time:start+1,data:{turn:1,step:1,usage:{inputTokens:0,outputTokens:tokens}}}];
-async function fixture(t){const directory=await mkdtemp(join(tmpdir(),'kujira-loot-'));t.after(()=>rm(directory,{recursive:true,force:true}));const options={directory,now:()=>start,random:seeded(),getConfig:()=>config};const wallet=createInventory(options);await wallet.snapshot();return{wallet,options,directory};}
+async function fixture(t){const directory=await mkdtemp(join(tmpdir(),'kujira-loot-'));t.after(async()=>{await wallet.dispose();await rm(directory,{recursive:true,force:true});});const options={directory,now:()=>start,random:seeded(),getConfig:()=>config};const wallet=createInventory(options);await wallet.snapshot();return{wallet,options,directory};}
 test('default probability is restrained and malformed rule ranges are rejected',()=>{
  assert.equal(REWARD_DEFAULTS.chance,25);assert.equal(REWARD_DEFAULTS.amount,.1);
  for(const patch of [{chance:-1},{chance:101},{chance:1.5},{amount:0},{amount:.001},{amount:NaN},{min:4,max:3},{max:21},{fishWeight:101},{peakBonus:'yes'}])assert.equal(rewardRules({...REWARD_DEFAULTS,...patch}),null);
@@ -51,8 +52,8 @@ test('missed chances remain settled after reload and probability changes',async 
  assert.equal((await wallet.observe(session)).drops,0);assert.equal((await createInventory(options).observe(session)).attempts,10);
 });
 test('legacy migration retains stock and fractional progress without retroactive awards',async t=>{
- const {directory,options}=await fixture(t);const file=join(directory,'inventory.json');const old=JSON.parse(await readFile(file,'utf8'));
- delete old.rewards;old.credited=250000;old.drops=2;old.stock.fish=2;old.earned.fish=2;await writeFile(file,JSON.stringify(old));
+ const {directory,options}=await fixture(t);const old=readInventory(directory);
+ delete old.rewards;old.credited=250000;old.drops=2;old.stock.fish=2;old.earned.fish=2;await seedLegacyInventory(directory,old);
  const next=await createInventory(options).snapshot();assert.equal(next.progress,.5);assert.equal(next.drops,2);assert.equal(next.stock.fish,2);assert.equal(next.rules.chance,25);
  assert.throws(()=>rewardState({...old,rewards:{...rewardState(old),carry:-1}}));
 });

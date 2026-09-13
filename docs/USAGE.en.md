@@ -19,7 +19,7 @@ Local preview has no real DSH agents and is labelled accordingly. The installed 
 
 ### Amounts and inventory
 
-`total_balance` is available credit, `topped_up_balance` is remaining paid credit, and `granted_balance` is granted credit. None is a lifetime deposit total. Country selection changes formatting, **not account currency**. Session costs are estimates from verifiable usage records and prices, not an official invoice.
+`total_balance` is available credit, `topped_up_balance` is remaining paid credit, and `granted_balance` is granted credit. None is a lifetime deposit total. Country selection converts displayed balances, session costs and supply amounts to CNY, USD, KRW or RUB at the latest reference rate. Account balances and settlement data remain in their original currencies. Session costs are estimates from verifiable usage records and prices, not an official invoice.
 
 By default, each CNY 0.10 of eligible usage earns a roll with a 25% chance of 1–3 items. Smaller bundles are more common. Peak bonus doubles roll progress without changing the bill. Items have no time cooldown. Unlimited mode preserves stock and still earns random drops; preview usage never awards real inventory.
 
@@ -70,7 +70,7 @@ A single category uses a small heading; multiple categories use tabs. Paths and 
 
 Set a preferred name under Companion & motion → Name. This overrides the account name of the system running DSH. Missing or generic service accounts fall back to an affectionate localized nickname (“sweetie” in English); Git authors are not consulted. Remote installations see the server account, so a custom name is recommended there. Names stay in the local UI and are never sent to the model. The limit is 24 graphemes.
 
-Context reactions add occasional balance, task-duration and idle feedback. Balance bands use the API's original currency, with no conversion or high/low inference for unknown currencies. Quick completion gets a happy jump; a long task ending gets a stretch. Disable Context reactions, enable focus/static mode, or hide the page to suppress these effects. Historical completions never replay celebrations. Reactions make no model calls and do not affect charges or supplies.
+Context reactions add occasional balance, task-duration and idle feedback. Balance bands use the API's original currency independently of converted display values, without high/low inference for unknown currencies. Quick completion gets a happy jump; a long task ending gets a stretch. Disable Context reactions, enable focus/static mode, or hide the page to suppress these effects. Historical completions never replay celebrations. Reactions make no model calls and do not affect charges or supplies.
 
 
 ### Continuous care and inclusive session costs
@@ -98,3 +98,9 @@ Local appearance changes apply immediately; storage writes debounce for 200 ms a
 ### Appearance
 
 Theme defaults to **Auto**, matching the current DSH appearance and updating when it changes. Choose Light or Dark to override it for Kujira. Language and reduced-motion settings remain independent.
+
+## Exchange rates
+
+[Frankfurter v2](https://frankfurter.dev/) supplies daily reference rates without an API key. The host coalesces requests and caches rates for 15 minutes, with a 5-second timeout and 60-second failure backoff. Hidden pages stop refreshing. Converted amounts show ≈; balance and cost details show source and publication date. Rates older than 7 days are rejected. On outages, a dated cache is labeled or the original currency is shown. No model calls or account data are sent to this service.
+
+Budget and reward-threshold inputs remain explicitly labeled CNY with an approximate local equivalent; changing country never rewrites settlement rules. Set `exchangeRates.enabled: false` in the host plugin configuration to disable requests. Offline previews disable rates by default; `PREVIEW_EXCHANGE=1` enables rate-only network testing without loading account credentials.

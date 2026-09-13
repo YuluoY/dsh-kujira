@@ -13,7 +13,7 @@ DeepSeek Harness Web 桌宠插件。查看任务进度、会话费用和账户�
 
 ## 安装
 
-需要 Node.js 22+、pnpm 和可正常运行的 DeepSeek Harness Web，`dsh` 与 `pnpm` 命令须在 PATH 中。
+需要 Node.js 22.13+、pnpm 和可正常运行的 DeepSeek Harness Web，`dsh` 与 `pnpm` 命令须在 PATH 中。
 
 在任意目录执行这一行，macOS、Linux 和 Windows 通用：
 
@@ -36,7 +36,7 @@ dsh plugin --profile web remove dsh-kujira
 - **任务进展**：显示当前操作、计划和子代理状态，展开查看结果与文件，通过入口跳转到对应会话。
 - **峰谷调度**：同一 DSH 服务中的主代理和子代理，峰价暂停、谷价续跑。默认关闭，在设置中开启。
 - **费用与余额**：输入框右下方显示峰谷状态和当前会话与嵌套子代理的合计费用；余额读取 DSH 已配置的 DeepSeek 账户。
-- **互动养成**：50 段动画覆盖待机、工作、睡眠和互动。连续使用物品无冷却；消费按可配置概率掉落 1–多件物品，也可开启无限互动。
+- **互动养成**：130 段动画覆盖待机、工作、作息、节日和互动。连续使用物品无冷却；消费按可配置概率掉落 1–多件物品，也可开启无限互动。
 - **个性化**：调整位置、大小、气泡停留时间和菜单数量；设置自动保存，连续调整防抖；支持中、英、韩、俄，以及跟随系统。
 - **扩展**：天气、GitHub 快捷入口，以及供外部插件注册功能的 [扩展 API](docs/EXTENSIONS.md)。
 
@@ -50,7 +50,7 @@ dsh plugin --profile web remove dsh-kujira
 
 天气无需单独配置密钥。城市留空时按 **DSH 服务的出口 IP** 定位，填写城市则使用该城市；远程部署或代理可能让定位偏离你所在的城市。内置国内、国际天气源及失败回退，公共服务可能限流或暂时不可用。
 
-金额保留 DeepSeek 返回的币种，切换语言不会换汇。充值余额是尚未用完的充值部分，不是历史充值总额；会话费用是用量估算，不是官方账单。
+切换国家／地区会按最新参考汇率显示人民币、美元、韩元或卢布，约合金额带 ≈ 标记。汇率由 Frankfurter 每日更新，界面每 15 分钟检查缓存；接口不可用时注明缓存日期或显示原币种。实际账户和结算币种保持不变。充值余额是尚未用完的充值部分，不是历史充值总额；会话费用是用量估算，不是官方账单。
 
 [调度与补给规则](docs/USAGE.md) · [数据与隐私](docs/PRIVACY.md) · [全部动画及触发条件](docs/ANIMATIONS.md)
 
@@ -64,7 +64,7 @@ npm run lint
 npm run typecheck
 ```
 
-无需前端构建。`lib/host` 处理宿主服务，`lib/shared/client` 与 `lib/shared/task` 负责界面，`lib/styles` 存放样式。类型检查覆盖已标注的模型与资源模块。
+无需前端构建。`lib/host` 处理宿主服务，`lib/shared/client` 与 `lib/shared/task` 负责界面，`lib/styles` 存放样式。类型检查覆盖已标注的模型、资源模块，以及轮询与取消基础设施。库存使用工作线程中的 SQLite 事务，旧 JSON 自动迁移并保留备份。
 
 预览提供状态、费用和长内容示例。任务与费用使用隔离的模拟数据；余额和天气可能访问真实接口。
 
@@ -95,6 +95,7 @@ OpenAI / Codex 以 AI 开发辅助身份列入贡献者，项目由 YuluoY 维�
 
 ## 致谢
 
+- [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet)：新增同人物动画，MIT 许可随素材提供。
 - [yanzwzz/dsh-whale-girl-pet](https://github.com/yanzwzz/dsh-whale-girl-pet)：动画素材。
 - [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet)：参考实现。
 
@@ -105,3 +106,9 @@ OpenAI / Codex 以 AI 开发辅助身份列入贡献者，项目由 YuluoY 维�
 ## 许可
 
 [MIT](LICENSE)。动画保留原作者版权，内置 [i18next](lib/shared/vendor/i18next.LICENSE) 与 [Marked](lib/shared/vendor/marked.LICENSE) 保留各自许可。
+
+### 动画与陪伴场景
+
+现有 130 个同人物透明动画，包含新增的 80 个动作。支持作息、养成需求、天气、节日、任务进展与鼠标停留回应；养成面板可搜索点播。运行中不调用模型生成这些回应，也不预加载全部素材。详见 [动画与场景](docs/ANIMATIONS.md)。眼神实时跟随需额外分层素材，当前提供的是停留回应。
+
+悬停进展可在设置中关闭；说话气泡采用渐次展开的思考样式。紧急避险的恢复范围、输入框暂停标记与测试证据见 [调度说明](docs/SCHEDULER.md)。

@@ -313,7 +313,7 @@ async function main()
             (one.headers?.['content-type'] || '').indexOf('javascript') >= 0,
             one.headers?.['content-type']);
         check('/shared/* 不缓存（改了立刻生效）',
-            /no-store/.test(one.headers?.['cache-control'] || ''), one.headers?.['cache-control']);
+            /no-cache/.test(one.headers?.['cache-control'] || ''), one.headers?.['cache-control']);
 
         // 白名单：请求没在名单里的模块必须被拒
         const bad = await call(route.handler, PREFIX + '/shared/../../package.json');

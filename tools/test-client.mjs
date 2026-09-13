@@ -1,3 +1,5 @@
+import {loadLocale, LOCALES} from "../lib/shared/i18n.js";
+await Promise.all(LOCALES.map(loadLocale));
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -320,7 +322,7 @@ test("external menu features register, sort and dispose without replacing built-
   assert.deepEqual([-1, 3, 5, 8, 99, NaN].map(menuLimit), [3, 3, 5, 8, 8, 6]);
 });
 
-test("all 50 animation clips belong to a runtime-consumed action route", async () => {
+test("all bundled animation clips belong to a runtime-consumed action route", async () => {
   const { readdir } = await import("node:fs/promises");
   const config = JSON.parse(
     await readFile(
@@ -328,21 +330,22 @@ test("all 50 animation clips belong to a runtime-consumed action route", async (
       "utf8",
     ),
   );
-  const paths = [
+  const {animationNames} = await import("../lib/shared/client/animation-catalog.js");
+  const paths = [...animationNames(config), ...[
     "idle",
     "action",
     "long",
     "click",
     "sleep",
     "workBreak",
-  ].flatMap((key) => config.pools[key] || []);
+  ].flatMap((key) => config.pools[key] || [])];
   paths.push(config.startAnim, config.dragAnim, "翻钱包", "看天气", "吃小鱼干");
   for (const state of Object.values(config.state.map))
     paths.push(...state.anim);
   for (const entries of Object.values(config.state.enter))
     paths.push(...entries);
   const files = await readdir(new URL("../assets/anim", import.meta.url));
-  assert.equal(files.filter((file) => file.endsWith(".webm")).length, 50);
+  assert.equal(files.filter((file) => file.endsWith(".webm")).length, 130);
   for (const file of files.filter((file) => file.endsWith(".webm")))
     assert.ok(
       paths.includes(file.slice(0, -5)),

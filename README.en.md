@@ -13,7 +13,7 @@ A desktop companion for DeepSeek Harness Web. Track agent tasks, session costs a
 
 ## Installation
 
-Requires Node.js 22+, pnpm and a working DeepSeek Harness Web installation, with `dsh` and `pnpm` on PATH.
+Requires Node.js 22.13+, pnpm and a working DeepSeek Harness Web installation, with `dsh` and `pnpm` on PATH.
 
 Run one command from any directory on macOS, Linux or Windows:
 
@@ -36,7 +36,7 @@ Installation, live balances and historical session reads were verified with DSH 
 - **Task progress** — current operations, plans and subagents, with expandable results, files and links to their sessions.
 - **Tariff scheduling** — pause main agents and subagents during peak hours and resume off-peak within the same DSH service. Off by default; enable in settings.
 - **Costs and balances** — tariff status and combined parent/subagent costs at the bottom right of the composer; balances from your configured DSH DeepSeek account.
-- **Pet interactions** — 50 animations for idle, work, sleep and interactions. Continuous use has no cooldown. Configurable spending thresholds and probabilities award random bundles; unlimited mode is available.
+- **Pet interactions** — 130 animations for idle, work, daily routines, holidays and interactions. Continuous use has no cooldown. Configurable spending thresholds and probabilities award random bundles; unlimited mode is available.
 - **Preferences** — position, size, bubble duration and menu size. Changes autosave with debouncing. Chinese, English, Korean and Russian, or follow the system.
 - **Extensions** — weather, a GitHub shortcut and an [API for external menu actions](docs/EXTENSIONS.md).
 
@@ -50,7 +50,7 @@ Balance queries reuse `DEEPSEEK_API_KEY` from DSH's credentials service. A valid
 
 Weather needs no separate API key. Leave the city blank to locate by the **DSH server's outbound IP**, or enter a city to override it. Remote hosting and proxies can affect location accuracy. Domestic and international providers include failover; public services can be rate-limited or temporarily unavailable.
 
-Amounts retain the currency returned by DeepSeek. Language selection does not convert currencies. Paid credit means remaining deposited funds, not lifetime deposits; session costs are usage estimates, not an official invoice.
+Country selection converts displayed amounts to CNY, USD, KRW or RUB using Frankfurter reference rates (updated daily, checked every 15 minutes). Converted amounts show ≈ and rate provenance. Outages show a dated cached rate or the original currency. Account and settlement currencies remain unchanged. Paid credit means remaining deposited funds, not lifetime deposits; session costs are usage estimates, not an official invoice.
 
 [Scheduling and supply rules](docs/USAGE.en.md) · [Data and privacy](docs/PRIVACY.md) · [Animation triggers](docs/ANIMATIONS.md)
 
@@ -105,3 +105,11 @@ OpenAI / Codex is credited for AI development assistance. This community plugin 
 ## License
 
 [MIT](LICENSE). Animations retain their original copyright. Vendored [i18next](lib/shared/vendor/i18next.LICENSE) and [Marked](lib/shared/vendor/marked.LICENSE) retain their licenses.
+
+Inventory uses transactional SQLite in a background worker (Node 22.13+). Existing JSON inventory migrates automatically and remains as a backup; do not mix older JSON writers with the new database. See [performance and migration details](docs/PERFORMANCE.md).
+
+### Animation scenes
+
+130 transparent clips for the same character, including 80 added animations, react to daily routines, companion needs, cached weather, holidays, task progress and pointer dwell. Search and play clips from the Companion panel. These reactions make no model requests and do not preload the full library. See [animation scenes](docs/ANIMATIONS.md). Independent eye tracking requires layered artwork; the current pointer interaction is a greeting.
+
+Progress-on-hover is configurable. Companion speech uses a staged thought bubble. The animation picker is searchable and clearable, and only an explicit changed selection plays a clip. See [scheduler behavior and verification](docs/SCHEDULER.md) for pause/resume guarantees and the composer indicator.

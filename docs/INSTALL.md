@@ -1,8 +1,8 @@
 # 安装、更新与卸载 / Install, update and remove
 
-需要已安装的 Node.js 22+、`dsh` 和 `pnpm`，并保证三者在终端 PATH 中可用。插件无需前端构建，也无需先安装开发依赖。
+需要已安装的 Node.js 22.13+、`dsh` 和 `pnpm`，并保证三者在终端 PATH 中可用。插件无需前端构建，也无需先安装开发依赖。
 
-Requires Node.js 22+, `dsh` and `pnpm` on PATH. No frontend build or development dependencies are needed.
+Requires Node.js 22.13+, `dsh` and `pnpm` on PATH. No frontend build or development dependencies are needed.
 
 ## 一行安装 / One-command installation
 

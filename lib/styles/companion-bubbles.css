@@ -1,0 +1,158 @@
+.dsh-kujira-root .kj-bubble-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  color: inherit;
+  pointer-events: none;
+}
+.kj-bubble-layer::backdrop {
+  background: transparent;
+  pointer-events: none;
+}
+.dsh-kujira-root .dsh-kujira-bubble:not([data-positioned]) {
+  visibility: hidden;
+}
+.dsh-kujira-root .dsh-kujira-bubble.kj-thought-bubble {
+  display: block;
+  padding: 0;
+  min-width: min(144px, calc(100vw - 24px));
+  max-width: min(244px, calc(100vw - 24px));
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  animation: none;
+  isolation: auto;
+  text-align: center;
+  --kj-thought-line: var(--kj-accent);
+}
+.kj-thought-body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-height: 80px;
+  padding: 22px 28px;
+  border: 3px solid var(--kj-thought-line);
+  border-radius: 50%;
+  background: var(--kj-surface);
+  color: var(--kj-accent);
+  box-shadow: var(--kj-elevation);
+  transform-origin: var(--kj-tail-x, 78%) 100%;
+  animation: kj-thought-emerge 480ms cubic-bezier(0.22, 0.8, 0.3, 1) 220ms both;
+}
+.kj-thought-body .kj-speech-copy {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.65;
+}
+.kj-thought-dot {
+  position: absolute;
+  box-sizing: border-box;
+  left: var(--kj-tail-x, 78%);
+  display: block;
+  border: 2.5px solid var(--kj-thought-line);
+  border-radius: 50%;
+  background: var(--kj-surface);
+  animation: kj-thought-dot-in 260ms ease-out both;
+}
+.kj-thought-dot-large {
+  bottom: -17px;
+  width: 18px;
+  height: 13px;
+  animation-delay: 110ms;
+}
+.kj-thought-dot-small {
+  bottom: -31px;
+  width: 10px;
+  height: 8px;
+  margin-left: 8px;
+}
+.kj-thought-bubble[data-side="right"] .kj-thought-dot-small {
+  margin-left: -2px;
+}
+.kj-thought-bubble[data-below="true"] .kj-thought-body {
+  transform-origin: var(--kj-tail-x, 78%) 0;
+}
+.kj-thought-bubble[data-below="true"] .kj-thought-dot-large {
+  top: -17px;
+  bottom: auto;
+}
+.kj-thought-bubble[data-below="true"] .kj-thought-dot-small {
+  top: -31px;
+  bottom: auto;
+}
+.kj-bubble-layer[data-leaving="true"] .kj-thought-body {
+  animation: kj-thought-away 150ms ease-in both;
+}
+.kj-bubble-layer[data-leaving="true"] .kj-thought-dot-large {
+  animation: kj-thought-away 100ms ease-in 90ms both;
+}
+.kj-bubble-layer[data-leaving="true"] .kj-thought-dot-small {
+  animation: kj-thought-away 80ms ease-in 150ms both;
+}
+.dsh-kujira-root .kj-bubble-layer[data-leaving="true"] .kj-task-bubble {
+  pointer-events: none;
+  animation: kj-thought-away 180ms ease-in both;
+}
+.kj-bubble-layer[data-reduced="true"] .kj-task-bubble,
+.kj-bubble-layer[data-reduced="true"] .kj-thought-body,
+.kj-bubble-layer[data-reduced="true"] .kj-thought-dot {
+  animation: none;
+}
+
+@keyframes kj-thought-emerge {
+  0% {
+    opacity: 0;
+    transform: translateY(7px) scale(0.62);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes kj-thought-dot-in {
+  from {
+    opacity: 0;
+    transform: scale(0.15);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes kj-thought-away {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kj-thought-body,
+  .kj-thought-dot {
+    animation: none;
+  }
+}

@@ -1,0 +1,678 @@
+{
+  "repository": "https://github.com/PC2005-cloud/dsh-pet",
+  "commit": "814b0e47812dfd51dbc2df4ca272b57403c5e9cd",
+  "license": "MIT",
+  "added": [
+    {
+      "name": "三球抛接",
+      "upstreamPath": "dsh-pet/assets/webm/三球抛接.webm",
+      "gitBlob": "a76228cb5f42fa159e3ec565b8ef969a7d289dca",
+      "sha256": "2b7762a0f4aded4070c707331dfc73b59dec6d16dfc264e6afa8a38871be972a",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 641885
+    },
+    {
+      "name": "下五子棋",
+      "upstreamPath": "dsh-pet/assets/webm/下五子棋.webm",
+      "gitBlob": "63295b32e6a0522dac3840abb74a5af7b1431a08",
+      "sha256": "12b8ec9f5bb64a727faccf285765cf61510541f4211c333fbb01bdea1b45ee11",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 611578
+    },
+    {
+      "name": "中秋赏月吃月饼",
+      "upstreamPath": "dsh-pet/assets/webm/中秋赏月吃月饼.webm",
+      "gitBlob": "48beff57ddc5b3c7e1c0387348e33ce8e3a5b819",
+      "sha256": "a32bfa2ddcef172756b748621ceb6fd9460683620d8712f3e1afaa03519cf0bd",
+      "filter": "crop=538:360:51:0,scale=360:240:flags=lanczos,pad=360:360:0:109:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 310917
+    },
+    {
+      "name": "优雅女仆舞",
+      "upstreamPath": "dsh-pet/assets/webm/优雅女仆舞.webm",
+      "gitBlob": "390c504dfb0b56bb647f0253782a91ee705f8933",
+      "sha256": "6813cb34b312979326fae043ef991084aa84d6463f606eb570e83146c16c6083",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 687342
+    },
+    {
+      "name": "余额-分文不剩",
+      "upstreamPath": "dsh-pet/assets/webm/余额-分文不剩.webm",
+      "gitBlob": "013b69906a5c56b219bbd74986f973eea53e3675",
+      "sha256": "581e1a7e74868705ab2afb733d3fff65ee191c0f11354924492f35f377764ed8",
+      "filter": "crop=496:360:72:0,scale=360:260:flags=lanczos,pad=360:360:0:90:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 346278
+    },
+    {
+      "name": "余额-数金皱眉",
+      "upstreamPath": "dsh-pet/assets/webm/余额-数金皱眉.webm",
+      "gitBlob": "6c1dac8e3edddc02f4988e1c38e289177c335ecf",
+      "sha256": "59f1f09bad998a07b519bd90e255c9ebe2e362d303d22113f9e2e098134badeb",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 366899
+    },
+    {
+      "name": "余额-袋空如洗",
+      "upstreamPath": "dsh-pet/assets/webm/余额-袋空如洗.webm",
+      "gitBlob": "a85eb2206596c7031fbc64146df09f6e7b137aae",
+      "sha256": "fb543c62151cb0a9ffb20ab1587c02f080cc6bdc60be15133ee1cf830700ca84",
+      "filter": "crop=500:360:70:0,scale=360:258:flags=lanczos,pad=360:360:0:92:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 261746
+    },
+    {
+      "name": "余额-金袋叮当",
+      "upstreamPath": "dsh-pet/assets/webm/余额-金袋叮当.webm",
+      "gitBlob": "1bbe074a0bef1a7ef80508b3033269885edb6b2c",
+      "sha256": "455a7aed8657677a37443e24cdaa8b0ed82786cbaaaa5a98175e9128be2b8e0c",
+      "filter": "crop=536:360:52:0,scale=360:240:flags=lanczos,pad=360:360:0:108:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 343064
+    },
+    {
+      "name": "余额-钱袋如常",
+      "upstreamPath": "dsh-pet/assets/webm/余额-钱袋如常.webm",
+      "gitBlob": "a52b686a7a3d801a98cccb81534eae2bfa7ac2b3",
+      "sha256": "79499cde458303b4f4fa851ac00ec5d96948405bdaba09292c0e241393103eaf",
+      "filter": "crop=502:360:69:0,scale=360:258:flags=lanczos,pad=360:360:0:93:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 274212
+    },
+    {
+      "name": "余额-钱袋满溢",
+      "upstreamPath": "dsh-pet/assets/webm/余额-钱袋满溢.webm",
+      "gitBlob": "34212594a3b9fc03daf2ae742763e62dfe4b034f",
+      "sha256": "2eae43e7aa3b4082d791b64789feae1fc39a4e0d3ce38ceae2132fb4b6c3dfef",
+      "filter": "crop=534:360:53:0,scale=360:242:flags=lanczos,pad=360:360:0:108:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 417425
+    },
+    {
+      "name": "写代码",
+      "upstreamPath": "dsh-pet/assets/webm/写代码.webm",
+      "gitBlob": "47902f235c11fadd22134dd71d2fbcc3a36a13fc",
+      "sha256": "c3ddb691ea5e5eca709d86b849f9fe036896a1dade2d8c44ae23c63909a591ee",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 446134
+    },
+    {
+      "name": "写福字",
+      "upstreamPath": "dsh-pet/assets/webm/写福字.webm",
+      "gitBlob": "b7aa9ce458b6e8d1c9513b5e4b059a07ca143f88",
+      "sha256": "cd145dee63b9a6fa195a96b06d8805b81033970a6427f2c007a349318768799e",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 588140
+    },
+    {
+      "name": "凭空生花",
+      "upstreamPath": "dsh-pet/assets/webm/凭空生花.webm",
+      "gitBlob": "085fe6d74ddfc268670be32b7c3f78c6806b68f1",
+      "sha256": "2b851471cd879cf736e0239dbfd89501730663254b3f9bf9433a3fa0b872e1d1",
+      "filter": "crop=466:360:87:0,scale=360:278:flags=lanczos,pad=360:360:0:75:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 491370
+    },
+    {
+      "name": "动物环绕",
+      "upstreamPath": "dsh-pet/assets/webm/动物环绕.webm",
+      "gitBlob": "44722e0afb7ef4c1cd85c5c98eadd9b4ade2fea9",
+      "sha256": "07bd0332a59c37e4599da09e8295a44e7178d7960f433135f1d6444b89148bdb",
+      "filter": "crop=494:360:73:0,scale=360:262:flags=lanczos,pad=360:360:0:90:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 756199
+    },
+    {
+      "name": "原地左转奔跑",
+      "upstreamPath": "dsh-pet/assets/webm/原地左转奔跑.webm",
+      "gitBlob": "d9b6611b32065a7937878a5467cd84d47a1be543",
+      "sha256": "e7ce849a895db8c22e717fa1b762efc95d5b2ba3384244685ec1e961a4619464",
+      "filter": "crop=408:360:116:0,scale=360:316:flags=lanczos,pad=360:360:0:39:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 591517
+    },
+    {
+      "name": "变鸽子",
+      "upstreamPath": "dsh-pet/assets/webm/变鸽子.webm",
+      "gitBlob": "150abd9011b3c9fec7229fa2b30418958040a7ad",
+      "sha256": "efdab97d9b3cfe69cac134f48669f76d00356e930e51663790461493ab719827",
+      "filter": "crop=418:360:111:0,scale=360:310:flags=lanczos,pad=360:360:0:46:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 462537
+    },
+    {
+      "name": "可爱宅舞",
+      "upstreamPath": "dsh-pet/assets/webm/可爱宅舞.webm",
+      "gitBlob": "0b96ac0de6fa7afe72f256148dd719698769043c",
+      "sha256": "680d88de5589f2cdc37e76b784ddeb1c139559e1df0c0b17176dc96d3971e30e",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 673801
+    },
+    {
+      "name": "吃冰淇淋融化",
+      "upstreamPath": "dsh-pet/assets/webm/吃冰淇淋融化.webm",
+      "gitBlob": "c696cf2f61366cd9ba973aae1526dbf920c3d85d",
+      "sha256": "50186d0b7c00cc98063a4950c7313cc39cf2cf3df1356d519c3eb79ecbeefd89",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 607623
+    },
+    {
+      "name": "吃午餐",
+      "upstreamPath": "dsh-pet/assets/webm/吃午餐.webm",
+      "gitBlob": "83618038d3d4fe98b9f42d0fd7ae1b7a24f686b3",
+      "sha256": "250dcfa0d67a51bfbc36e6b167aebddc17f5ac8fd8de8a0e0dc462a37aad0c85",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 585774
+    },
+    {
+      "name": "吃大闸蟹",
+      "upstreamPath": "dsh-pet/assets/webm/吃大闸蟹.webm",
+      "gitBlob": "f8e0774d6b4b38f27adfecdfc591dd40812f5e38",
+      "sha256": "d558cf7da0a33f79460f5a4b6cda243739711c07f3ba5de70233885869fac972",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 636369
+    },
+    {
+      "name": "吃年糕",
+      "upstreamPath": "dsh-pet/assets/webm/吃年糕.webm",
+      "gitBlob": "7b4473435dfa219428f5bb2e1dbf34fe83b59190",
+      "sha256": "0e54652c82f31e4e544b2894968043340abb0ddef2bd156fde3dd85eceb38656",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 524408
+    },
+    {
+      "name": "吃早餐",
+      "upstreamPath": "dsh-pet/assets/webm/吃早餐.webm",
+      "gitBlob": "6691dc43900e3f906b6576cc6eb7e0f23b0e2702",
+      "sha256": "b5e1269e63d8a85706d03a73d31d893f172935bd0379fbd23fd710c46cfda229",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 511441
+    },
+    {
+      "name": "吃晚餐",
+      "upstreamPath": "dsh-pet/assets/webm/吃晚餐.webm",
+      "gitBlob": "14f9eee2a361a592fd55c95979f5810b7b8dcd03",
+      "sha256": "923acfeea68a1901913e73103954aa6233dda3054b0c1cad67cfb35d911ff414",
+      "filter": "crop=466:360:87:0,scale=360:278:flags=lanczos,pad=360:360:0:75:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 597434
+    },
+    {
+      "name": "吃汤圆",
+      "upstreamPath": "dsh-pet/assets/webm/吃汤圆.webm",
+      "gitBlob": "eac65950006cf0814e6e4f1ebe1c73b9e36a8791",
+      "sha256": "de0bc47ff42c11a31f7ef736f294c90921ba8d57764d3e82eec403fda846f6b1",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 511638
+    },
+    {
+      "name": "吃白饭",
+      "upstreamPath": "dsh-pet/assets/webm/吃白饭.webm",
+      "gitBlob": "0f400023c2f036e6edc28033083d49f68686d347",
+      "sha256": "a1eaa52374d7a937c41a0f6962ed61a62a94cc3206169ce2e65150f3de59a4a6",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 542083
+    },
+    {
+      "name": "吃粽子",
+      "upstreamPath": "dsh-pet/assets/webm/吃粽子.webm",
+      "gitBlob": "6ad057c473cbaf209de8d4ec91781d9bc759cda9",
+      "sha256": "b135ed1f01cf9af7e9f583a2109501ef7b698a14afa3540ee331310321ba658e",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 522116
+    },
+    {
+      "name": "吃糖葫芦",
+      "upstreamPath": "dsh-pet/assets/webm/吃糖葫芦.webm",
+      "gitBlob": "def3fa70022f6b728f0d0b3ebbfcff601c406c57",
+      "sha256": "47abe811bce1b7a09c9484191d315ca44384bbae3cc3f40798bbe7d4a7618288",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 550451
+    },
+    {
+      "name": "吃腊八粥",
+      "upstreamPath": "dsh-pet/assets/webm/吃腊八粥.webm",
+      "gitBlob": "c20156c0de0863832d7bc10fb65153559de388be",
+      "sha256": "6383433635a34e2c7ef2c70886002ed6c39f06c23062d1a0802c40764603776a",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 539873
+    },
+    {
+      "name": "吃西瓜",
+      "upstreamPath": "dsh-pet/assets/webm/吃西瓜.webm",
+      "gitBlob": "ffa2c36e86e9056a7e965c73364a50c1fd8bb192",
+      "sha256": "0af50ff1640324e1d41cffaf90b7d1679451fb69e241897c029845c1e4f2bb7f",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 571671
+    },
+    {
+      "name": "吃重阳糕",
+      "upstreamPath": "dsh-pet/assets/webm/吃重阳糕.webm",
+      "gitBlob": "cc54c1f82bb5c4b8e366fba6433b6534bedcf4fc",
+      "sha256": "8bf60aed1d47ac84ceb79996b2a5042e056390b7c57081f47b3be5248dd1384a",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 550579
+    },
+    {
+      "name": "吃长寿面",
+      "upstreamPath": "dsh-pet/assets/webm/吃长寿面.webm",
+      "gitBlob": "ac71008a07686f858627e7f7f69e77448941bb97",
+      "sha256": "5fd3a7dc544125a57a3da9b079a569728a94b9843c3fd12dea8e8be5ca7b02dc",
+      "filter": "crop=394:360:123:0,scale=360:328:flags=lanczos,pad=360:360:0:28:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 481068
+    },
+    {
+      "name": "吃青团",
+      "upstreamPath": "dsh-pet/assets/webm/吃青团.webm",
+      "gitBlob": "00031236d476501f71b3f03f978a4b79952e5097",
+      "sha256": "711da5b2fc235db296ebd814eb6d9a82ef75923cdbdf0410c2332bd4999c4f50",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 437573
+    },
+    {
+      "name": "吃饺子",
+      "upstreamPath": "dsh-pet/assets/webm/吃饺子.webm",
+      "gitBlob": "2dee24954bae172a20ef1e0d44b34d7105872851",
+      "sha256": "174aaa67f9f30be5463c66621b4248488222a01618dd3791c1634f0d679a6930",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 658611
+    },
+    {
+      "name": "吹气球",
+      "upstreamPath": "dsh-pet/assets/webm/吹气球.webm",
+      "gitBlob": "3a632cd91c409ed1b889f0313ae1394113c0d7c0",
+      "sha256": "e2141a777c3af9769066bf26db8c5f327e0ec2596f01441813108c54eb665fcb",
+      "filter": "crop=608:360:16:0,scale=360:212:flags=lanczos,pad=360:360:0:135:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 418417
+    },
+    {
+      "name": "吹笛子",
+      "upstreamPath": "dsh-pet/assets/webm/吹笛子.webm",
+      "gitBlob": "fd57f820116b72c35e7b50ee3cdb5c20e775062b",
+      "sha256": "1f992558751e817a1ff6544f5d1704d65c8e443f98918349fcf4739c3da7da2c",
+      "filter": "crop=502:360:69:0,scale=360:258:flags=lanczos,pad=360:360:0:93:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 549667
+    },
+    {
+      "name": "堆雪人",
+      "upstreamPath": "dsh-pet/assets/webm/堆雪人.webm",
+      "gitBlob": "ce8e8be3b7e5c0dfbdebf15f5a8fd70e2836ee0f",
+      "sha256": "c63ebbe5f58f1d0762b4b2de78f6e585dcf933f30c48f216205b743847aa3822",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 611346
+    },
+    {
+      "name": "大口吃零食",
+      "upstreamPath": "dsh-pet/assets/webm/大口吃零食.webm",
+      "gitBlob": "ab57e48e28d0e0fb832549e1b546bed28f2eb3df",
+      "sha256": "33c8de149975c3d0b068fffaecbabdc53afb46b04c7a2f5db6442c28c41777b0",
+      "filter": "crop=578:360:31:0,scale=360:224:flags=lanczos,pad=360:360:0:124:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 494446
+    },
+    {
+      "name": "小提琴演奏",
+      "upstreamPath": "dsh-pet/assets/webm/小提琴演奏.webm",
+      "gitBlob": "2de1533cd0f2d7a72e0099f9ac6f816353f3912f",
+      "sha256": "57605233e94923a8fc6f1b50e795579a0521ad2ac6e9ae538715f2e8600e86b0",
+      "filter": "crop=376:360:132:0,scale=360:344:flags=lanczos,pad=360:360:0:14:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 642254
+    },
+    {
+      "name": "工作状态-原地踱步张望",
+      "upstreamPath": "dsh-pet/assets/webm/工作状态-原地踱步张望.webm",
+      "gitBlob": "7b9459a1efdf4155f5ddd3beb07936fcc5c8a7ed",
+      "sha256": "659f47b28144013175c6b615e95adf1b349911284df11b9fe3e9342df26a29cf",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 548933
+    },
+    {
+      "name": "工作状态-垂头叹气冒汗",
+      "upstreamPath": "dsh-pet/assets/webm/工作状态-垂头叹气冒汗.webm",
+      "gitBlob": "653ef82b71d52faa1d26a014afb7764f778926f7",
+      "sha256": "026da95dcb871e1b8d451ff2fc0fbb981b3402b4bd839aaa2502d930d0ccbbc4",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 231895
+    },
+    {
+      "name": "工作状态-忙碌点按",
+      "upstreamPath": "dsh-pet/assets/webm/工作状态-忙碌点按.webm",
+      "gitBlob": "32bc6dbf65a7f1afa403520c3dd37980ca353e5f",
+      "sha256": "e6382c0774e251d9e0bdbccf9e7daeb4b06144b35ec432d2386facf266daebf9",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 554701
+    },
+    {
+      "name": "工作状态-思考冒泡",
+      "upstreamPath": "dsh-pet/assets/webm/工作状态-思考冒泡.webm",
+      "gitBlob": "51bc3bb2fb894e6f1499974d62a3d93592f91859",
+      "sha256": "fc5689520c1eaeb525ab9ba588457224bb0bbee9baa2943678aca920ca8b79a5",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 478907
+    },
+    {
+      "name": "工作状态-清点归档",
+      "upstreamPath": "dsh-pet/assets/webm/工作状态-清点归档.webm",
+      "gitBlob": "af694fb0013cbc0aa5313ab0221f417b4efdb14a",
+      "sha256": "650678043d9d889be177b21e6699af9b61c8bb27650242f0e70a50eefd4f4bd6",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 422143
+    },
+    {
+      "name": "工作状态-雀跃庆祝",
+      "upstreamPath": "dsh-pet/assets/webm/工作状态-雀跃庆祝.webm",
+      "gitBlob": "edd6645a8ee9b222c720fb20cfff3b715e92db9b",
+      "sha256": "c42b094631bfa271e2883010c7a4ab427e7980278dfc5c831380519d13d669fe",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 573608
+    },
+    {
+      "name": "扑克魔术",
+      "upstreamPath": "dsh-pet/assets/webm/扑克魔术.webm",
+      "gitBlob": "2e33efead726dff587fa0ca46adef5ecb5d0b7c9",
+      "sha256": "12bab2d31caccfae42be6a5dbb92d6405527ac44243ad26f797e97c7fc7d77a3",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 542480
+    },
+    {
+      "name": "抽陀螺",
+      "upstreamPath": "dsh-pet/assets/webm/抽陀螺.webm",
+      "gitBlob": "1a0cd6a9447c3a36b068fb9db46fd56447520a73",
+      "sha256": "9a6ecdfd32743b941cf9d3b02d759d2d76e0a01c9d9d753bcf06208dad1171a6",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 611338
+    },
+    {
+      "name": "拆礼物",
+      "upstreamPath": "dsh-pet/assets/webm/拆礼物.webm",
+      "gitBlob": "01445f708db3e19b707e6d1609902dd4da9c0ade",
+      "sha256": "9060c98075f0cc8c10d022f806ed3f0301f745bb1d9545786c3621c45c25ee5f",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 609401
+    },
+    {
+      "name": "插茱萸赏菊",
+      "upstreamPath": "dsh-pet/assets/webm/插茱萸赏菊.webm",
+      "gitBlob": "7e2976e00317dfd681279890ab48f3a68ceb03f9",
+      "sha256": "6feea3c9e84f580a56caed8dc9a5d8305309d6815eff6f02f86caf78c90d6266",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 570009
+    },
+    {
+      "name": "摇扇纳凉",
+      "upstreamPath": "dsh-pet/assets/webm/摇扇纳凉.webm",
+      "gitBlob": "bbb9b8344e6c30579c967a27831ad85f19db1002",
+      "sha256": "da41372d2c3a6cb4293eeef47b9f917c66d83613806122c615cc01b4575aad7b",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 597024
+    },
+    {
+      "name": "撸猫",
+      "upstreamPath": "dsh-pet/assets/webm/撸猫.webm",
+      "gitBlob": "466044675ea20b863db850373aab8a6c2b7c11a8",
+      "sha256": "6f04582e94329d6c41bee7caa14e3d55b925d4600f560e5e2693e073708b7f1d",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 407410
+    },
+    {
+      "name": "收红包",
+      "upstreamPath": "dsh-pet/assets/webm/收红包.webm",
+      "gitBlob": "ca07f8792572e3b182b2077b768fbcf9ece4ee91",
+      "sha256": "52cc1553c55a52488b930868c4abce6b8034aa2b9372b9333d3b004c515dc127",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 554031
+    },
+    {
+      "name": "放孔明灯",
+      "upstreamPath": "dsh-pet/assets/webm/放孔明灯.webm",
+      "gitBlob": "ca554c0df5fb9cd2f35ad9eb54957b9e1dfcd2cf",
+      "sha256": "dee423699edc6223eb60293d11b155c388caac80af9496b7ef17b83734f34aee",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 691918
+    },
+    {
+      "name": "放河灯",
+      "upstreamPath": "dsh-pet/assets/webm/放河灯.webm",
+      "gitBlob": "2827fd308393a036201bc85dca0a9b2cc9f3ee13",
+      "sha256": "9c298e5b715cab8b46d492d5d7e4ee4e0ab0be45ce596dcc6e46310bc148d0a6",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 436495
+    },
+    {
+      "name": "放烟花",
+      "upstreamPath": "dsh-pet/assets/webm/放烟花.webm",
+      "gitBlob": "3a1bcd38b00b170b619e42b76ab8c9ea9225903a",
+      "sha256": "1b4c5250fb0c8aeef5245b8ffe01de99b1149469b2d5642309942dd5b9fc38e0",
+      "filter": "crop=608:360:16:0,scale=360:212:flags=lanczos,pad=360:360:0:135:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 738806
+    },
+    {
+      "name": "放风筝",
+      "upstreamPath": "dsh-pet/assets/webm/放风筝.webm",
+      "gitBlob": "000eba2f49a11beb21aa63ddc64c4d1522afa27e",
+      "sha256": "3b99ebb06ca17ce43263f66057c908cdf14ec4b9a65e84a0b411aa892f04db28",
+      "filter": "crop=442:360:99:0,scale=360:292:flags=lanczos,pad=360:360:0:61:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 669982
+    },
+    {
+      "name": "整体换装试色",
+      "upstreamPath": "dsh-pet/assets/webm/整体换装试色.webm",
+      "gitBlob": "abd198a8d1e4e67f09d86e4a5bdc99859e61098e",
+      "sha256": "e777077709277678aaf3cb3e524bb134831216b9403a61fba2e886b8fd9f40f5",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 623467
+    },
+    {
+      "name": "是啊，吃什么",
+      "upstreamPath": "dsh-pet/assets/webm/是啊，吃什么.webm",
+      "gitBlob": "e347b7574b4dca0d65bdd34bf9af0a176fbb15a1",
+      "sha256": "923ba8bae85754fd58cbea174f3a9a855274d89b060f911c7001d39039890b02",
+      "filter": "crop=582:360:29:0,scale=360:222:flags=lanczos,pad=360:360:0:126:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 316590
+    },
+    {
+      "name": "晨间刷牙",
+      "upstreamPath": "dsh-pet/assets/webm/晨间刷牙.webm",
+      "gitBlob": "66581dbd88c72bcba960d551b9cdcb0239da7d2f",
+      "sha256": "737e4c931b6fd0331f691bd3933162b6726136661e7b73435948a97d7aa75d81",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 493534
+    },
+    {
+      "name": "涮火锅",
+      "upstreamPath": "dsh-pet/assets/webm/涮火锅.webm",
+      "gitBlob": "d3e99cf6d8694b5e83a3957793f8fc7a0fc2cc2a",
+      "sha256": "5fac95fc1dde72db31c86e373c672b6a40ce509fd33db1ce4b6f755cbe4e836c",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 544101
+    },
+    {
+      "name": "深度思考碎碎念",
+      "upstreamPath": "dsh-pet/assets/webm/深度思考碎碎念.webm",
+      "gitBlob": "a4082cf30b60e02b4928c501c5416cbe14519724",
+      "sha256": "89f0fa7911533caa75c28126e46edcd82b8848adae5b5266e1302b651521c9d4",
+      "filter": "crop=472:360:84:0,scale=360:274:flags=lanczos,pad=360:360:0:78:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 347435
+    },
+    {
+      "name": "点击回应-元气挥手",
+      "upstreamPath": "dsh-pet/assets/webm/点击回应-元气挥手.webm",
+      "gitBlob": "f60556f06c386cfb569f76b0cfa2e34e34fdc362",
+      "sha256": "d8ddf61b6ab5b23c85ab766fef34a03ecfb238cdbee0c8b2bcff28f45ca8a7bc",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 494429
+    },
+    {
+      "name": "点击回应-挠痒咯咯笑",
+      "upstreamPath": "dsh-pet/assets/webm/点击回应-挠痒咯咯笑.webm",
+      "gitBlob": "d896eb9a91ca8eafa7f0af35a3073dc04a397742",
+      "sha256": "f14aee7750704eea3e2b5eda13261224246ff0b7725a39b90336dc4c0b47f2e8",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 493498
+    },
+    {
+      "name": "照镜子",
+      "upstreamPath": "dsh-pet/assets/webm/照镜子.webm",
+      "gitBlob": "f9ead4a5e1ab6cb702bd349794264f398f470867",
+      "sha256": "a09b3f76bdd44e978c2fff5a32355caf783048af6099a19e2d4659dff53c92b3",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 596734
+    },
+    {
+      "name": "玩水枪",
+      "upstreamPath": "dsh-pet/assets/webm/玩水枪.webm",
+      "gitBlob": "70cabac39a03ab1738540fdb9a9581ae523de463",
+      "sha256": "a6d604d663fec4bc4256e12f710f3a9e7ac5af76434ce768b65ee248a2d59ec8",
+      "filter": "crop=582:360:29:0,scale=360:222:flags=lanczos,pad=360:360:0:126:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 296145
+    },
+    {
+      "name": "碎碎念-发呆碎碎念",
+      "upstreamPath": "dsh-pet/assets/webm/碎碎念-发呆碎碎念.webm",
+      "gitBlob": "4afcaf7459e3b27b30252648b388e9cd3296807f",
+      "sha256": "861f932f3555e4f26e5d7313ce358f5618cb661e7ab5dd286e461f044ece1c06",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 374424
+    },
+    {
+      "name": "碎碎念-对屏碎碎念",
+      "upstreamPath": "dsh-pet/assets/webm/碎碎念-对屏碎碎念.webm",
+      "gitBlob": "8b7b357f01a9e5cf733dce28f32e8f94be4a030d",
+      "sha256": "e6f672e2ee4af637fed7a291953bba79c7f3b693567d8fc41a1940989400b397",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 417360
+    },
+    {
+      "name": "碎碎念-擦桌碎碎念",
+      "upstreamPath": "dsh-pet/assets/webm/碎碎念-擦桌碎碎念.webm",
+      "gitBlob": "343513cf0d5583b5f476080d5082f3f5e01588b8",
+      "sha256": "068fb7bf4fe13cf7fd7b93c9c94b0868ce67b2ce9cf3eb45dbd0f55343a63a58",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 410302
+    },
+    {
+      "name": "穿针乞巧",
+      "upstreamPath": "dsh-pet/assets/webm/穿针乞巧.webm",
+      "gitBlob": "f78881f4e996d5160ce4910ed06646b5b9d5bd60",
+      "sha256": "18cb42eeaae0cef747c5dbdc66f2b020d86ea50fb8087a9421655ce6b13da6a3",
+      "filter": "crop=438:360:101:0,scale=360:294:flags=lanczos,pad=360:360:0:59:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 403524
+    },
+    {
+      "name": "舞狮头",
+      "upstreamPath": "dsh-pet/assets/webm/舞狮头.webm",
+      "gitBlob": "b16d549ec2572f5d693bdc7691e3247544ccb88e",
+      "sha256": "9873978160d6892b8be64259793aa4d7fb165013484ea8a26512fa543ab0ddfc",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 749579
+    },
+    {
+      "name": "荡秋千",
+      "upstreamPath": "dsh-pet/assets/webm/荡秋千.webm",
+      "gitBlob": "41c61429405139344b13875135468edb25b6f28e",
+      "sha256": "f82e18f2a317c1435acc941b62d7ada1ecb62916cdb9053be7d3daa7280cec8a",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 757509
+    },
+    {
+      "name": "萌化小幽灵",
+      "upstreamPath": "dsh-pet/assets/webm/萌化小幽灵.webm",
+      "gitBlob": "cae5ebbca8634591a49daf5f7a4bc56fa369a7bf",
+      "sha256": "40fbb2742e68a2c40b77148011aafbb5430582a9e6f3f6d9049fc4dff23be9a8",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 500500
+    },
+    {
+      "name": "蓝鲸现世",
+      "upstreamPath": "dsh-pet/assets/webm/蓝鲸现世.webm",
+      "gitBlob": "eb62a155d056d35a16b1d4e961d5ff10c109f684",
+      "sha256": "aa2b8f3150bfdc0150ffc34c12f0f4ca6b0cb90b32c23f266e1f124a3c2cd876",
+      "filter": "crop=392:360:124:0,scale=360:330:flags=lanczos,pad=360:360:0:27:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 481007
+    },
+    {
+      "name": "蝴蝶蜜蜂环绕头顶开花",
+      "upstreamPath": "dsh-pet/assets/webm/蝴蝶蜜蜂环绕头顶开花.webm",
+      "gitBlob": "6f39bb90fd8349d5f23d0912a4bc01c2c06470f2",
+      "sha256": "4f04e909b788ad256dd6d2bce96922e76494bb0588c583d615282840dd953b97",
+      "filter": "crop=640:360:0:0,scale=360:202:flags=lanczos,pad=360:360:0:144:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 444273
+    },
+    {
+      "name": "被落叶淹没",
+      "upstreamPath": "dsh-pet/assets/webm/被落叶淹没.webm",
+      "gitBlob": "1e35fff171fb8856bd89de91329ef357c7d33e65",
+      "sha256": "ca0eb58fadb7eb1ef42f121bd73d31d910d4b4fff7011cf9103d94965c74e2e5",
+      "filter": "crop=592:360:24:0,scale=360:218:flags=lanczos,pad=360:360:0:129:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 440483
+    },
+    {
+      "name": "装点圣诞树",
+      "upstreamPath": "dsh-pet/assets/webm/装点圣诞树.webm",
+      "gitBlob": "1217c9625c3a682732bc4398108ce7c4ae2a07f6",
+      "sha256": "783854ee1ef88b2b8c7faed54e6893b221088815dcb2231d4046a3d687d88543",
+      "filter": "crop=534:360:53:0,scale=360:242:flags=lanczos,pad=360:360:0:108:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 540577
+    },
+    {
+      "name": "讨糖南瓜灯",
+      "upstreamPath": "dsh-pet/assets/webm/讨糖南瓜灯.webm",
+      "gitBlob": "3a17ac14fba449e8d7bb0e0d38085825b068a9e1",
+      "sha256": "7983fcab9d8a62b435c8b99602103e73bf96e2f62d3cf9a729a7b9c842c4d2fa",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 565902
+    },
+    {
+      "name": "踢毽子",
+      "upstreamPath": "dsh-pet/assets/webm/踢毽子.webm",
+      "gitBlob": "1a0586564e58e6a60e4f151d2bf161e975673e30",
+      "sha256": "271cec9920a13b5cff7cabf0204318b7ede11b80c0c23b00c3b7472ca95a4b05",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 618904
+    },
+    {
+      "name": "轻快摇摆舞",
+      "upstreamPath": "dsh-pet/assets/webm/轻快摇摆舞.webm",
+      "gitBlob": "596558b14cacee0d96f5e9d3942fd5731be49718",
+      "sha256": "305e52f79c79f51e34e36a22c8f263115e5a5c7e961d465d22728694dbe252d4",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 634181
+    },
+    {
+      "name": "轻快记录",
+      "upstreamPath": "dsh-pet/assets/webm/轻快记录.webm",
+      "gitBlob": "d0c1bc670b74450e53019b36366edbe54056a363",
+      "sha256": "1e878af0ccf33c480989dda8083ddd1cb2c65ab76ba3f48d45e36bb499f1e6b0",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 519937
+    },
+    {
+      "name": "骑木马",
+      "upstreamPath": "dsh-pet/assets/webm/骑木马.webm",
+      "gitBlob": "b578f4c951a11c3fe97bdbd609315d3e72fe6827",
+      "sha256": "aa040e9d3085ec1ebe7fb9b466504cf1cf30c75c8de9b01bdb4b22f9fcaf91b1",
+      "filter": "crop=360:360:140:0,scale=360:360:flags=lanczos,pad=360:360:0:0:color=black@0,lut=a='if(lt(val,12),0,val)',setsar=1",
+      "bytes": 825924
+    }
+  ],
+  "existingNameMappings": {
+    "小幅度原地360度旋转展示": "小幅度原地 360 度旋转展示",
+    "点击回应-开心跃动": "点击回应 - 开心跃动",
+    "点击回应-害羞惊讶": "点击回应 - 害羞惊讶",
+    "点击回应-傲娇生气": "点击回应 - 傲娇生气（侧身展示）",
+    "被吓一跳": "被吓一跳（炸毛）",
+    "吃Token": "偷吃Token"
+  },
+  "existingSameNames": [
+    "东张西望",
+    "偷吃零食被抓住",
+    "原地专心玩魔方",
+    "原地小憩沉眠",
+    "原地敲击桌面互动",
+    "原地漂浮踏步",
+    "原地跳跃抓碎头顶物品",
+    "原地蹲下玩玩具汽车",
+    "原地重力下蹲压缩",
+    "哈欠连天",
+    "女仆屈膝礼仪",
+    "待机呼吸休闲",
+    "悠闲哼歌",
+    "打瞌睡被惊醒",
+    "玩游戏气急败坏",
+    "用鲸鱼尾巴拍打地面",
+    "螃蟹走路",
+    "被鼠标拖拽悬空反馈",
+    "超大伸懒腰",
+    "鲸鱼吐泡泡特效"
+  ],
+  "encoding": "VP9 alpha, 360x360, CRF 38; alpha <12 cleared; full-clip visible bounds"
+}

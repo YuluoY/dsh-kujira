@@ -10,7 +10,7 @@ const files=execFileSync('git',['ls-files','-z'],{cwd:root,encoding:'utf8'}).spl
 const checks=[['private key',/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/],['access token',/\b(?:sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})/],['personal device path',/\/Users\/[A-Za-z0-9_.-]+/],['personal email',/[A-Za-z0-9._%+-]+@(?:gmail|qq|163|126|outlook|hotmail|icloud)\.[A-Za-z]{2,}/]];
 let findings=0;
 for(const file of files){
- if(/(^|\/)(\.env(?:\..*)?|\.credentials\.yaml|inventory\.json|realtime\.json|id_rsa)$/.test(file)&&!file.endsWith('.env.example')){console.error(file+': private runtime file');findings++;}
+ if(/(^|\/)(\.env(?:\..*)?|\.credentials\.yaml|inventory\.json|inventory\.sqlite(?:-wal|-shm)?|realtime\.json|id_rsa)$/.test(file)&&!file.endsWith('.env.example')){console.error(file+': private runtime file');findings++;}
  const bytes=await readFile(resolve(root,file));if(bytes.subarray(0,8192).includes(0))continue;
  bytes.toString('utf8').split('\n').forEach((line,i)=>{for(const [kind,pattern]of checks)if(pattern.test(line)){findings++;console.error(file+':'+(i+1)+': '+kind);}});
 }

@@ -5,12 +5,12 @@
 | 字段 | 值 |
 |---|---|
 | 组件名 | Panel controls |
-| 版本 | v1.3.0 |
+| 版本 | v1.4.0 |
 | 框架 | React 18 |
 | 状态 | 已集成，浏览器验收 |
 | 入口路径 | ../panel-controls.js |
 | 依赖 | 宿主 React、浏览器 Popover API、本地 i18next / Intl |
-| 组件层次 | 原子层 Select / NumberField / Range / TooltipHost |
+| 组件层次 | 原子层 Select / SearchSelect / NumberField / Range / TooltipHost |
 | 风格兼容性 | 中性浅色与深色；全部消费语义 Token |
 
 ## 是什么
@@ -30,12 +30,15 @@ React.createElement(Select, { label: '主题', value: theme,
 
 ### Props
 
+SearchSelect 是单个可编辑下拉控件。初始 value 为空，不自动提交首项；输入仅过滤，点击候选或 Enter 明确确认后提交。清除回调空字符串；Tab、Escape、加载和外部 value 更新都不提交。支持 IME 组合输入。下拉使用 Popover top layer 避免面板 overflow 裁切。
+
+
 | 名称 | 适用 | 说明 |
 |---|---|---|
-| label | Select / NumberField | 必填，可访问名称 |
-| value | Select / NumberField | 当前受控值 |
-| options | Select | `[value, label][]`，保留数字值类型 |
-| onChange | Select / NumberField | 提交后回调新值 |
+| label | Select / SearchSelect / NumberField | 必填，可访问名称 |
+| value | Select / SearchSelect / NumberField | 当前受控值 |
+| options | Select / SearchSelect | `[value, label][]`，保留数字值类型 |
+| onChange | Select / SearchSelect / NumberField | 提交后回调新值 |
 | disabled | Select / NumberField | 禁止交互，默认 false |
 | loading | Select | 显示加载文案并禁用，默认 false |
 | error | Select | 错误文案、aria-invalid 和描述关联 |
@@ -86,7 +89,16 @@ React.createElement(Select, { label: '主题', value: theme,
 
 Select 采用 select-only combobox：方向键、Home/End、Enter/Space、字符定位、Tab、Escape；焦点保持在触发器，以 aria-activedescendant 表达活动选项。Escape 仅先关闭列表；外部点击不提交。Tooltip 支持悬浮与键盘焦点，通过 aria-describedby 关联。
 
+### 国际化
+
+控件文案、ARIA 标签、选项与提示通过统一 i18next 字典渲染，选项 value 和输入值保持原始语义。NumberField 使用支持地区小数分隔符的 spinbutton，键盘上下键即时更新；Range 的输出和提示按地区格式化。语言切换不重建控件身份，跟随系统时响应 languagechange。
+
 ## 变更记录
+
+### v1.4.0 (2026-09-13)
+
+新增 SearchSelect。清空和筛选与选项提交分离；空选项、禁用、加载、错误状态完整；保留 Select 的旧 API。
+
 
 ### v1.3.0 (2026-09-11)
 
@@ -99,7 +111,3 @@ Select 采用 select-only combobox：方向键、Home/End、Enter/Space、字符
 ### v1.0.0 (2026-09-11)
 
 新增组件化列表、提示与数字步进；统一说话与功能气泡轮廓。
-
-## 国际化
-
-控件文案、ARIA 标签、选项与提示通过统一 i18next 字典渲染，选项 value 和输入值保持原始语义。NumberField 使用支持地区小数分隔符的 spinbutton，键盘上下键即时更新；Range 的输出和提示按地区格式化。语言切换不重建控件身份，跟随系统时响应 languagechange。

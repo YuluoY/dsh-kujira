@@ -18,6 +18,7 @@
  */
 
 import { readdir, readFile } from 'node:fs/promises';
+import { animationNames } from '../lib/shared/client/animation-catalog.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -51,7 +52,8 @@ async function main()
     const config = JSON.parse(await readFile(CONFIG_FILE, 'utf8'));
     const pools = config.pools || {};
 
-    const referenced = new Set();
+    const referenced = new Set(animationNames(config));
+    for (const name of referenced) if (!onDisk.has(name)) problems.push("场景引用不存在的素材：" + name);
     for (const [poolName, list] of Object.entries(pools))
     {
         if (!Array.isArray(list))

@@ -170,7 +170,19 @@
     }
 
     #sim {top:14px;right:16px;left:auto;bottom:auto;max-width:390px}
-    #preview-composer {position:fixed;left:24px;bottom:58px;width:min(590px,calc(100vw - 48px));height:64px;box-sizing:border-box;border:1px solid #353840;border-radius:12px;padding:14px 16px;background:#202228;color:#9da2ae;font-size:12px;z-index:10}
+    /* DSH InputBar.tsx / InputBar.module.css, c291e796: native composer fixture. */
+    #preview-composer {--dsw-specific-input-major:#2b2b2d;--dsw-alias-label-secondary:#d1d1d4;--dsw-alias-label-caption:#858589;--dsw-specific-selector:#333335;--dsw-alias-button-info-fill:#669dff;--dsw-alias-button-info-hover:#7dabff;position:fixed;left:24px;bottom:58px;width:min(1500px,calc(100vw - 48px));box-sizing:border-box;border:0;border-radius:22px;padding-top:8px;background:var(--dsw-specific-input-major);color:var(--dsw-alias-label-secondary);font-size:14px;line-height:24px;display:flex;flex-direction:column;gap:12px;z-index:10}
+    #preview-composer[data-theme="light"] {--dsw-specific-input-major:#f5f5f5;--dsw-alias-label-secondary:#52545a;--dsw-alias-label-caption:#858589;--dsw-specific-selector:#ebebed;--dsw-alias-button-info-fill:#4d6bfe;--dsw-alias-button-info-hover:#3b5ae8}
+    .preview-input {box-sizing:border-box;min-height:36px;padding:4px 8px 0 14px;color:var(--dsw-alias-label-caption)}
+    .preview-toolbar {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;min-width:0;padding:2px 8px 6px}
+    .preview-tools,.preview-trailing {display:flex;align-items:center;gap:12px;min-width:0}
+    .preview-trailing {flex:none;margin-left:auto}
+    .preview-add {display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:999px;background:var(--dsw-specific-selector)}
+    .preview-permission,.preview-model {display:flex;align-items:center;gap:4px;font-size:13px;line-height:20px;white-space:nowrap}
+    #preview-pause-slot:empty {display:none}
+    #preview-stop {display:grid;place-items:center;flex:none;width:34px;height:34px;border:none;border-radius:999px;corner-shape:round;background:var(--dsw-alias-button-info-fill);color:#fff;cursor:pointer;transition:background-color 100ms ease;transform:translateY(-2px)}
+    #preview-stop:hover:not(:disabled) {background:var(--dsw-alias-button-info-hover)}
+    #preview-stop:disabled {opacity:.4;cursor:default}
     @media(max-width:700px){#hud{display:none}#sim{left:12px;right:12px;max-width:none}#sim .note{display:none}}
 
     #hud summary {color:#9da2ae;font-size:11px;cursor:pointer;margin-top:6px}
@@ -227,7 +239,23 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
 
 </div>
 
-<div id="preview-composer">输入框位置（仅用于展示下方费用栏）</div>
+<div id="preview-composer" data-composer-card>
+  <div class="preview-input">发消息或创建任务，/ 调用指令，@ 文件或对话</div>
+  <div class="preview-toolbar">
+    <div class="preview-tools" aria-hidden="true">
+      <span class="preview-add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+      <span class="preview-add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 5v5a2 2 0 0 0 4 0V4a3 3 0 0 0-6 0v6a4 4 0 0 0 8 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+      <span class="preview-permission"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 13 4v4c0 3-5 6-5 6s-5-3-5-6V4zM8 5v4m0 1v1" stroke="currentColor" stroke-width="1.2"/></svg>完全权限<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m3 4.5 3 3 3-3" stroke="currentColor" stroke-linecap="round"/></svg></span>
+    </div>
+    <div class="preview-trailing">
+      <span id="preview-pause-slot"></span>
+      <span class="preview-model">deepseek-flash Max<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m3 4.5 3 3 3-3" stroke="currentColor" stroke-linecap="round"/></svg></span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="2" opacity=".3"/><path d="M8 3a5 5 0 0 1 5 5" stroke="currentColor" stroke-width="2"/></svg>
+      <button type="button" aria-label="停止预览任务" id="preview-stop"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="3" fill="currentColor" /></svg></button>
+    </div>
+  </div>
+</div>
+<script>document.getElementById('preview-composer').dataset.theme = galleryOptions.get('composerTheme') === 'light' ? 'light' : 'dark';</script>
 <!-- 真 React（DSH 外壳在真实环境里提供的也是这个） -->
 <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
@@ -321,7 +349,8 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
                         const step = generatorFactory().next();
                         mounted.push({ slotName, element: step.value });
                         const target = document.createElement('div');
-                        root.appendChild(target);
+                        if (slotName === "conversation.input.right") document.getElementById("preview-pause-slot").appendChild(target);
+                        else root.appendChild(target);
                         if (slotName === 'conversation.composer.dock')
                         {
                             target.style.cssText = 'position:fixed;left:24px;width:min(590px,calc(100vw - 48px));bottom:20px;z-index:20';
@@ -342,6 +371,7 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
         };
     }
 
+    document.getElementById("preview-stop").onclick = () => fetch("/__preview/gate",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action:"cancel"})});
     window.__ModuleLoader__ = {
         load(info)
         {
@@ -414,5 +444,6 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
 <!-- 未经改动的真实客户端半侧 -->
 <script src="/client.js"></script>
 
+<script type="module" src="/experiments/whale-lab/preview-bridge.js"></script>
 </body>
 </html>

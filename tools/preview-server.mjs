@@ -38,7 +38,6 @@ import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
 import { apply } from '../lib/index.js';
-import {createActivityReader} from '../lib/host/activity.js';
 import { activityPreview } from './fixtures/activity-preview.mjs';
 import {rateAt} from '../lib/shared/billing.js';
 import { previewUsage } from './fixtures/usage-preview.mjs';
@@ -81,7 +80,7 @@ function loadApiKey()
     return null;
 }
 
-const apiKey = loadApiKey();
+const apiKey = process.env.PREVIEW_OFFLINE === "1" ? null : loadApiKey();
 
 // ============================================================================
 // 用一个假 ctx 抠出真实路由，并截获 session/event 处理器
@@ -89,6 +88,8 @@ const apiKey = loadApiKey();
 const routes = [];
 const sessionHandlers = [];
 const agentHandlers = [];
+const previewGates = [], previewHolds = new Map();
+let previewResumeCount = 0;
 let supplyDemoSerial=0, supplyClock=0, previewRunning=false;
 try {
     const previous=JSON.parse(readFileSync(join(homedir(),'.dsh','dsh-kujira-preview',String(PORT),'inventory.json'),'utf8'));
@@ -117,6 +118,7 @@ const ctx = {
     on(event, handler)
     {
         if (event === 'agent/status') agentHandlers.push(handler);
+        if (event === 'agent/pre-step') previewGates.push(handler);
         if (event === 'session/event')
         {
             sessionHandlers.push(handler);
@@ -144,7 +146,7 @@ const ctx = {
     }
 };
 
-apply(ctx, { size: 260, realtime:{enabled:false,cacheDir:join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT))}, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { now:()=>Date.now() + supplyClock, directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
+apply(ctx, { exchangeRates:{enabled:process.env.PREVIEW_OFFLINE !== "1" || process.env.PREVIEW_EXCHANGE === "1"}, size: 260, realtime:{enabled:false,cacheDir:join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT))}, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { now:()=>Date.now() + supplyClock, directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
 
 // ============================================================================
 // 模拟会话事件
@@ -179,6 +181,7 @@ const MIME = {
     '.json': 'application/json; charset=utf-8',
     '.webm': 'video/webm',
     '.png': 'image/png',
+    '.webp': 'image/webp',
     '.svg': 'image/svg+xml'
 };
 
@@ -194,12 +197,26 @@ function readBody(req)
     });
 }
 
-const previewActivityReader=createActivityReader(()=>ctx.sessions);
 const server = createServer(async (req, res) =>
 {
     const url = new URL(req.url ?? '/', 'http://localhost');
     const pathname = url.pathname;
 
+    if(pathname==='/__preview/gate' && req.method==='POST') {
+        const body=JSON.parse(await readBody(req));
+        if(body.action==='cancel') {previewHolds.get('preview-session')?.abort(Error('preview user stop'));emit('abort','preview-session');}
+        else {
+            usagePreviewMode='peak';previewRunning=true;
+            previewHolds.get('preview-session')?.abort(Error('preview replacement'));
+            const controller=new AbortController();previewHolds.set('preview-session',controller);
+            emit('working','preview-session');
+            const payload={agent:{id:'preview-session',session:previewSession},signal:controller.signal,turn:1,step:1};
+            const next=async()=>{previewResumeCount++;return {kind:'enter',messages:[]};};
+            const run=previewGates.reduceRight((next,gate)=>()=>gate(payload,next),next);
+            run().catch(()=>{}).finally(()=>{if(previewHolds.get('preview-session')===controller)previewHolds.delete('preview-session');});
+        }
+        res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({ok:true,resumed:previewResumeCount}));return;
+    }
     if(pathname==='/__preview/rewards' && req.method==='POST') {
         previewRunning=true;
         const requested=url.searchParams.get('mode') || rateAt(Date.now()+supplyClock);
@@ -217,13 +234,6 @@ const server = createServer(async (req, res) =>
         const account = {currency:'¥',rawCurrency:'CNY',total:110,granted:10,toppedUp:100};
         res.writeHead(200, {'content-type':'application/json','cache-control':'no-store'});
         res.end(JSON.stringify({ok:true,available:true,...account,balances:[account],fetchedAt:Date.now()}));return;
-    }
-    if(pathname==='/dsh-kujira/activity') {
-        if(url.searchParams.has('messagesBefore')) {const value=previewActivityReader.messages(url.searchParams.get('sessionId'),Number(url.searchParams.get('messagesBefore')));res.writeHead(value.ok?200:400,{'content-type':'application/json'});res.end(JSON.stringify(value));return;}
-        const value=previewActivityReader.read(url.searchParams.get('sessionId'));
-        const etag='"'+value.epoch+'-'+value.revision+'"';
-        if(req.headers['if-none-match']===etag){res.writeHead(304,{'ETag':etag,'cache-control':'no-store'});res.end();return;}
-        res.writeHead(200,{'content-type':'application/json','cache-control':'no-store','ETag':etag});res.end(JSON.stringify({...value,preview:true}));return;
     }
     // Preview-only usage fixtures never pass through reward settlement.
     if(pathname==='/dsh-kujira/usage' && url.searchParams.get('sessionId')==='preview-session') {
@@ -277,6 +287,8 @@ const server = createServer(async (req, res) =>
                 hasApiKey: Boolean(apiKey),
                 apiKeySource: apiKey ? apiKey.source : null,
                 sessionHandlers: sessionHandlers.length,
+                schedulerResumed: previewResumeCount,
+                schedulerHeld: previewHolds.size,
                 pluginRoutes: routes.map((r) => r.kind + ' ' + r.path)
             }));
             return;

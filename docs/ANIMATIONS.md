@@ -1,48 +1,233 @@
-# 动画覆盖 / Animation coverage
+# 动画与场景 / Animation scenes
 
-全部 50 个素材均有实际播放入口。静态陪伴、系统减少动态效果、后台标签页会抑制动画。覆盖表表示可触发路径，不表示每次都会播放全部素材。
+当前包包含 **130 个透明 WebM**：保留原有 50 个，补入上游同人物的 80 个。上游快照为 PC2005-cloud/dsh-pet 的 814b0e47812dfd51dbc2df4ca272b57403c5e9cd，20 个同名和 6 个名称映射使用现有素材，不重复加入。名称对应不等于视频文件逐帧一致。
 
-All 50 clips have a playback route. Reduced motion, focus mode and hidden tabs suppress playback. Probabilistic and context-specific clips do not run on every interaction.
+The package contains **130 transparent WebM clips**: the original 50 plus 80 imported clips for the same character. Existing clips cover 20 matching names and 6 naming aliases. The originals are retained; name equivalence does not imply identical video content.
 
-| 场景 / Context | 触发 / Trigger | 素材 / Clips |
-|---|---|---|
-| idle | 随机安静待机 / quiet idle | 待机呼吸休闲、东张西望、悠闲哼歌、原地小憩沉眠、睡眼惺忪、空白举牌 |
-| action | 空闲小动作 / idle gestures | 超大伸懒腰、哈欠连天、喝奶茶、原地专心玩魔方、原地敲击桌面互动、原地重力下蹲压缩、原地蹲下玩玩具汽车、鲸鱼吐泡泡特效、女仆屈膝礼仪、被吓一跳（炸毛）、原地跳跃抓碎头顶物品、小幅度原地 360 度旋转展示、偷吃零食被抓住、打喷嚏、用鲸鱼尾巴拍打地面、打瞌睡被惊醒、偷吃Token、举牌不是大肥鱼、原地漂浮踏步、迷糊犯困 |
-| long | 低频空闲动作 / rare idle | 玩游戏气急败坏、闲得无聊打游戏、女仆扫除、螃蟹走路、吃盒饭 |
-| click | 点击与摸头 / click and pat | 点击回应 - 开心跃动、点击回应 - 害羞惊讶、点击回应 - 傲娇生气（侧身展示） |
-| sleep | 23:00–06:00 空闲时，20% 概率进入三段睡眠 / nighttime idle sequence | 睡觉第一段、睡觉第二段、睡觉第三段 |
-| workBreak | 连续工作至少 3 分钟，最多每 3 分钟一次；摸鱼→被抓→认真工作 / playful long-work interlude | 工作摸鱼、摸鱼被抓、认真工作 |
-| thinking | 真实任务状态 / public task state | 工作思考 |
-| working | 真实任务状态 / public task state | 认真工作 |
-| result | 真实任务状态 / public task state | 工作思考 |
-| waiting | 真实任务状态 / public task state | 工作被打扰、看表叹气 |
-| success | 真实任务状态 / public task state | 工作结束 |
-| error | 真实任务状态 / public task state | 长时间工作看表 |
-| 启动 / Startup | 首次配置加载 / first load | 待机呼吸休闲 |
-| 拖拽 / Drag | 超过点击阈值 / drag threshold | 被鼠标拖拽悬空反馈 |
-| 查看数据 / Open panels | 空闲时打开天气或余额 / open weather or balance while idle | 看天气、翻钱包 |
-| 喂食 / Feed | 库存消费成功或免费模式 / inventory accepted or free mode | 吃小鱼干 |
-| 状态过渡 / Enter state | 开始工作、结束工作 / work transitions | 开始工作、工作结束 |
+## 使用
 
-工作状态优先于睡眠和空闲链；用户拖动或需要确认、错误等紧急状态会取消旧动画序列；短暂反馈完整播放后回到最新任务状态。所有影片通过双 video 缓冲交替，避免黑帧。未对 WebM 瞳孔进行独立变形，因此不声称支持眼睛追踪鼠标。
+- **养成 → 动作点播**：单个可输入检索、可清空的下拉项，初始为空；选择不同的有效项时播放并收起面板，避免遮住人物。点播不消耗补给、不改变养成数值，工作/专注/静态模式下禁用。
+- **设置 → 陪伴与动效 → 情境回应**：控制作息、养成、天气、节日与鼠标停留回应。关闭后仍保留真实任务状态和主动互动。
+- 鼠标在人物上停留 900 ms，空闲且未打开面板/菜单时挥手回应；至少间隔 60 秒。键盘聚焦同样可触发，触屏不会触发悬停。
+- 减少动态效果、专注和后台页面会抑制/暂停播放。拖拽优先，等待确认和出错优先于装饰动作；排队反馈超过 15 秒失效。
 
-Task state takes priority over idle and sleep sequences. Dragging and urgent states cancel stale sequences; other reactions finish before returning to the latest task state. Two video buffers avoid a blank frame between clips. The supplied WebM clips do not support independent pupil tracking.
+## 气泡与进展
 
-## 功能与启动反馈 / Feature and startup reactions
+设置 → 陪伴与动效 → 悬停显示进展，默认开启。关闭只停止鼠标悬停唤出进展，保留任务状态变化时的限时提醒、需要确认/出错提示与键盘访问。旧偏好没有该字段时使用开启默认值。
 
-`ui.featureAnimations` configures first-session eating (`偷吃Token`) and the default menu actions. Feed hover combines the eating clip with a separate SVG drool overlay; wallet and weather use `翻钱包` and `看天气`. Hover waits for a deliberate dwell and observes cooldowns. Reactions play to their natural end, with a 320 ms crossfade. A pending hover is replaced by the latest one and discarded when the pointer leaves. Peak rewards use `ui.featureAnimations.reward` (`点击回应 - 开心跃动`) with bounded SVG fish scatter and drool. Inventory gains use SVG symbols shared with the growth panel.
+人物说话使用椭圆思考气泡：小圆点、较大圆点、主体依次出现（0 / 110 / 220 ms），主体舒展约 480 ms；退场约 240 ms。减少动态效果时直接呈现。进展气泡保留紧凑信息样式，两种内容共用一个 top-layer 容器，紧急进展优先；面板或菜单打开时收起。放置时比较上下左右空间，限制正文和圆点在视口内，避免人物与滚动容器遮盖。
 
-## 情境回应 / Context reactions
+动作下拉框输入只检索、清空只删除选择；挂载、外部值显示、Tab、Escape、失焦都不触发播放。本次打开页面内可保留选择，重新展开不会重播；刷新页面初始化为空，不从存储恢复动作并自动执行。选择项与检索文字分离，支持中文输入法。
 
-| 条件 / Condition | 反馈 / Reaction |
-|---|---|
-| 打开余额，低于 CNY 10 / USD 2（含零） | 翻钱包；零钱回应 / wallet gesture |
-| 打开余额，至少 CNY 100 / USD 20 | 开心跃动 / happy jump |
-| 已观察到本轮执行，30 秒内完成 | 开心跃动；不重播历史完成 / quick completion |
-| 当前页面累计观察执行 10 分钟 | 喝奶茶；每轮一次 / long-work companionship |
-| 已观察到本轮执行，至少 10 分钟后完成 | 超大伸懒腰 / stretch after long completion |
-| 无结束记录的空闲状态，每 10 分钟以 35% 概率 | 鲸鱼吐泡泡特效 / occasional idle bubbles |
+## 自动场景
 
-情境回应共享 2 分钟冷却，余额同一档位不因刷新重播。暂停、后台与专注时间不累计为执行时间。等待输入、错误、暂停状态抑制反馈，排队动作播放前重新检查当前状态。用户主动动作优先；“情境回应”开关也控制工作摸鱼序列。余额档位只用于动画，不是理财建议，也不改变库存或记账。
+| 场景 | 条件与节奏 |
+| --- | --- |
+| 作息 | 06–10 晨间；07–10 早餐；11–14 午餐；14–17 加餐；18–21 晚餐；同类至少隔 1 小时 |
+| 养成 | 精力 <20、饱食 <25、心情 <25；同类至少隔 10 分钟；直接读取现有养成数据 |
+| 睡眠 | 23:00–05:59 的空闲选择中有 20% 候选机会；睡觉三段连续播放；至少隔 10 分钟；状态变化会中断 |
+| 天气 | 仅用已加载的有效天气数据：≥28°C 或 ≤8°C；不新增天气请求；同类隔 15 分钟 |
+| 季节 | 按本地月份采用北半球季节主题；至少隔 20 分钟；可用 scenes 覆盖主题池 |
+| 节日 | 公历元旦/万圣节/圣诞节及 Intl 农历节日；同主题至少隔 15 分钟；农历不可用时跳过，闰月不误算为正月 |
+| 工作 | 思考/执行/整理/等待/成功/错误使用真实任务状态；长任务低频插播看表或喝奶茶；思考阶段可用记录/思考动作 |
+| 余额 | 复用原币种余额档位；首次打开或档位变化时使用钱袋动画；不增加余额请求 |
+| 陪玩 | 消耗陪玩补给成功后从玩耍场景池选择；投喂小鱼干仍对应吃小鱼干 |
+| 空闲 | 保留基础随机链，娱乐动作只进入低权重 long 池；记住最近 8 个选择，尽量避免重复 |
 
-Context reactions share a two-minute cooldown. Repeated balance refreshes in the same band do not replay them. Paused, hidden and focus time does not count as observed execution. Waiting, error and paused states suppress reactions; queued clips recheck the current state before playback. Deliberate interactions take priority. The setting also controls playful work-break sequences. Balance bands are decorative and do not alter inventory or accounting.
+主动空闲场景共用 **90 秒**最小间隔；同一时刻只选择一个满足条件且不在冷却中的场景。候选不保证每次出现。工作情境反应沿用原有 2 分钟最小间隔，与空闲场景调度不同。日历场景使用设备本地日期，与操作系统时区一致。
+
+## 配置与模块
+
+- assets/pet.config.json：基础动画池与真实任务状态；scenes 可按 key 覆盖默认场景池，空数组表示禁用该池。
+- lib/shared/client/animation-catalog.js：场景素材、可点播目录、文字动作不镜像名单。
+- animation-calendar.js：日历识别；animation-director.js：场景选择、冷却和有限去重。
+- use-pet-motion.js：单一播放器、优先级、序列与恢复；use-pointer-reaction.js：局部鼠标/键盘监听。
+- scene-companion.js：只读养成/天气上下文和点播接线；animation-menu.js：按需挂载的搜索与点播界面。
+- animationRevision 为视频 URL 提供版本键；修改素材时同步更新，避免沿用旧浏览器缓存。
+- 已删除未被代码消费的 pools.tool。天气/余额入口使用 ui.featureAnimations；养成互动和情境动作通过明确的场景入口选择。
+
+## 眼神跟随边界
+
+本次实现的是**鼠标停留回应**，没有独立瞳孔追踪。现有素材是合成视频，眼白、瞳孔、眼睑、头部没有独立图层；不能把整个人物平移或镜像称为眼神跟随。
+
+若要自然地实时看向光标，需要额外的分层站立姿态或 Live2D/骨骼资产：每只眼睛有独立瞳孔与遮罩，受眼白边界限制；眨眼、侧脸及大幅动作时停用跟随，并在恢复站立后衔接。也可以只对新增的分层待机姿态实现，继续保留现有视频动作。当前包不包含这些分层资产。
+
+## 素材来源与重建
+
+新增素材来源记录在 assets/animation-sources.json，包含固定提交、Git blob、产物 SHA-256、转换参数与文件大小；MIT 许可随包保存在 assets/LICENSE.dsh-pet。
+
+开发者可运行 python3 scripts/import-animations.py 重建这 80 个文件（需要 ffmpeg/libvpx-vp9）。原有 50 个文件不会被脚本改写。管线检查整段 alpha 可见范围，统一到 360×360、方形像素、VP9 alpha CRF 38；清除极低 alpha 噪声。道具特别宽的动画会整体适当缩小并对齐脚底，以保留道具，动作切换时可能有尺度差异。
+
+视频总计约 **69.03 MB**，新增约 **41.95 MB**。安装体积增加，但启动不预加载 130 个视频；继续使用两个 video 缓冲、HTTP Range 与缓存。选择器不加载 GIF/缩略图。没有新增模型请求、眼部逐帧识别、全局 pointermove 轮询或持续渲染循环。
+
+## 场景素材表
+
+| Scene key | Clips |
+| --- | --- |
+| welcome | 点击回应-元气挥手、点击回应-挠痒咯咯笑 |
+| play | 玩水枪、小提琴演奏、蓝鲸现世、优雅女仆舞、轻快摇摆舞、可爱宅舞、吹气球、动物环绕、放风筝、拆礼物、变鸽子、扑克魔术、抽陀螺、吹笛子、蝴蝶蜜蜂环绕头顶开花、撸猫、凭空生花、骑木马、三球抛接、踢毽子、下五子棋、荡秋千、原地左转奔跑 |
+| morning | 晨间刷牙、照镜子、整体换装试色 |
+| tidy | 女仆扫除、碎碎念-擦桌碎碎念 |
+| breakfast | 吃早餐 |
+| lunch | 吃午餐、吃盒饭 |
+| dinner | 吃晚餐、吃白饭 |
+| snack | 大口吃零食、吃糖葫芦、吃长寿面、吃小鱼干 |
+| hungry | 是啊，吃什么、偷吃零食被抓住 |
+| tired | 迷糊犯困、睡眼惺忪、哈欠连天 |
+| bored | 碎碎念-发呆碎碎念、闲得无聊打游戏 |
+| thinking | 深度思考碎碎念、碎碎念-对屏碎碎念、轻快记录 |
+| longWork | 长时间工作看表、喝奶茶 |
+| warm | 摇扇纳凉、吃西瓜、吃冰淇淋融化 |
+| cold | 涮火锅、喝奶茶 |
+| spring | 吃青团、放风筝、蝴蝶蜜蜂环绕头顶开花 |
+| summer | 玩水枪、吃西瓜、摇扇纳凉 |
+| autumn | 被落叶淹没、吃大闸蟹 |
+| winter | 堆雪人、涮火锅 |
+| newYear | 放烟花、拆礼物 |
+| springFestival | 吃年糕、收红包、写福字、舞狮头、吃饺子 |
+| lantern | 吃汤圆、放孔明灯 |
+| dragonBoat | 吃粽子 |
+| qixi | 穿针乞巧 |
+| riverLantern | 放河灯 |
+| midAutumn | 中秋赏月吃月饼 |
+| doubleNinth | 吃重阳糕、插茱萸赏菊 |
+| laba | 吃腊八粥 |
+| halloween | 讨糖南瓜灯、萌化小幽灵 |
+| christmas | 装点圣诞树、拆礼物 |
+| balancePlenty | 余额-钱袋满溢、余额-金袋叮当 |
+| balanceNormal | 余额-钱袋如常 |
+| balanceLow | 余额-数金皱眉、余额-袋空如洗 |
+| balanceEmpty | 余额-分文不剩 |
+
+## 完整目录（130）
+
+- 三球抛接
+- 下五子棋
+- 东张西望
+- 中秋赏月吃月饼
+- 举牌不是大肥鱼
+- 优雅女仆舞
+- 余额-分文不剩
+- 余额-数金皱眉
+- 余额-袋空如洗
+- 余额-金袋叮当
+- 余额-钱袋如常
+- 余额-钱袋满溢
+- 偷吃Token
+- 偷吃零食被抓住
+- 写代码
+- 写福字
+- 凭空生花
+- 动物环绕
+- 原地专心玩魔方
+- 原地小憩沉眠
+- 原地左转奔跑
+- 原地敲击桌面互动
+- 原地漂浮踏步
+- 原地跳跃抓碎头顶物品
+- 原地蹲下玩玩具汽车
+- 原地重力下蹲压缩
+- 变鸽子
+- 可爱宅舞
+- 吃冰淇淋融化
+- 吃午餐
+- 吃大闸蟹
+- 吃小鱼干
+- 吃年糕
+- 吃早餐
+- 吃晚餐
+- 吃汤圆
+- 吃白饭
+- 吃盒饭
+- 吃粽子
+- 吃糖葫芦
+- 吃腊八粥
+- 吃西瓜
+- 吃重阳糕
+- 吃长寿面
+- 吃青团
+- 吃饺子
+- 吹气球
+- 吹笛子
+- 哈欠连天
+- 喝奶茶
+- 堆雪人
+- 大口吃零食
+- 女仆屈膝礼仪
+- 女仆扫除
+- 小幅度原地 360 度旋转展示
+- 小提琴演奏
+- 工作思考
+- 工作摸鱼
+- 工作状态-原地踱步张望
+- 工作状态-垂头叹气冒汗
+- 工作状态-忙碌点按
+- 工作状态-思考冒泡
+- 工作状态-清点归档
+- 工作状态-雀跃庆祝
+- 工作结束
+- 工作被打扰
+- 开始工作
+- 待机呼吸休闲
+- 悠闲哼歌
+- 扑克魔术
+- 打喷嚏
+- 打瞌睡被惊醒
+- 抽陀螺
+- 拆礼物
+- 插茱萸赏菊
+- 摇扇纳凉
+- 摸鱼被抓
+- 撸猫
+- 收红包
+- 放孔明灯
+- 放河灯
+- 放烟花
+- 放风筝
+- 整体换装试色
+- 是啊，吃什么
+- 晨间刷牙
+- 涮火锅
+- 深度思考碎碎念
+- 点击回应 - 傲娇生气（侧身展示）
+- 点击回应 - 害羞惊讶
+- 点击回应 - 开心跃动
+- 点击回应-元气挥手
+- 点击回应-挠痒咯咯笑
+- 照镜子
+- 玩水枪
+- 玩游戏气急败坏
+- 用鲸鱼尾巴拍打地面
+- 看天气
+- 看表叹气
+- 睡眼惺忪
+- 睡觉第一段
+- 睡觉第三段
+- 睡觉第二段
+- 碎碎念-发呆碎碎念
+- 碎碎念-对屏碎碎念
+- 碎碎念-擦桌碎碎念
+- 空白举牌
+- 穿针乞巧
+- 翻钱包
+- 舞狮头
+- 荡秋千
+- 萌化小幽灵
+- 蓝鲸现世
+- 蝴蝶蜜蜂环绕头顶开花
+- 螃蟹走路
+- 被吓一跳（炸毛）
+- 被落叶淹没
+- 被鼠标拖拽悬空反馈
+- 装点圣诞树
+- 认真工作
+- 讨糖南瓜灯
+- 超大伸懒腰
+- 踢毽子
+- 轻快摇摆舞
+- 轻快记录
+- 迷糊犯困
+- 长时间工作看表
+- 闲得无聊打游戏
+- 骑木马
+- 鲸鱼吐泡泡特效

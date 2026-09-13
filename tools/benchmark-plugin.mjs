@@ -11,7 +11,7 @@ const median=values=>+values.sort((a,b)=>a-b)[Math.floor(values.length/2)].toFix
 const report=[];
 for(const count of [100,1000,5000]) {
  let events=[{type:'request/header',data:{header:{config:{provider:'deepseek-official',model:'deepseek-flash'}}}},...Array.from({length:count},(_,i)=>sample(i+1))];
- const session={snapshotEvents:()=>events,inheritedEventCount:0},index=createUsageIndex();index(session);
+ const session={snapshotEvents:()=>events,inheritedEventCount:0},index=createUsageIndex({mutable:true});index(session);
  const full=[],incremental=[],cached=[];
  for(let i=0;i<20;i++){
   events=[...events,sample(count+i+1)];let start=performance.now();usageRecords(events);full.push(performance.now()-start);

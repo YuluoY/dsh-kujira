@@ -53,3 +53,55 @@ test('enabling during existing work reports pending safe stops and gates the nex
  await settled();assert.equal(calls,0);assert.equal(scheduler.snapshot().paused,2);assert.equal(scheduler.snapshot().pausing,0);
  now=valley;scheduler.tick();await Promise.all(runs);assert.equal(calls,2);
 });
+
+test('session headers and registry aliases share pause identity across duplicate gates',async t=>{
+ const {scheduler,setTime}=await setup(t);await scheduler.configure(true);
+ const agent={id:'registry-id',session:{id:'session-alias',header:{id:'canonical'}}};
+ const a=new AbortController(),b=new AbortController();let calls=0;
+ const one=scheduler.gate({agent,signal:a.signal},()=>++calls),two=scheduler.gate({agent,signal:b.signal},()=>++calls);
+ await settled();for(const id of ['registry-id','session-alias','canonical'])assert(scheduler.paused(id));
+ assert.equal(scheduler.snapshot().paused,1);a.abort(Error('stop one gate'));await assert.rejects(one,/stop one/);
+ assert(scheduler.paused('canonical'));setTime(valley);await two;assert.equal(calls,1);assert(!scheduler.paused('canonical'));
+});
+test('200 main and child continuations survive repeated tariff transitions without duplicate work',async t=>{
+ const {scheduler,setTime}=await setup(t);await scheduler.configure(true);const counts=Array(200).fill(0);
+ const pending=counts.map((_,i)=>scheduler.gate({agent:{id:'agent-'+i,session:{header:{id:'session-'+i}}},signal:new AbortController().signal},()=>++counts[i]));
+ await settled();assert.equal(scheduler.snapshot().paused,200);
+ setTime(valley);setTime(peak);await settled();assert.equal(scheduler.snapshot().paused,200);assert(counts.every(n=>n===0));
+ setTime(valley);await Promise.all(pending);assert(counts.every(n=>n===1));assert.equal(scheduler.snapshot().paused,0);
+});
+test('cancelling one child while paused preserves other children and never resurrects the cancelled child',async t=>{
+ const {scheduler,setTime}=await setup(t);await scheduler.configure(true);const controllers=Array.from({length:4},()=>new AbortController());const calls=[];
+ const tasks=controllers.map((controller,i)=>scheduler.gate({agent:{id:i===0?'parent':'child-'+i},signal:controller.signal},()=>calls.push(i)));
+ await settled();controllers[2].abort(Error('user stopped child'));await assert.rejects(tasks[2],/user stopped/);
+ setTime(valley);await Promise.all(tasks.filter((_,i)=>i!==2));assert.deepEqual(calls,[0,1,3]);
+});
+test('a failed configuration write preserves the running setting and no caller remains in a poisoned save queue',async t=>{
+ const {scheduler,directory,setTime}=await setup(t);await scheduler.configure(true);
+ const {mkdir}=await import('node:fs/promises');await mkdir(join(directory,'peak-scheduler.json.tmp'));
+ await assert.rejects(scheduler.configure(false));assert.equal(scheduler.snapshot().enabled,true);
+ await rm(join(directory,'peak-scheduler.json.tmp'),{recursive:true});await scheduler.configure(false);assert.equal(scheduler.snapshot().enabled,false);setTime(valley);
+});
+test('pricing rule changes and clock rollback invalidate the cached transition',async t=>{
+ const directory=await mkdtemp(join(tmpdir(),'kujira-tariff-'));let clock=peak;const config={peakHours:[[9,12]],workdays:[1,2,3,4,5]};
+ const scheduler=createPeakScheduler({directory,now:()=>clock,getConfig:()=>config,available:true});t.after(async()=>{scheduler.dispose();await rm(directory,{recursive:true,force:true});});await scheduler.ready;
+ assert.equal(scheduler.snapshot().rate,'peak');config.peakHours=[];assert.equal(scheduler.snapshot().rate,'offpeak');
+ config.peakHours=[[9,12]];clock=Date.parse('2026-09-11T08:00:00+08:00');assert.equal(scheduler.snapshot().rate,'offpeak');assert.equal(scheduler.snapshot().nextAt,peak);
+});
+test('already cancelled tasks cannot enter the gate and rejected downstream work has no stranded waiter',async t=>{
+ const {scheduler}=await setup(t);await scheduler.configure(true);const stop=new AbortController();stop.abort(Error('already stopped'));
+ await assert.rejects(scheduler.gate({agent:{id:'stopped'},signal:stop.signal},()=>assert.fail('executed cancelled task')),/already stopped/);
+ await scheduler.configure(false);await assert.rejects(scheduler.gate({agent:{id:'failure'}},()=>Promise.reject(Error('preparation failed'))),/preparation failed/);assert.equal(scheduler.snapshot().paused,0);
+});
+test('malformed pricing never crashes the timer or silently resumes paid work; recovery releases the same continuation',async t=>{
+ const directory=await mkdtemp(join(tmpdir(),'kujira-invalid-tariff-'));let config={peakHours:[null]};
+ const scheduler=createPeakScheduler({directory,now:()=>valley,getConfig:()=>config,available:true});t.after(async()=>{scheduler.dispose();await rm(directory,{recursive:true,force:true});});
+ await scheduler.configure(true);assert.equal(scheduler.snapshot().rate,'unknown');let calls=0;
+ const pending=scheduler.gate({agent:{id:'held'}},()=>++calls);await settled();scheduler.tick();assert.equal(calls,0);assert.equal(scheduler.snapshot().paused,1);
+ config={peakHours:[]};scheduler.tick();await pending;assert.equal(calls,1);assert.equal(scheduler.snapshot().error,'');
+});
+test('a pending continuation keeps the scheduler alive even without another referenced event-loop handle',async t=>{
+ const directory=await mkdtemp(join(tmpdir(),'kujira-gate-liveness-'));t.after(()=>rm(directory,{recursive:true,force:true}));
+ const {spawnSync}=await import('node:child_process');const {fileURLToPath}=await import('node:url');
+ const child=spawnSync(process.execPath,[fileURLToPath(new URL('./fixtures/scheduler-liveness.mjs',import.meta.url)),directory],{encoding:'utf8',timeout:3000});assert.equal(child.status,0,child.stderr);assert.equal(child.stdout,'continued');
+});

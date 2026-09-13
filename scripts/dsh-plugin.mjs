@@ -34,7 +34,8 @@ const run=(command,args,options={})=>process.platform==='win32'
 export async function main(args=process.argv.slice(2)) {
   const options=parseOptions([...args]);
   if(options.help){console.log('node scripts/dsh-plugin.mjs [install|uninstall|doctor] [--profile web] [--dry-run]');return 0;}
-  if(Number(process.versions.node.split('.')[0])<22)throw Error('Node.js 22 or newer is required.');
+  const [major,minor]=process.versions.node.split('.').map(Number);
+  if(major<22 || (major===22 && minor<13))throw Error('Node.js 22.13 or newer is required.');
   const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
   const pkg=JSON.parse(await readFile(join(root,'package.json'),'utf8'));
   if(pkg.name!=='dsh-kujira'||!pkg.dsh?.bundle?.patch)throw Error('This is not a complete dsh-kujira package.');

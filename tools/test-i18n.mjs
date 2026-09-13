@@ -1,6 +1,8 @@
+import {loadLocale, LOCALES} from "../lib/shared/i18n.js";
+await Promise.all(LOCALES.map(loadLocale));
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {resolveLocale,configure,translate,number,money,date,temperature,serviceRegion,element,parseNumber,officialPricingUrl} from '../lib/shared/i18n.js';
+import {resolveLocale,configure,translate,number,rawMoney as money,date,temperature,serviceRegion,element,parseNumber,officialPricingUrl} from '../lib/shared/i18n.js';
 import {messages} from '../lib/shared/messages.js';
 import {createWeatherClient} from '../lib/host/weather.js';
 const response=body=>({ok:true,json:async()=>body});

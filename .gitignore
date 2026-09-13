@@ -22,3 +22,8 @@ docs/看板娘交互设计研究.md
 inventory.json
 realtime.json
 peak-scheduler.json
+experiments/
+output/
+# Transactional inventory files
+inventory.sqlite
+inventory.sqlite-*
