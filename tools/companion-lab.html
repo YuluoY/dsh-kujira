@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>气泡与人物比例预览</title>
+<link rel="stylesheet" href="/dsh-kujira/appearance.css">
+<style>
+:root {color-scheme:dark;--lab-bg:#181a20;--lab-ink:#e6e9f1;--lab-line:#414957;--lab-control:#292e38;--lab-accent:#91a9de}
+body {margin:0;background:var(--lab-bg);color:var(--lab-ink);font:13px/1.6 system-ui,sans-serif;min-height:100vh}
+header {position:relative;z-index:100;max-width:720px;margin:20px auto;padding:0 20px}
+h1 {font-size:18px;margin:0 0 12px}
+nav {display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,select,input {font:inherit;color:inherit;background:var(--lab-control);border:1px solid var(--lab-line);border-radius:7px;padding:6px 10px}
+button {cursor:pointer}button:hover {border-color:var(--lab-accent)}button:focus-visible,select:focus-visible,input:focus-visible {outline:2px solid var(--lab-accent);outline-offset:2px}
+#sample-copy {box-sizing:border-box;width:min(440px,100%)}
+.note {opacity:.75;font-size:12px}label {display:inline-flex;align-items:center;gap:5px}
+#lab-status {min-height:20px}
+.lab-pet {left:calc(50vw - 130px);top:calc(100vh - 340px);--kj-size:260px;pointer-events:none}
+.lab-pet .dsh-kujira-stage {pointer-events:none}
+@media(max-width:600px){header{margin-top:12px}.lab-pet{left:calc(50vw - 110px);top:calc(100vh - 280px);--kj-size:220px}h1{font-size:16px}}
+</style>
+</head>
+<body>
+<header>
+<h1>气泡与人物比例预览</h1>
+<nav><button id="show">冒出思考气泡</button><button id="hide">收起气泡</button><select id="clip" aria-label="预览动作"><option>正在加载</option></select></nav>
+<p><input id="sample-copy" aria-label="气泡文字" value="休息一下，我陪你慢慢想～"></p>
+<nav><label><input id="old" type="checkbox">对比旧缩放</label><label><input id="reduced" type="checkbox">减少动态效果</label></nav>
+<p class="note">小圆泡 → 中圆泡 → 主思考泡。选择动作可比较人物比例；“对比旧缩放”仅用于查看修复前的效果。</p>
+<p id="lab-status" role="status"></p>
+</header>
+<div id="lab"></div>
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script type="module">
+import {BubbleLayer} from '/dsh-kujira/shared/client/bubble-layer.js';
+import {fitBubble} from '/dsh-kujira/shared/client/bubble-geometry.js';
+import {createVideoPlayer} from '/dsh-kujira/shared/client/video-player.js';
+const config=await (await fetch('/dsh-kujira/config.json')).json();
+const h=React.createElement;
+const picker=document.getElementById('clip');
+const clips=['待机呼吸休闲','被落叶淹没','放烟花','中秋赏月吃月饼','小提琴演奏',...Object.keys(config.animationFraming||{})];
+picker.replaceChildren(...[...new Set(clips)].map(name=>{const o=document.createElement('option');o.value=name;o.textContent=name;return o;}));
+function Lab(){
+ const [speech,setSpeech]=React.useState(''),[reduced,setReduced]=React.useState(false),[revision,setRevision]=React.useState(0);
+ const root=React.useRef(null),a=React.useRef(null),b=React.useRef(null),front=React.useRef(null),token=React.useRef(0),fit=React.useRef(null);
+ React.useLayoutEffect(()=>{
+   const position=()=>{const node=root.current.querySelector('.kj-thought-bubble');if(node)fitBubble(node,root.current.querySelector('.dsh-kujira-stage').getBoundingClientRect(),{w:innerWidth,h:innerHeight});};
+   fit.current=position;position();window.addEventListener('resize',position);
+   return()=>window.removeEventListener('resize',position);
+ },[speech,revision]);
+ React.useEffect(()=>{
+   const player=createVideoPlayer({videos:()=>[a.current,b.current],frontRef:front,tokenRef:token,base:'/dsh-kujira',quiet:()=>document.hidden,revision:()=>config.animationRevision,framing:name=>document.getElementById('old').checked?null:config.animationFraming?.[name],onStart:name=>{document.getElementById('lab-status').textContent=name+(document.getElementById('old').checked?' · 旧缩放':' · 人物比例已还原');},onFinish:()=>player.play('待机呼吸休闲',{loop:true,restart:true})});
+   const play=()=>player.play(picker.value,{loop:false,restart:true});
+   document.getElementById('show').onclick=()=>{setSpeech(document.getElementById('sample-copy').value.trim()||'我在认真想呢～');setRevision(r=>r+1);};
+   document.getElementById('hide').onclick=()=>setSpeech('');
+   document.getElementById('reduced').onchange=e=>setReduced(e.target.checked);
+   picker.onchange=play;document.getElementById('old').onchange=play;
+   play();return()=>player.dispose();
+ },[]);
+ return h('div',{ref:root,className:'dsh-kujira-root lab-pet','data-theme':'dark'},
+   h('div',{className:'dsh-kujira-stage'},h('video',{ref:a,className:'dsh-kujira-video',muted:true,playsInline:true}),h('video',{ref:b,className:'dsh-kujira-video',muted:true,playsInline:true})),
+   h(BubbleLayer,{key:revision,React,h,kind:speech?'speech':null,speech,reduced,fit,blocked:false}));
+}
+ReactDOM.createRoot(document.getElementById('lab')).render(h(Lab));
+</script>
+</body>
+</html>

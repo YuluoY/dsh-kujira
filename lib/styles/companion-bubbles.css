@@ -23,7 +23,7 @@
 .dsh-kujira-root .dsh-kujira-bubble.kj-thought-bubble {
   display: block;
   padding: 0;
-  min-width: min(144px, calc(100vw - 24px));
+  min-width: min(168px, calc(100vw - 24px));
   max-width: min(244px, calc(100vw - 24px));
   background: transparent;
   border: 0;
@@ -31,22 +31,22 @@
   animation: none;
   isolation: auto;
   text-align: center;
-  --kj-thought-line: var(--kj-accent);
+
 }
 .kj-thought-body {
   position: relative;
   display: grid;
   place-items: center;
   box-sizing: border-box;
-  min-height: 80px;
-  padding: 22px 28px;
+  min-height: 86px;
+  padding: 20px 26px;
   border: 3px solid var(--kj-thought-line);
-  border-radius: 50%;
-  background: var(--kj-surface);
-  color: var(--kj-accent);
-  box-shadow: var(--kj-elevation);
+  border-radius: 53% 47% 49% 51% / 50% 47% 53% 50%;
+  background: var(--kj-thought-fill);
+  color: var(--kj-thought-ink);
+  box-shadow: var(--kj-thought-shadow);
   transform-origin: var(--kj-tail-x, 78%) 100%;
-  animation: kj-thought-emerge 480ms cubic-bezier(0.22, 0.8, 0.3, 1) 220ms both;
+  animation: kj-thought-emerge 620ms cubic-bezier(0.2, 0.8, 0.25, 1) 360ms both;
 }
 .kj-thought-body .kj-speech-copy {
   display: -webkit-box;
@@ -56,7 +56,8 @@
   overflow-wrap: anywhere;
   font-size: 13px;
   font-weight: 550;
-  line-height: 1.65;
+  line-height: 1.6;
+  animation: kj-thought-copy-in 260ms ease-out 660ms both;
 }
 .kj-thought-dot {
   position: absolute;
@@ -65,43 +66,45 @@
   display: block;
   border: 2.5px solid var(--kj-thought-line);
   border-radius: 50%;
-  background: var(--kj-surface);
-  animation: kj-thought-dot-in 260ms ease-out both;
+  background: var(--kj-thought-fill);
+  transform-origin: center;
+  animation: kj-thought-dot-in 320ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
 }
 .kj-thought-dot-large {
-  bottom: -17px;
-  width: 18px;
-  height: 13px;
-  animation-delay: 110ms;
+  bottom: -30px;
+  width: 25px;
+  height: 19px;
+  transform-origin: 70% 100%;
+  animation-delay: 160ms;
 }
 .kj-thought-dot-small {
-  bottom: -31px;
-  width: 10px;
-  height: 8px;
-  margin-left: 8px;
+  bottom: -55px;
+  width: 14px;
+  height: 11px;
+  margin-left: 20px;
 }
 .kj-thought-bubble[data-side="right"] .kj-thought-dot-small {
-  margin-left: -2px;
+  margin-left: -10px;
 }
 .kj-thought-bubble[data-below="true"] .kj-thought-body {
   transform-origin: var(--kj-tail-x, 78%) 0;
 }
 .kj-thought-bubble[data-below="true"] .kj-thought-dot-large {
-  top: -17px;
+  top: -30px;
   bottom: auto;
 }
 .kj-thought-bubble[data-below="true"] .kj-thought-dot-small {
-  top: -31px;
+  top: -55px;
   bottom: auto;
 }
 .kj-bubble-layer[data-leaving="true"] .kj-thought-body {
-  animation: kj-thought-away 150ms ease-in both;
+  animation: kj-thought-away 200ms ease-in both;
 }
 .kj-bubble-layer[data-leaving="true"] .kj-thought-dot-large {
-  animation: kj-thought-away 100ms ease-in 90ms both;
+  animation: kj-thought-away 140ms ease-in 110ms both;
 }
 .kj-bubble-layer[data-leaving="true"] .kj-thought-dot-small {
-  animation: kj-thought-away 80ms ease-in 150ms both;
+  animation: kj-thought-away 120ms ease-in 200ms both;
 }
 .dsh-kujira-root .kj-bubble-layer[data-leaving="true"] .kj-task-bubble {
   pointer-events: none;
@@ -109,18 +112,22 @@
 }
 .kj-bubble-layer[data-reduced="true"] .kj-task-bubble,
 .kj-bubble-layer[data-reduced="true"] .kj-thought-body,
-.kj-bubble-layer[data-reduced="true"] .kj-thought-dot {
+.kj-bubble-layer[data-reduced="true"] .kj-thought-dot,
+.kj-bubble-layer[data-reduced="true"] .kj-speech-copy {
   animation: none;
 }
 
 @keyframes kj-thought-emerge {
   0% {
     opacity: 0;
-    transform: translateY(7px) scale(0.62);
+    transform: translateY(10px) scale(0.12, 0.08);
   }
-  75% {
+  46% {
     opacity: 1;
-    transform: translateY(-1px) scale(1.015);
+    transform: translateY(-2px) scale(0.88, 1.08);
+  }
+  72% {
+    transform: translateY(0) scale(1.035, 0.965);
   }
   100% {
     opacity: 1;
@@ -129,13 +136,28 @@
 }
 
 @keyframes kj-thought-dot-in {
+  0% {
+    opacity: 0;
+    transform: translateY(5px) scale(0.08);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.16, 0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes kj-thought-copy-in {
   from {
     opacity: 0;
-    transform: scale(0.15);
+    transform: translateY(2px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -152,7 +174,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .kj-thought-body,
-  .kj-thought-dot {
+  .kj-thought-dot,
+  .kj-thought-body .kj-speech-copy {
     animation: none;
   }
 }

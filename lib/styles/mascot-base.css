@@ -37,7 +37,8 @@
   position: relative;
   width: var(--kj-size, 260px);
   height: var(--kj-size, 260px);
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: grab;
 }
 .dsh-kujira-video {
   position: absolute;
@@ -45,21 +46,22 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  pointer-events: auto;
-  cursor: grab;
+  pointer-events: none;
   opacity: 0;
   transition: opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
+  transform: translateY(var(--kj-clip-offset-y, 0%))
+    scale(calc(var(--kj-clip-scale-x, 1) * var(--kj-clip-facing, 1)), var(--kj-clip-scale-y, 1));
 }
 .dsh-kujira-video.is-front {
   opacity: 1;
 }
-.dsh-kujira-video:active {
+.dsh-kujira-stage:active {
   cursor: grabbing;
 }
 .dsh-kujira-root[data-facing="right"]
   .dsh-kujira-video:not([data-no-mirror="true"]) {
-  transform: scaleX(-1);
+  --kj-clip-facing: -1;
 }
 .dsh-kujira-tag {
   position: absolute;

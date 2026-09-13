@@ -49,3 +49,11 @@
   --kj-outline-color: #494c53;
   --kj-elevation: 0 12px 24px #00000040;
 }
+
+/* Companion thought balloons use the character's blue ink and paper-white fill. */
+.dsh-kujira-root .kj-thought-bubble {
+  --kj-thought-fill: #fcfdff;
+  --kj-thought-line: #6176ae;
+  --kj-thought-ink: #4d6192;
+  --kj-thought-shadow: 0 5px 0 #2e41661a, 0 10px 22px #18263e1a;
+}

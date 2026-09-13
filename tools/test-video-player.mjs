@@ -5,16 +5,17 @@ import {fishParticles} from '../lib/shared/client/reward-scatter.js';
 class Video extends EventTarget {
  dataset={};paused=true;ended=false;duration=10;loop=false;loads=0;
  classList={add(){},remove(){}};
+ style={values:{},setProperty(key,value){this.values[key]=value;}};
  play(){this.paused=false;return Promise.resolve();}
  pause(){this.paused=true;}
  load(){this.loads++;this.ended=false;}
  emit(type){if(type==='ended'){this.ended=true;this.paused=true;}this.dispatchEvent(new Event(type));}
 }
-function fixture(quiet = () => false){
+function fixture(quiet = () => false, framing = () => null){
  const a=new Video(),b=new Video(),frontRef={current:a},tokenRef={current:0},timers=new Map(),finished=[];let clock=0,serial=0;
  const later=(fn,ms)=>{const id=++serial;timers.set(id,{fn,at:clock+ms});return id;};
  const advance=ms=>{clock+=ms;for(const [id,job] of [...timers])if(job.at<=clock){timers.delete(id);job.fn();}};
- const player=createVideoPlayer({videos:()=>[a,b],frontRef,tokenRef,base:'/assets',quiet,onStart:()=>{},onFinish:failed=>finished.push(failed),later,cancel:id=>timers.delete(id)});
+ const player=createVideoPlayer({videos:()=>[a,b],frontRef,tokenRef,base:'/assets',quiet,framing,onStart:()=>{},onFinish:failed=>finished.push(failed),later,cancel:id=>timers.delete(id)});
  return {a,b,frontRef,player,finished,timers,advance};
 }
 test('a full clip outlives 2.2 seconds; outgoing video stays live until crossfade completes',()=>{
@@ -44,4 +45,13 @@ test('background or focus pauses do not truncate a clip when playback resumes',(
  quiet=false;f.b.currentTime=3;f.advance(5000);assert.deepEqual(f.finished,[]);
  f.b.currentTime=9;f.advance(5000);assert.deepEqual(f.finished,[]);
  f.b.emit('ended');assert.deepEqual(f.finished,[false]);f.player.dispose();assert.equal(f.timers.size,0);
+});
+
+test('per-clip framing restores source scale and resets buffered styles for ordinary clips',()=>{
+ const f=fixture(()=>false,name=>name==='wide'?{x:1.644444,y:1.651376,offsetY:-26.605505}:name==='invalid'?{x:Infinity,y:-1,offsetY:900}:null);
+ f.player.play('wide');f.b.emit('canplay');
+ assert.equal(f.b.style.values['--kj-clip-scale-x'],'1.644444');assert.equal(f.b.style.values['--kj-clip-offset-y'],'-26.605505%');
+ f.player.play('normal');f.a.emit('canplay');assert.equal(f.a.style.values['--kj-clip-scale-x'],'1');
+ f.player.play('invalid');f.b.emit('canplay');assert.equal(f.b.style.values['--kj-clip-scale-x'],'1');assert.equal(f.b.style.values['--kj-clip-scale-y'],'1');assert.equal(f.b.style.values['--kj-clip-offset-y'],'0%');
+ f.player.dispose();
 });

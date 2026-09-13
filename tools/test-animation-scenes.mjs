@@ -104,3 +104,20 @@ test('returning to a visible idle page restores its scheduler and no-mirror reac
  f.props.frontRef.current.dispatchEvent(new Event('ended'));
  assert.notEqual(f.props.currentRef.current,'三球抛接');
  });
+
+test('framing reverses all imported export scaling and padding while preserving canonical character coordinates',async()=>{
+ const manifest=JSON.parse(await readFile(new URL('../assets/animation-sources.json',import.meta.url),'utf8'));
+ let corrected=0;
+ for(const entry of manifest.added){
+  const [,wText,hText,yText]=entry.filter.match(/crop=(\d+):360:.*?scale=360:(\d+).*?pad=360:360:0:(\d+)/);
+  const w=Number(wText),height=Number(hText),pad=Number(yText),fit=config.animationFraming[entry.name];
+  if(w===360&&height===360&&pad===0){assert.equal(fit,undefined);continue;}
+  corrected++;assert(fit);
+  for(const x of [220,320,420])for(const y of [40,180,330]){
+   const encodedX=(x-(640-w)/2)*360/w,encodedY=y*height/360+pad;
+   assert(Math.abs(180+(encodedX-180)*fit.x-(x-140))<.001,entry.name+' x');
+   assert(Math.abs(180+(encodedY-180)*fit.y+fit.offsetY*3.6-y)<.001,entry.name+' y');
+  }
+ }
+ assert.equal(corrected,26);assert.equal(Object.keys(config.animationFraming).length,26);
+});

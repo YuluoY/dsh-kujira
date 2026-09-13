@@ -37,7 +37,7 @@ test('editable select does not commit typing, blur, Tab or Escape, but supports 
 test('bubble body and dotted trail stay in bounds at every corner and prefer the open side',()=>{
  for(const w of [280,390,760,1440])for(const h of [260,844,1080])for(const x of [0,w-240])for(const y of [0,h-240]){
   const a={left:x,top:y,right:x+240,bottom:y+240,width:240,height:240};
-  for(const thought of [false,true]){const p=bubbleGeometry(a,{width:220,height:100},{w,h},thought);assert(p.left>=12);assert(p.left+p.width<=w-12);assert(p.top>=12);assert(p.top+p.height<=h-12);if(thought){assert(p.below?p.top-34>=12:p.top+p.height+34<=h-12);}}
+  for(const thought of [false,true]){const p=bubbleGeometry(a,{width:220,height:100},{w,h},thought);assert(p.left>=12);assert(p.left+p.width<=w-12);assert(p.top>=12);assert(p.top+p.height<=h-12);if(thought){assert(p.below?p.top-62>=12:p.top+p.height+62<=h-12);}}
  }
  const p=bubbleGeometry({left:900,right:1160,top:500,bottom:760,width:260,height:260},{width:200,height:100},{w:1200,h:800},true);assert.equal(p.side,'left');assert(p.top+100<550);
 });

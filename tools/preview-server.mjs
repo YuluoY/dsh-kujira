@@ -168,6 +168,7 @@ emit('working');
 // 静态文件
 // ============================================================================
 const STATIC = {
+    '/companion-lab.html': { file: join(ROOT, 'tools', 'companion-lab.html'), type: 'text/html; charset=utf-8' },
     '/': { file: join(ROOT, 'tools', 'preview.html'), type: 'text/html; charset=utf-8' },
     '/preview.html': { file: join(ROOT, 'tools', 'preview.html'), type: 'text/html; charset=utf-8' },
     '/client.js': { file: join(ROOT, 'lib', 'client.js'), type: 'text/javascript; charset=utf-8' }
