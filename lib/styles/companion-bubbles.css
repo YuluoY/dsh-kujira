@@ -23,7 +23,8 @@
 .dsh-kujira-root .dsh-kujira-bubble.kj-thought-bubble {
   display: block;
   padding: 0;
-  min-width: min(168px, calc(100vw - 24px));
+  width: min(192px, calc(100vw - 24px));
+  min-width: 0;
   max-width: min(244px, calc(100vw - 24px));
   background: transparent;
   border: 0;
@@ -38,23 +39,45 @@
   display: grid;
   place-items: center;
   box-sizing: border-box;
-  min-height: 86px;
-  padding: 20px 26px;
-  border: 3px solid var(--kj-thought-line);
-  border-radius: 53% 47% 49% 51% / 50% 47% 53% 50%;
-  background: var(--kj-thought-fill);
+  aspect-ratio: 380 / 320;
+  min-height: 0;
+  padding: 25% 20% 22%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--kj-thought-ink);
-  box-shadow: var(--kj-thought-shadow);
+  box-shadow: none;
   transform-origin: var(--kj-tail-x, 78%) 100%;
   animation: kj-thought-emerge 620ms cubic-bezier(0.2, 0.8, 0.25, 1) 360ms both;
 }
+.kj-thought-cloud {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: var(--kj-thought-fill);
+  stroke: var(--kj-thought-line);
+  stroke-width: 15px;
+  filter: drop-shadow(0 0 1px var(--kj-thought-edge));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.kj-thought-bubble[data-side="left"] .kj-thought-cloud {
+  transform: scaleX(-1);
+}
 .kj-thought-body .kj-speech-copy {
+  position: relative;
+  z-index: 1;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 4;
+  min-height: 0;
+  max-height: 100%;
   overflow: hidden;
   overflow-wrap: anywhere;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 550;
   line-height: 1.6;
   animation: kj-thought-copy-in 260ms ease-out 660ms both;
@@ -64,38 +87,37 @@
   box-sizing: border-box;
   left: var(--kj-tail-x, 78%);
   display: block;
-  border: 2.5px solid var(--kj-thought-line);
+  border: 6px solid var(--kj-thought-line);
   border-radius: 50%;
   background: var(--kj-thought-fill);
   transform-origin: center;
   animation: kj-thought-dot-in 320ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
 }
 .kj-thought-dot-large {
-  bottom: -30px;
-  width: 25px;
-  height: 19px;
-  transform-origin: 70% 100%;
+  left: var(--kj-dot-large-x);
+  top: var(--kj-dot-large-y);
+  width: 28px;
+  height: 28px;
+  border-width: 5px;
+  background: var(--kj-thought-dot-fill);
   animation-delay: 160ms;
 }
 .kj-thought-dot-small {
-  bottom: -55px;
-  width: 14px;
-  height: 11px;
-  margin-left: 20px;
-}
-.kj-thought-bubble[data-side="right"] .kj-thought-dot-small {
-  margin-left: -10px;
+  left: var(--kj-dot-small-x);
+  top: var(--kj-dot-small-y);
+  width: 18px;
+  height: 18px;
+  border-width: 4px;
+  background: var(--kj-thought-small-fill);
 }
 .kj-thought-bubble[data-below="true"] .kj-thought-body {
   transform-origin: var(--kj-tail-x, 78%) 0;
 }
-.kj-thought-bubble[data-below="true"] .kj-thought-dot-large {
-  top: -30px;
-  bottom: auto;
+.kj-thought-bubble[data-dock="side"][data-side="left"] .kj-thought-body {
+  transform-origin: 100% 50%;
 }
-.kj-thought-bubble[data-below="true"] .kj-thought-dot-small {
-  top: -55px;
-  bottom: auto;
+.kj-thought-bubble[data-dock="side"][data-side="right"] .kj-thought-body {
+  transform-origin: 0 50%;
 }
 .kj-bubble-layer[data-leaving="true"] .kj-thought-body {
   animation: kj-thought-away 200ms ease-in both;

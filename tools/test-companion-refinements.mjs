@@ -37,7 +37,7 @@ test('editable select does not commit typing, blur, Tab or Escape, but supports 
 test('bubble body and dotted trail stay in bounds at every corner and prefer the open side',()=>{
  for(const w of [280,390,760,1440])for(const h of [260,844,1080])for(const x of [0,w-240])for(const y of [0,h-240]){
   const a={left:x,top:y,right:x+240,bottom:y+240,width:240,height:240};
-  for(const thought of [false,true]){const p=bubbleGeometry(a,{width:220,height:100},{w,h},thought);assert(p.left>=12);assert(p.left+p.width<=w-12);assert(p.top>=12);assert(p.top+p.height<=h-12);if(thought){assert(p.below?p.top-62>=12:p.top+p.height+62<=h-12);}}
+  for(const thought of [false,true]){const p=bubbleGeometry(a,{width:220,height:100},{w,h},thought);assert(p.left>=12);assert(p.left+p.width<=w-12);assert(p.top>=12);assert(p.top+p.height<=h-12);if(thought){for(const dot of [p.large,p.small]){assert(p.left+dot.x>=12);assert(p.left+dot.x+dot.size<=w-12);assert(p.top+dot.y>=12);assert(p.top+dot.y+dot.size<=h-12);}}}
  }
  const p=bubbleGeometry({left:900,right:1160,top:500,bottom:760,width:260,height:260},{width:200,height:100},{w:1200,h:800},true);assert.equal(p.side,'left');assert(p.top+100<550);
 });
@@ -74,3 +74,13 @@ test('turning off hover visibility can immediately expire its bubble without los
  assert.equal(isSelectAnchorScroll(doc,anchor,doc),true);
  assert.equal(isSelectAnchorScroll(null,anchor,doc),false);
  });
+
+test('thought trail keeps a deliberate head gap and internal spacing without viewport clamping',()=>{
+ const anchor={left:500,top:420,right:760,bottom:680,width:260,height:260};
+ const p=bubbleGeometry(anchor,{width:192,height:162},{w:1400,h:1000},true);
+ assert.equal(p.dock,'above');
+ const headTop=anchor.top+anchor.height*.17;
+ assert(Math.abs(headTop-(p.top+p.small.y+p.small.size)-13)<.001);
+ assert.equal(p.small.y-(p.large.y+p.large.size),12);
+ assert.equal(p.large.size,28);assert.equal(p.small.size,18);
+});

@@ -15,6 +15,8 @@ button {cursor:pointer}button:hover {border-color:var(--lab-accent)}button:focus
 #sample-copy {box-sizing:border-box;width:min(440px,100%)}
 .note {opacity:.75;font-size:12px}label {display:inline-flex;align-items:center;gap:5px}
 #lab-status {min-height:20px}
+body:has(#outline:checked) {color-scheme:light;--lab-bg:#fff;--lab-ink:#191919;--lab-line:#d1d4da;--lab-control:#f4f5f6;--lab-accent:#438d82}
+.lab-pet[data-outline="true"] .kj-speech-copy {visibility:hidden}
 .lab-pet {left:calc(50vw - 130px);top:calc(100vh - 340px);--kj-size:260px;pointer-events:none}
 .lab-pet .dsh-kujira-stage {pointer-events:none}
 @media(max-width:600px){header{margin-top:12px}.lab-pet{left:calc(50vw - 110px);top:calc(100vh - 280px);--kj-size:220px}h1{font-size:16px}}
@@ -25,7 +27,7 @@ button {cursor:pointer}button:hover {border-color:var(--lab-accent)}button:focus
 <h1>气泡与人物比例预览</h1>
 <nav><button id="show">冒出思考气泡</button><button id="hide">收起气泡</button><select id="clip" aria-label="预览动作"><option>正在加载</option></select></nav>
 <p><input id="sample-copy" aria-label="气泡文字" value="休息一下，我陪你慢慢想～"></p>
-<nav><label><input id="old" type="checkbox">对比旧缩放</label><label><input id="reduced" type="checkbox">减少动态效果</label></nav>
+<nav><label><input id="old" type="checkbox">对比旧缩放</label><label><input id="outline" type="checkbox">只看轮廓</label><label><input id="reduced" type="checkbox">减少动态效果</label></nav>
 <p class="note">小圆泡 → 中圆泡 → 主思考泡。选择动作可比较人物比例；“对比旧缩放”仅用于查看修复前的效果。</p>
 <p id="lab-status" role="status"></p>
 </header>
@@ -42,7 +44,7 @@ const picker=document.getElementById('clip');
 const clips=['待机呼吸休闲','被落叶淹没','放烟花','中秋赏月吃月饼','小提琴演奏',...Object.keys(config.animationFraming||{})];
 picker.replaceChildren(...[...new Set(clips)].map(name=>{const o=document.createElement('option');o.value=name;o.textContent=name;return o;}));
 function Lab(){
- const [speech,setSpeech]=React.useState(''),[reduced,setReduced]=React.useState(false),[revision,setRevision]=React.useState(0);
+ const [speech,setSpeech]=React.useState(''),[reduced,setReduced]=React.useState(false),[revision,setRevision]=React.useState(0),[outline,setOutline]=React.useState(false);
  const root=React.useRef(null),a=React.useRef(null),b=React.useRef(null),front=React.useRef(null),token=React.useRef(0),fit=React.useRef(null);
  React.useLayoutEffect(()=>{
    const position=()=>{const node=root.current.querySelector('.kj-thought-bubble');if(node)fitBubble(node,root.current.querySelector('.dsh-kujira-stage').getBoundingClientRect(),{w:innerWidth,h:innerHeight});};
@@ -54,11 +56,12 @@ function Lab(){
    const play=()=>player.play(picker.value,{loop:false,restart:true});
    document.getElementById('show').onclick=()=>{setSpeech(document.getElementById('sample-copy').value.trim()||'我在认真想呢～');setRevision(r=>r+1);};
    document.getElementById('hide').onclick=()=>setSpeech('');
+   document.getElementById('outline').onchange=e=>setOutline(e.target.checked);
    document.getElementById('reduced').onchange=e=>setReduced(e.target.checked);
    picker.onchange=play;document.getElementById('old').onchange=play;
    play();return()=>player.dispose();
  },[]);
- return h('div',{ref:root,className:'dsh-kujira-root lab-pet','data-theme':'dark'},
+ return h('div',{ref:root,className:'dsh-kujira-root lab-pet','data-theme':outline?'light':'dark','data-outline':outline},
    h('div',{className:'dsh-kujira-stage'},h('video',{ref:a,className:'dsh-kujira-video',muted:true,playsInline:true}),h('video',{ref:b,className:'dsh-kujira-video',muted:true,playsInline:true})),
    h(BubbleLayer,{key:revision,React,h,kind:speech?'speech':null,speech,reduced,fit,blocked:false}));
 }
