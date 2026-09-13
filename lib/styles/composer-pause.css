@@ -29,7 +29,7 @@
   width: 16px;
   height: 16px;
   background: currentcolor;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='3' width='3' height='10' rx='1.5'/%3E%3Crect x='10' y='3' width='3' height='10' rx='1.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 3.5Q5 2.5 6 3.1L12.5 7.2Q13.7 8 12.5 8.8L6 12.9Q5 13.5 5 12.5Z'/%3E%3C/svg%3E") center / contain no-repeat;
   content: "";
   transform: translate(-50%, -50%);
   pointer-events: none;

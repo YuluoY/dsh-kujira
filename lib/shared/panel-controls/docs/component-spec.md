@@ -35,3 +35,15 @@ Loading：禁用并显示正在读取；Error：aria-invalid、关联错误提�
 ## 模板检查适用性
 
 validate_output.py 的 index.vue/ts/tsx 与 types.ts 两项仅适用于该目录模板；当前组件的真实 ESM 入口为 ../panel-controls.js，SearchSelect 为 ../client/search-select.js，输入输出类型由 JSDoc 和本规格表定义。保持现有零构建入口，不添加不被运行时消费的 TypeScript 占位文件。其余文档结构检查照常执行；运行时检查由 ESLint、tsc、单测与浏览器验证承担。
+
+## 线上交互与尺寸纠偏（2026-09-13）
+
+用户反馈要求以实际 DSH 验收，不能以开发预览代替。调研 [Reka UI Combobox](https://www.reka-ui.com/docs/components/combobox) 的输入、选中状态与键盘交互分离，以及 [Radix Popover](https://www.radix-ui.com/primitives/docs/components/popover) 的浮层外部交互边界。当前代码复用现有 Select 的触发器、选项、图标、主题 token，不额外引入框架依赖。
+
+- SearchSelect 使用设置同款 144 × 32px 控件；窄面板按 52% 限宽。11px 字号、7px 圆角、12px 图标，清除按钮放在内部。通用输入框的 min-height 和父容器 padding 不再累加；实测已从 46px 回到 32px。选项复用 Select 的列表规则。
+- 面板内输入框即使已有焦点，点击仍可展开；清空与 Escape 关闭后可再次点击。失焦、Tab 与初始化不提交动作。
+- 原先全局 scroll 监听会把宿主对话区域的独立滚动当作关闭条件。现在仅祖先滚动/窗口变化重定位，列表保持打开；列表自身滚动不触发关闭。
+- 播放请求被拒绝时不保存值，允许重选同一动作。明确手动点播立即取代环境动作并清理排队项；普通自动场景继续原有队列策略。清空、同值、挂载仍不播放。
+- 浏览器验收必须在实际 DSH 完成：检索、滚动对话、选项仍在、点击后前景视频名称吻合；另检查桌面/窄屏尺寸与本地状态预览。
+
+响应式校验提示 search-select.css 无独立断点属于跨文件组合：宽度使用 min(144px,52%)，列表断点定义在 form-controls.css，触发器按用户要求保持设置同款 32px；不为了消除提示额外增高移动端控件。

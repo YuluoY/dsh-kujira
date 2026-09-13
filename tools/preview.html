@@ -229,6 +229,7 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
         <button data-k="success">完成</button>
         <button data-k="error">出错</button>
         <button class="warn" data-k="abort">中断回合</button>
+        <button id="demo-pause">峰价暂停（右三角）</button><button id="demo-resume">谷价恢复</button>
         <button class="warn" data-k="idle">清空（回空闲）</button>
         <button id="demo-rewards">模拟新会话与补给</button><button id="demo-energy">补给能量 +0.02</button>
         <button data-k="extreme">长内容与多任务</button>
@@ -415,6 +416,22 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
         await fetch('/__preview/usage?mode='+button.dataset.usage,{method:'POST'});
         document.getElementById('usage-mode').textContent='当前：'+button.textContent+'（最多 5 秒更新）';
     });
+    const previewSchedule = async (paused) => {
+        const button = document.getElementById(paused ? 'demo-pause' : 'demo-resume');
+        button.disabled = true;
+        try {
+            if (paused) {
+                const settings = await fetch('/dsh-kujira/scheduler', {method:'POST', headers:{'Content-Type':'application/json','X-Kujira-Settings':'1'}, body:JSON.stringify({enabled:true})});
+                if (!settings.ok || !(await settings.json()).ok) throw Error('无法开启预览调度');
+            }
+            const result = await fetch(paused ? '/__preview/gate' : '/__preview/usage?mode=offpeak', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({})});
+            if (!result.ok) throw Error('预览请求失败');
+            document.getElementById('usage-mode').textContent = paused ? '峰价暂停：输入框显示右三角（最多 5 秒更新）' : '谷价恢复：输入框还原停止图标（最多 5 秒更新）';
+        } catch (error) { setStatus(error.message, true); }
+        finally { button.disabled = false; }
+    };
+    document.getElementById('demo-pause').onclick = () => previewSchedule(true);
+    document.getElementById('demo-resume').onclick = () => previewSchedule(false);
     // 状态模拟按钮
     document.getElementById('demo-plan').onclick=()=>fetch('/__preview/plan',{method:'POST'});
     document.querySelectorAll('#sim button[data-k]').forEach((btn) =>

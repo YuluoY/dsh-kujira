@@ -17,19 +17,25 @@
   line-height: 1.55;
   z-index: 1;
 }
+.dsh-kujira-root {
+  --kj-select-height: 32px;
+  --kj-select-option-height: 34px;
+}
 .dsh-kujira-root .kj-select {
   position: relative;
   min-width: 0;
+  width: min(144px, 60%);
   max-width: 60%;
   font-size: 11px;
 }
 .dsh-kujira-root .kj-select-trigger {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  min-height: 32px;
+  min-height: var(--kj-select-height);
   padding: 6px 9px;
   border: 1px solid var(--kj-line-strong);
   border-radius: 7px;
@@ -99,7 +105,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  min-height: 34px;
+  min-height: var(--kj-select-option-height);
   box-sizing: border-box;
   border-radius: 5px;
   padding: 7px 9px;
@@ -158,11 +164,9 @@
 }
 
 @media (width <= 600px) {
-  .dsh-kujira-root .kj-select-trigger {
-    min-height: 40px;
-  }
-  .dsh-kujira-root .kj-select-option {
-    min-height: 40px;
+  .dsh-kujira-root {
+    --kj-select-height: 40px;
+    --kj-select-option-height: 40px;
   }
 }
 

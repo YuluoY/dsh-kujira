@@ -13,7 +13,7 @@
 根据用户提供的真实输入框截图，进一步对照 GitHub `deepseek-ai/deepseek-harness` 提交 `c291e7961a515f6d7af9304e7fd1d257929aef26` 的 [InputBar.module.css](https://github.com/deepseek-ai/deepseek-harness/blob/c291e7961a515f6d7af9304e7fd1d257929aef26/packages/client/ui-conversation/src/client/skeleton/InputBar.module.css#L355) 与 [InputBar.tsx](https://github.com/deepseek-ai/deepseek-harness/blob/c291e7961a515f6d7af9304e7fd1d257929aef26/packages/client/ui-conversation/src/client/skeleton/InputBar.tsx#L525)，并与本机 0.1.5-rc.1 交叉核对：
 
 - 原按钮是 34 × 34px 圆形，采用宿主 `button-info-fill` / `button-info-hover` 主题色、白色图标、100ms 悬停变色及原有焦点/禁用反馈；插件继续继承它们。
-- 原图标画布为 16 × 16px，实形为 10 × 10px。暂停图标使用同样画布及包围范围，两条 3 × 10px、圆角 1.5px 的竖条，只在进入暂停时淡入 100ms；减少动态效果偏好下取消动画。
+- 原图标画布为 16 × 16px，实形为 10 × 10px。暂停图标使用同样的 16px 画布，按用户要求采用朝右的圆角实心三角形，只在进入暂停时淡入 100ms；减少动态效果偏好下取消动画。
 - 图标覆盖层不参与布局，不捕获指针事件，不改动 React 管理的子节点；谷价恢复后移除覆盖层，原停止/发送图标由宿主呈现。
 - 预览输入框采用上述原生结构与尺寸；辅助图标和主题色回退值仅用于预览示意。后续不能用旧的简化白色测试按钮判断宿主视觉一致性。
 
@@ -59,3 +59,5 @@
 `tools/test-scheduler.mjs` 共 16 项：默认值、持久化、全部恢复、用户取消、保存失败、恢复旧设置、服务卸载、北京时间边界、跨界准备、拒绝/异常、200 个并发 gate、多身份、多次峰谷切换、单独取消子任务、规则变化/时钟回退、非法规则与等待期间的进程保活。
 
 本地无模型预览通过真实 scheduler gate 与 HTTP activity 路由验证：峰价进入暂停、谷价释放与按钮复原；用户点击停止后再次进入谷价，续跑计数为 0。未在真实付费任务上跨时段运行，因此不把这些测试写成对所有宿主版本或故障情形的绝对保证。
+
+本地预览「状态预览」提供「峰价暂停（右三角）」与「谷价恢复」，通过隔离预览的真实调度 gate 切换按钮状态，不需要发起模型请求。右三角仅表示当前暂停状态，原按钮仍保留停止任务处理函数。

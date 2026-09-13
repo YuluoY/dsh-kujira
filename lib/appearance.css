@@ -6,7 +6,6 @@
 @import url("./styles/theme.css");
 @import url("./styles/surface-tokens.css");
 @import url("./styles/companion-bubbles.css");
-@import url("./styles/search-select.css");
 @import url("./styles/composer-pause.css");
 @import url("./styles/surfaces.css");
 @import url("./styles/feature-content.css");
@@ -14,6 +13,7 @@
 @import url("./styles/form-layout.css");
 @import url("./styles/frames-loading.css");
 @import url("./styles/balance-layout.css");
+@import url("./styles/search-select.css");
 @import url("./styles/inventory-cost.css");
 @import url("./styles/task-layout.css");
 @import url("./styles/task-content.css");

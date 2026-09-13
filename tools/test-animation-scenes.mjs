@@ -90,3 +90,17 @@ test('returning to a visible idle page restores its scheduler and no-mirror reac
  assert([...f.timers.values()].some(v=>v.ms>=config.gapMs[0]&&v.ms<=config.gapMs[1]));
  f.motion.play('待机呼吸休闲');assert.equal(f.props.frontRef.current.dataset.noMirror,'false');
 });
+
+ test('explicit animation preview interrupts ambient playback and discards its queued scene',t=>{
+ const f=motionFixture(t);
+ assert(f.motion.playMoment('小提琴演奏'));
+ assert(f.motion.playMoment('三球抛接',{ambient:true}));
+ assert.equal(f.props.currentRef.current,'小提琴演奏');
+ assert(f.motion.playMoment('下五子棋',{repeat:true,interrupt:true}));
+ assert.equal(f.props.currentRef.current,'下五子棋');
+ const first=f.props.tokenRef.current;
+ assert(f.motion.playMoment('下五子棋',{repeat:true,interrupt:true}));
+ assert(f.props.tokenRef.current>first);
+ f.props.frontRef.current.dispatchEvent(new Event('ended'));
+ assert.notEqual(f.props.currentRef.current,'三球抛接');
+ });

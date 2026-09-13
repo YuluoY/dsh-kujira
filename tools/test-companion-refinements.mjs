@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {AnimationMenu} from '../lib/shared/client/animation-menu.js';
-import {createSearchSelect} from '../lib/shared/client/search-select.js';
+import {createSearchSelect,isSelectAnchorScroll} from '../lib/shared/client/search-select.js';
 import {floatingPosition} from '../lib/shared/panel-controls.js';
 import {bubbleGeometry} from '../lib/shared/client/bubble-geometry.js';
 import {createPresenceClock} from '../lib/shared/client/presence-clock.js';
@@ -45,3 +45,32 @@ test('turning off hover visibility can immediately expire its bubble without los
  let now=0,value=false;const timers=new Map();let id=0;const clock=createPresenceClock(v=>value=v,{now:()=>now,schedule:fn=>{timers.set(++id,fn);return id;},cancel:id=>timers.delete(id)});
  clock.show(5000);assert(value);clock.hide();assert(!value);assert.equal(timers.size,0);clock.show(5000);assert(value);now=6000;clock.sync();assert(!value);clock.dispose();
 });
+
+ test('an already-focused input reopens after Escape and clear, and pointer selection commits exactly once',()=>{
+ const f=harness(),commits=[];const Component=createSearchSelect(f.React,{h:f.h,t:s=>s,position:floatingPosition});
+ const props={label:'clip',value:'',options:[['one','One'],['two','Two']],onChange:v=>{commits.push(v);props.value=v;}};
+ const view=()=>f.render(Component,props),input=()=>find(view(),n=>n.type==='input');
+ input().props.onFocus();assert.equal(input().props['aria-expanded'],true);
+ input().props.onKeyDown({key:'Escape',preventDefault(){},stopPropagation(){}});
+ assert.equal(input().props['aria-expanded'],false);
+ input().props.onClick();assert.equal(input().props['aria-expanded'],true);
+ const option=find(view(),n=>n.props?.role==='option'&&n.children.includes('Two') || n.props?.role==='option'&&n.children.some(c=>c?.children?.includes('Two')));
+ option.props.onPointerDown({preventDefault(){}});assert.equal(commits.length,0);
+ option.props.onClick();assert.deepEqual(commits,['two']);
+ find(view(),n=>n.props?.className==='kj-search-clear').props.onClick();assert.deepEqual(commits,['two','']);
+ input().props.onClick();assert.equal(input().props['aria-expanded'],true);
+ });
+ test('rejected playback does not consume selection and the same animation can be retried',()=>{
+ const f=harness();let accept=false,calls=0;const props={...f,config,SearchSelect:'select',value:'',onValueChange:value=>{props.value=value;},playMoment:(_name,options)=>{assert.equal(options.interrupt,true);calls++;return accept;}};
+ const view=()=>find(f.render(AnimationMenu,props),n=>n.type==='select');
+ view().props.onChange('小提琴演奏');assert.equal(props.value,'');assert(view().props.error);
+ accept=true;view().props.onChange('小提琴演奏');assert.equal(props.value,'小提琴演奏');assert.equal(calls,2);assert.equal(view().props.error,'');
+ });
+
+ test('host conversation scrolling is independent of select popup positioning',()=>{
+ const anchor={},doc={},chat={contains:()=>false},panel={contains:node=>node===anchor};
+ assert.equal(isSelectAnchorScroll(chat,anchor,doc),false);
+ assert.equal(isSelectAnchorScroll(panel,anchor,doc),true);
+ assert.equal(isSelectAnchorScroll(doc,anchor,doc),true);
+ assert.equal(isSelectAnchorScroll(null,anchor,doc),false);
+ });
