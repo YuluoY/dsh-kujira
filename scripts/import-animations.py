@@ -76,15 +76,16 @@ def main():
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
     config_path = ROOT / 'assets/pet.config.json'
     config = json.loads(config_path.read_text())
-    framing = {}
+    anchors = {}
     for entry in manifest['added']:
         width, height, y = map(int, re.search(
             r'crop=(\d+):360:.*?scale=360:(\d+).*?pad=360:360:0:(\d+)', entry['filter']).groups())
         if width != 360 or height != 360 or y:
-            framing[entry['name']] = {
-                'x': round(width / 360, 6), 'y': round(360 / height, 6),
-                'offsetY': round(((180-y)*360/height-180)/360*100, 6)}
-    config['animationFraming'] = framing
+            anchors[entry['name']] = {
+                'width': round(360 / width, 6), 'height': round(height / 360, 6),
+                'top': round(y / 360, 6)}
+    config.pop('animationFraming', None)
+    config['animationAnchors'] = anchors
     config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2)+'\n')
     print('TOTAL', sum(entry['bytes'] for entry in manifest['added']), flush=True)
 

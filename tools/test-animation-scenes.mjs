@@ -1,3 +1,4 @@
+import {animationAnchor} from '../lib/shared/client/bubble-geometry.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,readdir} from 'node:fs/promises';
@@ -105,19 +106,23 @@ test('returning to a visible idle page restores its scheduler and no-mirror reac
  assert.notEqual(f.props.currentRef.current,'三球抛接');
  });
 
-test('framing reverses all imported export scaling and padding while preserving canonical character coordinates',async()=>{
+test('native export anchors locate all imported characters without upscaling',async()=>{
  const manifest=JSON.parse(await readFile(new URL('../assets/animation-sources.json',import.meta.url),'utf8'));
- let corrected=0;
+ const stage={left:0,top:0,width:360,height:360,right:360,bottom:360};
+ assert.equal(config.animationFraming,undefined);
+ let mapped=0;
  for(const entry of manifest.added){
   const [,wText,hText,yText]=entry.filter.match(/crop=(\d+):360:.*?scale=360:(\d+).*?pad=360:360:0:(\d+)/);
-  const w=Number(wText),height=Number(hText),pad=Number(yText),fit=config.animationFraming[entry.name];
-  if(w===360&&height===360&&pad===0){assert.equal(fit,undefined);continue;}
-  corrected++;assert(fit);
+  const w=Number(wText),height=Number(hText),pad=Number(yText),placement=config.animationAnchors[entry.name];
+  if(w===360&&height===360&&pad===0){assert.equal(placement,undefined);continue;}
+  mapped++;assert(placement);
+  const anchor=animationAnchor(stage,placement);
   for(const x of [220,320,420])for(const y of [40,180,330]){
    const encodedX=(x-(640-w)/2)*360/w,encodedY=y*height/360+pad;
-   assert(Math.abs(180+(encodedX-180)*fit.x-(x-140))<.001,entry.name+' x');
-   assert(Math.abs(180+(encodedY-180)*fit.y+fit.offsetY*3.6-y)<.001,entry.name+' y');
+   assert(Math.abs(anchor.left+(x-140)/360*anchor.width-encodedX)<.001,entry.name+' x');
+   assert(Math.abs(anchor.top+y/360*anchor.height-encodedY)<.001,entry.name+' y');
   }
  }
- assert.equal(corrected,26);assert.equal(Object.keys(config.animationFraming).length,26);
+ assert.equal(mapped,26);assert.equal(Object.keys(config.animationAnchors).length,26);
+ for(const invalid of [null,{}, {width:2,height:1,top:0},{width:1,height:1,top:NaN},{width:1,height:1,top:.1}])assert.equal(animationAnchor(stage,invalid),stage);
 });

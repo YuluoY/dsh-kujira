@@ -50,8 +50,7 @@
   opacity: 0;
   transition: opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
-  transform: translateY(var(--kj-clip-offset-y, 0%))
-    scale(calc(var(--kj-clip-scale-x, 1) * var(--kj-clip-facing, 1)), var(--kj-clip-scale-y, 1));
+  transform: none;
 }
 .dsh-kujira-video.is-front {
   opacity: 1;
@@ -61,7 +60,7 @@
 }
 .dsh-kujira-root[data-facing="right"]
   .dsh-kujira-video:not([data-no-mirror="true"]) {
-  --kj-clip-facing: -1;
+  transform: scaleX(-1);
 }
 .dsh-kujira-tag {
   position: absolute;

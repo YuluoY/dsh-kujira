@@ -50,17 +50,17 @@
   --kj-elevation: 0 12px 24px #00000040;
 }
 
-/* Cartoon cloud palette follows the supplied mint/charcoal reference. */
+/* Cartoon cloud palette echoes the character’s blue and lavender hair. */
 .dsh-kujira-root .kj-thought-bubble {
-  --kj-thought-fill: #77ded0;
-  --kj-thought-line: #191919;
-  --kj-thought-ink: #172c29;
-  --kj-thought-dot-fill: #52a79b;
-  --kj-thought-small-fill: #438d82;
+  --kj-thought-fill: #e5e9fb;
+  --kj-thought-line: #505d96;
+  --kj-thought-ink: #303b65;
+  --kj-thought-dot-fill: #b4bfe8;
+  --kj-thought-small-fill: #8d9cd3;
   --kj-thought-edge: transparent;
 }
 
 .dsh-kujira-root[data-theme="dark"] .kj-thought-bubble {
-  --kj-thought-line: #303b38;
-  --kj-thought-edge: #b8e5db40;
+  --kj-thought-line: #697ab5;
+  --kj-thought-edge: #cbd5ff30;
 }

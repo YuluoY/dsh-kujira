@@ -80,7 +80,7 @@ test('thought trail keeps a deliberate head gap and internal spacing without vie
  const p=bubbleGeometry(anchor,{width:192,height:162},{w:1400,h:1000},true);
  assert.equal(p.dock,'above');
  const headTop=anchor.top+anchor.height*.17;
- assert(Math.abs(headTop-(p.top+p.small.y+p.small.size)-13)<.001);
- assert.equal(p.small.y-(p.large.y+p.large.size),12);
+ assert(Math.abs(headTop-(p.top+p.small.y+p.small.size)-8)<.001);
+ assert.equal(p.small.y-(p.large.y+p.large.size),8);
  assert.equal(p.large.size,28);assert.equal(p.small.size,18);
 });
