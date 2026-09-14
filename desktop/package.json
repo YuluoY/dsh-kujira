@@ -1,0 +1,99 @@
+{
+  "name": "dsh-kujira-desktop",
+  "version": "0.1.18",
+  "private": true,
+  "description": "Independent Kujira companion for DSH",
+  "author": "YuluoY",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --publish never",
+    "pack": "electron-builder --dir --publish never"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "electron": "44.3.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "io.github.yuluoy.dsh-kujira",
+    "productName": "Kujira",
+    "artifactName": "Kujira-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "../output/desktop"
+    },
+    "files": [
+      "src/**",
+      "ui/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../lib",
+        "to": "runtime/lib",
+        "filter": [
+          "shared/**",
+          "styles/**",
+          "appearance.css"
+        ]
+      },
+      {
+        "from": "../assets",
+        "to": "runtime/assets",
+        "filter": [
+          "anim/**",
+          "pet.config.json",
+          "LICENSE.dsh-pet",
+          "animation-sources.json"
+        ]
+      },
+      {
+        "from": "../LICENSE",
+        "to": "LICENSE.dsh-kujira"
+      }
+    ],
+    "protocols": [
+      {
+        "name": "Kujira desktop",
+        "schemes": [
+          "dsh-kujira"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.entertainment",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "minimumSystemVersion": "13.0",
+      "extendInfo": {
+        "NSAppleEventsUsageDescription": "Kujira selects your existing local DSH browser tab instead of opening a duplicate."
+      }
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "category": "Utility",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "maintainer": "YuluoY"
+    },
+    "icon": "ui/icon.png"
+  }
+}

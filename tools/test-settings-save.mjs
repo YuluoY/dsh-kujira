@@ -69,3 +69,12 @@ test('automatic appearance follows live DSH palette, preserves overrides and rel
  cleanups.forEach(fn=>fn());assert(observers.every(o=>o.closed));
  delete globalThis.document;assert.equal(readHostTheme(),'light');assert.doesNotThrow(()=>observeHostTheme(()=>{})());
 });
+
+test('appearance constraints reject invalid stored types and normalize every numeric setting',async()=>{
+ const {createPreferences,normalizePreferences,PREFERENCE_NUMBERS}=await import('../lib/shared/client/preferences.js');
+ const {PREF_DEFAULTS}=createPreferences({});
+ const input={size:Infinity,opacity:500,menuRadius:-10,menuLimit:3.8,taskPeekSeconds:70,usageDecimals:2.8,budget:12.345,care:'false',theme:'invalid',locale:'invalid'};
+ const result=normalizePreferences(input,PREF_DEFAULTS);
+ assert.equal(result.size,260);assert.equal(result.opacity,100);assert.equal(result.menuRadius,0);assert.equal(result.menuLimit,4);assert.equal(result.taskPeekSeconds,60);assert.equal(result.usageDecimals,3);assert.equal(result.budget,12.35);assert.equal(result.care,true);assert.equal(result.theme,'system');
+ for(const [key,rule] of Object.entries(PREFERENCE_NUMBERS)){const bounded=normalizePreferences({[key]:Number.MAX_VALUE},PREF_DEFAULTS)[key];assert.equal(bounded,rule.max);}
+});

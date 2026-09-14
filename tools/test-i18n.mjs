@@ -109,3 +109,9 @@ test('weather outages return an explicit failure or stale data for the same loca
  city='Seoul';assert.equal((await query(true)).reason,'weather-unavailable');
  city='';assert.equal((await query(true)).reason,'location-unavailable');
 });
+
+test('compact daily money rounds only presentation while retaining precise tooltip formatting',async()=>{
+ const {money}=await import('../lib/shared/i18n.js');
+ assert.equal(money(32.034456,'CNY','zh-CN',2),'¥32.03');
+ assert.equal(money(32.034456,'CNY','zh-CN'),'¥32.034456');
+});

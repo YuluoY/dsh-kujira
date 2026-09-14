@@ -32,13 +32,13 @@ test('decreases roll downward, reduced motion snaps to latest and disposal cance
  control.update(format(5));control.update(format(6));const count=frames.length;control.dispose();time.advance(1000);assert.equal(frames.length,count);assert.equal(time.jobs.size,0);
 });
 
-test('decimal-place control commits whole numbers and clamps typed values without changing other numeric fields',async()=>{
+test('decimal-place control rejects fractions and clamps whole values for decimal-place settings',async()=>{
  const {createControls}=await import('../lib/shared/panel-controls.js');
  let draft,committed=4;
  const React={createElement:(type,props,...children)=>({type,props,children}),useId:()=>'',useRef:()=>({current:null}),useState:fn=>{draft ??= typeof fn==='function'?fn():fn;return[draft,v=>{draft=v;}];},useEffect:()=>{},useLayoutEffect:()=>{}};
  const {NumberField}=createControls(React);
  const render=()=>NumberField({label:'Precision',value:committed,min:0,max:6,integer:true,onChange:v=>{committed=v;}}).children.flatMap(c=>c?.children||[]).find(c=>c?.type==='input');
- render().props.onChange({currentTarget:{value:'4.6'}});assert.equal(committed,5);render().props.onBlur();assert.equal(draft,'5');
- render().props.onChange({currentTarget:{value:'99'}});render().props.onBlur();assert.equal(committed,6);assert.equal(draft,'6');
- render().props.onChange({currentTarget:{value:'0'}});render().props.onBlur();assert.equal(committed,0);
+ render().props.onChange({currentTarget:{value:'4.6'}});assert.equal(committed,4);render().props.onBlur({currentTarget:{value:draft}});assert.equal(draft,'4');
+ render().props.onChange({currentTarget:{value:'99'}});render().props.onBlur({currentTarget:{value:draft}});assert.equal(committed,6);assert.equal(draft,'6');
+ render().props.onChange({currentTarget:{value:'0'}});render().props.onBlur({currentTarget:{value:draft}});assert.equal(committed,0);
 });

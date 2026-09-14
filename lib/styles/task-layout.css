@@ -13,7 +13,7 @@
   text-align: start;
   font: inherit;
   gap: 9px;
-  max-width: min(244px, calc(100vw - 24px));
+  max-width: min(200px, calc(100vw - 24px));
   color: var(--kj-text);
 }
 .dsh-kujira-root .kj-task-bubble:focus-visible {
@@ -218,4 +218,10 @@
   .dsh-kujira-root .kj-task-file .kj-task-link {
     min-height: 44px;
   }
+}
+
+.dsh-kujira-root .dsh-kujira-bubble.kj-task-bubble {
+  padding: 8px 10px;
+  gap: 7px;
+  box-sizing: border-box;
 }

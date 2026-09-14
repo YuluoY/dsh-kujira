@@ -141,7 +141,8 @@
     11px/1.5 -apple-system,
     "PingFang SC",
     sans-serif;
-  pointer-events: none;
+  pointer-events: auto;
+  user-select: text;
   white-space: normal;
   overflow-wrap: anywhere;
 }
@@ -266,4 +267,134 @@
 .dsh-kujira-root .kj-nickname:focus-visible {
   outline: 2px solid var(--kj-accent);
   outline-offset: 2px;
+}
+
+/* Text fields share the compact select dimensions and semantic colors. */
+.dsh-kujira-root .kj-text-field {
+  --kj-field-error: var(--kj-task-error);
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+}
+.dsh-kujira-root .kj-text-label {
+  margin: 0;
+  color: var(--kj-text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.dsh-kujira-root .kj-text-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--kj-line-strong);
+  border-radius: 7px;
+  background: var(--kj-surface-soft);
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+.dsh-kujira-root .kj-text-control:not([data-disabled="true"]):hover {
+  border-color: var(--kj-accent);
+}
+.dsh-kujira-root .kj-text-control:focus-within {
+  border-color: var(--kj-accent);
+  box-shadow: 0 0 0 2px var(--kj-accent-soft);
+}
+.dsh-kujira-root .kj-text-control input[type] {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 0;
+  height: 30px;
+  margin: 0;
+  padding: 0 9px;
+  box-sizing: border-box;
+  border: 0;
+  outline: none;
+  border-radius: inherit;
+  box-shadow: none;
+  appearance: none;
+  background: transparent;
+  color: var(--kj-text);
+  font: inherit;
+  font-size: 11px;
+}
+.dsh-kujira-root .kj-text-control input::placeholder {
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-text-action {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 6px;
+  margin-inline-end: 1px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--kj-muted);
+  cursor: pointer;
+}
+.dsh-kujira-root .kj-text-action svg {
+  width: 16px;
+  height: 16px;
+}
+.dsh-kujira-root .kj-text-action:hover {
+  color: var(--kj-accent);
+  background: var(--kj-accent-soft);
+}
+.dsh-kujira-root .kj-text-action:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: -2px;
+}
+.dsh-kujira-root .kj-text-control[data-disabled="true"] {
+  opacity: 0.55;
+}
+.dsh-kujira-root .kj-field-help,
+.dsh-kujira-root .kj-field-error {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-field-error {
+  color: var(--kj-field-error);
+}
+.dsh-kujira-root .kj-text-field[data-invalid="true"] .kj-text-control {
+  border-color: var(--kj-field-error);
+}
+
+.dsh-kujira-root .kj-text-control input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Only the outer control owns the border and focus ring. */
+.dsh-kujira-root .kj-number input[type="text"],
+.dsh-kujira-root .kj-number input[type="text"]:focus,
+.dsh-kujira-root input.kj-nickname {
+  box-shadow: none;
+}
+.dsh-kujira-root .kj-number input[type="text"]:focus {
+  outline: none;
+}
+.dsh-kujira-root .kj-number:focus-within,
+.dsh-kujira-root input.kj-nickname:focus,
+.dsh-kujira-root .kj-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--kj-accent);
+  box-shadow: 0 0 0 2px var(--kj-accent-soft);
+}
+.dsh-kujira-root
+  .kj-text-field[data-invalid="true"]
+  .kj-text-control:focus-within {
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--kj-field-error) 16%, transparent);
 }

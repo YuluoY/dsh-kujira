@@ -132,3 +132,31 @@ test('upgrading old cumulative ledgers does not turn corrected retry history int
  session.snapshotEvents=()=>[header,usage(500000),usage(100000,2,START+6000)];
  assert.equal((await wallet.observe(session)).drops,6);
 });
+
+test('daily spend deduplicates requests, includes sessions once, corrects amounts and resets at local midnight',async t=>{
+ const f=await fixture(t);const events=[header,usage(100000)];
+ const a=f.session(events);
+ let value=await f.wallet.observe(a);assert.equal(value.today.total,0.1);assert.equal(value.today.requests,1);
+ value=await f.wallet.observe(a);assert.equal(value.today.total,0.1);
+ const second={...f.session(events),header:{id:'second-session'}};
+ value=await f.wallet.observe(second);assert.equal(value.today.total,0.2);
+ const corrected=f.session([header,usage(50000)]);
+ value=await f.wallet.observe(corrected);assert.equal(value.today.total,0.15);assert.equal(value.today.requests,2);
+ const reloaded=createInventory(f.options);try {assert.equal((await reloaded.snapshot()).today.total,0.15);} finally {await reloaded.dispose();}
+ f.advance(86400000);value=await f.wallet.snapshot();assert.equal(value.today.total,0);assert.equal(value.today.requests,0);
+});
+
+test('historical daily accounting never grants rewards or suppresses later live settlement',async t=>{
+ const f=await fixture(t),session=f.session([header,usage(100000)]);
+ await f.wallet.account(session);
+ let value=await f.wallet.snapshot();assert.equal(value.today.total,0.1);assert.equal(value.drops,0);
+ value=await f.wallet.observe(session);assert.equal(value.today.total,0.1);assert(value.drops>0);
+});
+test('daily history scan waits for idle, uses read-only sessions and remains bounded',async()=>{
+ const {createDailyUsage}=await import('../lib/host/daily-usage.js');let busy=true,reads=0,accounted=0;
+ const job=createDailyUsage({now:()=>START,isBusy:()=>busy,getController:()=>({list:async()=>({items:[{sessionId:'today',updatedAt:START},{sessionId:'old',updatedAt:START-86400000}]})}),access:{prepare:async id=>{reads++;return {header:{id}};}},inventory:{account:async()=>{accounted++;return [];}}});
+ job.start();assert.equal(reads,0);assert.equal(job.snapshot().status,'partial');busy=false;job.start();
+ for(let i=0;i<20 && job.snapshot().status==='loading';i++)await new Promise(r=>setTimeout(r,1));
+ assert.equal(job.snapshot().status,'complete');assert.equal(reads,1);assert.equal(accounted,1);
+ job.start();assert.equal(reads,1);job.dispose();
+});

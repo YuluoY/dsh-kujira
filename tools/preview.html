@@ -344,6 +344,7 @@ html[data-gallery] .dsh-kujira-root:has(.dsh-kujira-panel) .dsh-kujira-orb {visi
             mounted,
             ctx: {
                 get: name => services[name],
+                effect(setup) { const dispose=setup(); if(typeof dispose==='function') window.addEventListener('pagehide',dispose,{once:true}); },
                 slots: {
                     inject(slotName, generatorFactory)
                     {

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {AnimationMenu} from '../lib/shared/client/animation-menu.js';
+import {useSceneInteractions} from '../lib/shared/client/scene-companion.js';
 import {createSearchSelect,isSelectAnchorScroll} from '../lib/shared/client/search-select.js';
 import {floatingPosition} from '../lib/shared/panel-controls.js';
 import {bubbleGeometry} from '../lib/shared/client/bubble-geometry.js';
@@ -14,6 +15,19 @@ function harness(){
  return {React,h,render:(component,props)=>{cursor=0;return component(props);}};
 }
 function find(tree,match){if(match(tree))return tree;for(const child of tree?.children||[]){if(typeof child==='object'){const found=find(child,match);if(found)return found;}}}
+test('growth playback keeps the panel open through selection, switching, clearing and reopening',()=>{
+ const f=harness(),menu=harness(),plays=[];
+ const state={panel:'growth',cfgRef:{current:config},busyRef:{current:false},setPanel:()=>assert.fail('manual playback must not close its panel')};
+ const props={...f,state,prefs:{},reduced:false,SearchSelect:'select',playScene(){},playMoment:(name,options)=>{plays.push([name,options]);return true;}};
+ const view=()=>{const scene=f.render(useSceneInteractions,props);return find(menu.render(AnimationMenu,{...scene.props,React:menu.React}),n=>n.type==='select');};
+ assert.equal(view().props.value,'');assert.equal(plays.length,0);
+ view().props.onChange('小提琴演奏');assert.equal(view().props.value,'小提琴演奏');assert.equal(state.panel,'growth');
+ view().props.onChange('三球抛接');assert.equal(view().props.value,'三球抛接');assert.equal(plays.length,2);
+ view().props.onChange('');assert.equal(view().props.value,'');assert.equal(plays.length,2);
+ view().props.onChange('小提琴演奏');state.panel=null;assert.equal(f.render(useSceneInteractions,props),null);
+ state.panel='growth';assert.equal(view().props.value,'小提琴演奏');assert.equal(plays.length,3);
+ assert(plays.every(([,options])=>options.interrupt&&options.repeat));
+});
 test('animation selection starts empty; only explicit changed values play, while clear, mount and blocked state are inert',()=>{
  const f=harness(),plays=[];const props={...f,config,SearchSelect:'select',value:'',onValueChange:value=>{props.value=value;},playMoment:name=>{plays.push(name);return true;}};
  const view=()=>find(f.render(AnimationMenu,props),n=>n.type==='select');
@@ -83,4 +97,11 @@ test('thought trail keeps a deliberate head gap and internal spacing without vie
  assert(Math.abs(headTop-(p.top+p.small.y+p.small.size)-8)<.001);
  assert.equal(p.small.y-(p.large.y+p.large.size),8);
  assert.equal(p.large.size,28);assert.equal(p.small.size,18);
+});
+
+test('progress message bubble prefers the side of the face when there is room',()=>{
+ const anchor={left:500,right:760,top:300,bottom:560,width:260,height:260};
+ const p=bubbleGeometry(anchor,{width:195,height:60},{w:1400,h:900},false);
+ assert.equal(p.top,anchor.top+anchor.height*.44-30);
+ assert.equal(p.tailY,30);assert(p.left+p.width<anchor.left+anchor.width*.2);
 });

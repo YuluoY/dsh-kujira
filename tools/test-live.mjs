@@ -61,3 +61,10 @@ test('model assistance requires opt-in and persists a 24-hour paid-call limit',a
  const path=join(cacheDir,'realtime.json'), saved=JSON.parse(await readFile(path,'utf8'));saved.attemptedAt=0;await writeFile(path,JSON.stringify(saved));const again=createRealtime(options);await again.refresh();assert.equal(paid,1);
  }finally{await rm(cacheDir,{recursive:true,force:true});}
 });
+
+test('realtime settings reject invalid supplied values without partly saving a patch',async()=>{
+ const {realtimeSettings}=await import('../lib/host/realtime.js');
+ const base={automatic:false,modelAssist:false,intervalHours:24,model:'deepseek-flash'};
+ for(const patch of [{automatic:'true'},{intervalHours:0},{intervalHours:1.5},{model:'bad model'},{automatic:true,modelAssist:1}])assert.throws(()=>realtimeSettings(patch,base));
+ assert.equal(base.automatic,false);assert.deepEqual(realtimeSettings({intervalHours:72},base),{...base,intervalHours:72});assert.deepEqual(realtimeSettings({intervalHours:-1},base,false),base);
+});

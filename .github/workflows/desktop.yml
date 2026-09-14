@@ -1,0 +1,41 @@
+name: Desktop compatibility builds
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-15, platform: mac, arch: arm64 }
+          - { os: macos-15, platform: mac, arch: x64 }
+          - { os: windows-latest, platform: win, arch: x64 }
+          - { os: windows-latest, platform: win, arch: arm64 }
+          - { os: ubuntu-24.04, platform: linux, arch: x64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - run: npm ci
+      - run: npm run test:desktop
+      - run: npm run lint
+      - run: npm ci --prefix desktop
+      - run: npm --prefix desktop run build -- --${{ matrix.platform }} --${{ matrix.arch }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kujira-${{ matrix.platform }}-${{ matrix.arch }}-unsigned
+          path: |
+            output/desktop/*.dmg
+            output/desktop/*.zip
+            output/desktop/*.exe
+            output/desktop/*.AppImage
+            output/desktop/*.deb
+          if-no-files-found: error

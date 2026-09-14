@@ -1,21 +1,36 @@
 .dsh-kujira-root .kj-reward-rise {
   position: absolute;
-  top: 12%;
-  right: 4%;
-  width: 94px;
-  height: 40px;
+  top: 8%;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, calc(var(--kj-size, 260px) * 0.025), 9px);
+  min-width: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   z-index: 2;
   pointer-events: none;
   color: var(--kj-accent);
-  filter: drop-shadow(0 1px 2px var(--kj-surface));
-  animation: kj-reward-rise 1350ms ease-out both;
+  box-shadow: none;
+  filter: none;
+  animation: kj-reward-rise 3000ms ease-out both;
+}
+.dsh-kujira-root .kj-reward-item,
+.dsh-kujira-root .kj-reward-item svg {
+  display: block;
+  width: clamp(18px, calc(var(--kj-size, 260px) * 0.1), 34px);
+  height: clamp(18px, calc(var(--kj-size, 260px) * 0.1), 34px);
+  flex: none;
 }
 .dsh-kujira-root .kj-reward-count {
-  fill: var(--kj-ink);
-  font:
-    600 14px system-ui,
-    sans-serif;
+  color: var(--kj-ink);
+  font: 750 clamp(14px, calc(var(--kj-size, 260px) * 0.075), 24px)/1 system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .dsh-kujira-root .kj-drool {
   position: absolute;
@@ -66,15 +81,15 @@
 @keyframes kj-reward-rise {
   0% {
     opacity: 0;
-    transform: translateY(8px) scale(0.94);
+    transform: translateY(5px) scale(0.97);
   }
-  18%,
-  72% {
+  10%,
+  88% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translateY(-24px) scale(1);
+    transform: translateY(-10px) scale(1);
   }
 }
 
@@ -116,7 +131,7 @@
   width: clamp(16px, 8%, 24px);
   aspect-ratio: 1;
   color: var(--kj-tone-satiety, #d7a75c);
-  filter: drop-shadow(0 2px 1px var(--kj-line));
+  filter: none;
   animation: kj-fish-land 4100ms var(--kj-fish-delay) both;
 }
 .dsh-kujira-root .kj-falling-fish svg {

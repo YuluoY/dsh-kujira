@@ -85,7 +85,8 @@ test("client composition renders with the host React instance after module extra
   globalThis.matchMedia = () => ({ matches: false });
   try {
     const client = createClient(React);
-    const root = client.Pet();
+    const mount = client.Pet();
+    const root = typeof mount.type === "function" ? mount.type(mount.props) : mount;
     assert.equal(root.props.className, "dsh-kujira-root");
     assert.equal(walk(root).filter((node) => node.type === "video").length, 2);
     assert.equal(
@@ -519,4 +520,48 @@ test('file labels separate extension tags without losing dotfiles or compound fi
  assert.deepEqual(fileLabel('src/a.test.tsx'),{name:'a.test.tsx',stem:'a.test',extension:'tsx'});
  assert.deepEqual(fileLabel('C:\\work\\.gitignore'),{name:'.gitignore',stem:'.gitignore',extension:''});
  assert.equal(fileLabel('README.MD').extension,'MD');assert.equal(fileLabel('LICENSE').stem,'LICENSE');
+});
+
+
+test('task panels follow their measured height through child-detail shrink and expansion',async()=>{
+ const {panelGeometry}=await import('../lib/shared/client/panel-geometry.js');
+ const anchor={top:480,height:260},viewport={w:820,h:740};
+ const expanded=panelGeometry(anchor,viewport,380);
+ const compact=panelGeometry(anchor,viewport,130);
+ assert(compact.top>expanded.top);
+ assert.equal(compact.top+80,anchor.top+anchor.height/2);
+ for(const height of [130,380,180,520,130]){
+   const frame=panelGeometry(anchor,viewport,height);
+   assert(frame.top+Math.min(height,frame.maxHeight)<=viewport.h-12);
+   const relative=anchor.top+anchor.height/2-frame.top;
+   assert(relative>=38 && relative<=Math.min(height,frame.maxHeight)-38);
+ }
+ for(const h of [160,300,500,900])for(const top of [0,h-260])for(const height of [100,130,380,520]){
+   const frame=panelGeometry({top,height:260},{w:320,h},height);
+   assert(frame.top>=12);
+   assert(frame.top+Math.min(height,frame.maxHeight)<=h-12);
+ }
+});
+
+test('moving radial buttons preserve quick presses, cancel drag-away and keep keyboard activation',async()=>{
+ const {orbPressHandlers}=await import('../lib/shared/client/render-orbs.js');let activated=0,captured;
+ let rect={left:100,right:134,top:100,bottom:134};
+ const node={getBoundingClientRect:()=>rect,setPointerCapture:id=>{captured=id;}};
+ const events=orbPressHandlers(()=>activated++,true);
+ const e={currentTarget:node,pointerId:1,button:0,clientX:115,clientY:115,detail:1};
+ events.onPointerDown(e);assert.equal(captured,1);
+ rect={left:160,right:194,top:60,bottom:94};
+ events.onPointerUp(e);events.onClick(e);assert.equal(activated,1);
+ events.onClick(e);assert.equal(activated,1);
+ events.onPointerDown({...e,clientX:175,clientY:75});events.onPointerUp({...e,clientX:500,clientY:500});events.onClick(e);assert.equal(activated,1);
+ events.onPointerDown(e);events.onPointerCancel(e);events.onClick(e);assert.equal(activated,1);
+ events.onClick({...e,detail:0});assert.equal(activated,2);
+ orbPressHandlers(()=>activated++,false).onClick({...e,detail:0});assert.equal(activated,2);
+});
+
+test('scheduler session navigation opens the requested session without requiring it to be current',async()=>{
+ const {createNavigation}=await import('../lib/shared/client/navigation.js');const opened=[];
+ const {navigateTask}=createNavigation({taskRuntime:{snapshot:()=>({sessionId:'current'})},ctx:{get:name=>name==='sessions'?{open:async id=>opened.push(id)}:null}});
+ assert.equal(await navigateTask({kind:'session',sessionId:'different-session'}),true);
+ assert.deepEqual(opened,['different-session']);assert.equal(await navigateTask({kind:'session',sessionId:''}),false);
 });

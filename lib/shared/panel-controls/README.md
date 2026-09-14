@@ -5,7 +5,7 @@
 | 字段 | 值 |
 |---|---|
 | 组件名 | Panel controls |
-| 版本 | v1.4.0 |
+| 版本 | v1.5.0 |
 | 框架 | React 18 |
 | 状态 | 已集成，浏览器验收 |
 | 入口路径 | ../panel-controls.js |
@@ -95,7 +95,7 @@ Select 采用 select-only combobox：方向键、Home/End、Enter/Space、字符
 
 ## 变更记录
 
-### v1.4.0 (2026-09-13)
+### v1.5.0 (2026-09-13)
 
 新增 SearchSelect。清空和筛选与选项提交分离；空选项、禁用、加载、错误状态完整；保留 Select 的旧 API。
 
@@ -111,3 +111,10 @@ Select 采用 select-only combobox：方向键、Home/End、Enter/Space、字符
 ### v1.0.0 (2026-09-11)
 
 新增组件化列表、提示与数字步进；统一说话与功能气泡轮廓。
+
+### v1.5.0 分类设置与输入组件
+
+新增 TextField、SettingsTabs、SettingsSection。输入组件支持受控编辑、失焦提交、IME、错误/说明、清除和尾部操作；设置页按四个分类按需挂载。详细 API 与尺寸约束见 [component-spec](docs/component-spec.md)。
+
+
+`SchedulerSessionList` 显示服务端接管中的 session ID、状态、父会话与 Goal 标记。组件只渲染传入快照，不读取历史、不发送请求、不执行会话导航；长 ID 截断并保留完整 title，详情允许换行。

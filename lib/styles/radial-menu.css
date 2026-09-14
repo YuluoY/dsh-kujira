@@ -23,9 +23,12 @@
   box-shadow: 0 3px 10px rgb(20 14 8 / 34%);
   pointer-events: none;
   opacity: 0;
+  visibility: hidden;
   transform: translate(0, 0) scale(0.42) rotate(-26deg);
   will-change: transform, opacity;
   transition:
+    visibility 0s linear
+      calc(var(--kj-out-ms, 190ms) + var(--kj-out-delay, 0ms)),
     transform var(--kj-out-ms, 190ms) cubic-bezier(0.4, 0, 0.72, 1)
       var(--kj-out-delay, 0ms),
     opacity var(--kj-out-ms, 190ms) cubic-bezier(0.4, 0, 0.72, 1)
@@ -42,13 +45,14 @@
 }
 .dsh-kujira-root[data-orb="1"] .dsh-kujira-orb {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
-  transform: translate(var(--kj-dx, 0), var(--kj-dy, 0)) scale(1)
-    rotate(0deg);
+  transform: translate(var(--kj-dx, 0), var(--kj-dy, 0)) scale(1) rotate(0deg);
   transition:
     transform var(--kj-in-ms, 285ms) cubic-bezier(0.22, 1.06, 0.36, 1)
       var(--kj-in-delay, 0ms),
     opacity var(--kj-fade-ms, 155ms) ease-out var(--kj-in-delay, 0ms),
+    visibility 0s linear var(--kj-in-delay, 0ms),
     background-color 150ms ease,
     border-color 150ms ease,
     color 150ms ease;
@@ -98,8 +102,8 @@
   box-shadow: 0 6px 16px rgb(74 58 36 / 22%);
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, -50%)
-    translate(var(--kj-lx, 0), var(--kj-ly, 0)) scale(0.9);
+  transform: translate(-50%, -50%) translate(var(--kj-lx, 0), var(--kj-ly, 0))
+    scale(0.9);
   transform-origin: center;
   transition:
     opacity 150ms ease,
@@ -110,7 +114,7 @@
   .dsh-kujira-orb:focus-visible
   .dsh-kujira-orblabel {
   opacity: 1;
-  transform: translate(-50%, -50%)
-    translate(var(--kj-lx, 0), var(--kj-ly, 0)) scale(1);
+  transform: translate(-50%, -50%) translate(var(--kj-lx, 0), var(--kj-ly, 0))
+    scale(1);
   transition-delay: 110ms;
 }

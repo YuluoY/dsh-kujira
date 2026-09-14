@@ -57,3 +57,21 @@ validate_output.py 的 index.vue/ts/tsx 与 types.ts 两项仅适用于该目录
 主泡保留多瓣云朵 SVG，改用人物的蓝紫色系：浅蓝紫底、靛蓝描边、深蓝字，两颗尾泡由浅到深。主泡随映射后人物宽度 0.74 联动，限制 144–208px；尾泡 28/18px。未受视口限制的上/下布局中，圆泡间及小泡到估算头部各保留 8px。整体考虑面部碰撞与屏幕边界。预览删除旧缩放对比，全部动作使用原始大小。
 
 纠偏记录：用户要求清晰度优先于动作尺寸一致，禁止再次对低分辨率片段添加放大补偿；云朵用色跟随人物而非参考图的薄荷绿。保留小圆泡、中圆泡、主云朵依次冒出的动效。
+
+## 分类设置与文本输入（2026-09-13）
+
+用户反馈：设置折叠层级过多，字段和按钮没有统一对齐。改为外观、互动、桌面、服务四个页签，分类内部使用静态 section 标题，保留单一滚动区域和固定页签/页脚。只挂载当前分类，避免未打开的服务设置持续请求。
+
+参考 [Radix Tabs](https://www.radix-ui.com/themes/docs/components/tabs)、[Radix Text Field](https://www.radix-ui.com/themes/docs/components/text-field)、[Ant Design Form](https://ant.design/components/form-cn/) 的交互和布局原则。继续复用本地组件库及宿主 React，不引入第二套样式运行时。
+
+TextField 为原子组件：label/value/onChange/onCommit/placeholder/help/error/disabled/loading/readOnly/clearable/type/maxLength/action/hideLabel。onChange 只更新草稿；失焦提交，Enter 触发失焦，IME 中 Enter 不提交；不会在挂载时保存。action 是尾部按钮的 label/icon/onClick。label 与 input ID 关联，错误通过 aria-invalid 和 aria-describedby 定位。Loading 禁用输入；Error 保留草稿并在字段下显示；Empty 保留占位；Success 正常编辑或只读复制。
+
+SettingsTabs 接受 items（id/label/render），提供 tablist/tab/tabpanel 语义，左右箭头、Home/End 切换并移动焦点。render 只执行当前分类。SettingsSection 负责分组标题和内容，不增加折叠。
+
+尺寸：32px 控件高、7px 圆角；普通行共用 144px 控件列，列间 12px，组内 8px，分组间 20px；长地址与文件路径采用标签在上的整行 TextField。字段内 label/control gap 6px，动作组间 gap 8px。所有颜色引用既有主题 token；浅色/深色均沿用相同布局。
+
+测试覆盖输入法不误提交、失焦提交一次、字段错误关联、加载/只读状态、分类按需挂载与键盘导航。布局以浏览器和本机桌面应用实际检查为准。
+
+边框与说明跟进：TextField、NumberField 内部 input 清除旧通用样式的内阴影；外层只保留 1px 边框，focus 使用统一 2px 柔和 halo，不再叠加 input 的独立描边。称呼和下拉控件采用同一焦点规则。错误状态使用语义错误色；禁用状态不触发 hover 强调。
+
+TextField 的 help 改为标签右上角问号，复用 HelpLabel / TooltipHost 的悬停、键盘聚焦和点击提示；正常说明不占正文高度，错误仍在输入框下方显示。HelpLabel 新增可选 htmlFor，标签文字与 input 关联，问号按钮作为 label 的同级元素，避免把按钮嵌进 label。输入通过 visually-hidden 说明保留 aria-describedby。桌面配置补充显示位置、穿透、启动、节能、连接与程序路径的四语言说明。

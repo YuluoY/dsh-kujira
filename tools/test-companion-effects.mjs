@@ -149,3 +149,32 @@ test('uncertain care requests stop unsent clicks and reuse the receipt ID on exp
  const first=actions.feed({keepOpen:true}),second=actions.feed({keepOpen:true});assert.equal(await first,false);assert.equal(await second,false);assert.equal(ids.length,1);assert.equal(pending.current.requestId,ids[0]);
  await actions.feed({keepOpen:true});assert.equal(ids.length,2);assert.equal(ids[0],ids[1]);
 });
+
+test('footer keeps inventory alive after desktop handoff without duplicate polling',async()=>{
+ const {createInventoryFeed}=await import('../lib/shared/client/reward-queue.js');
+ let read, starts=0, stops=0, revision=10000;
+ const feed=createInventoryFeed({poll:fn=>{starts++;read=fn;return {refresh:()=>read(new AbortController().signal),dispose:()=>stops++};},request:async()=>({ok:true,json:async()=>({ok:true,revision:++revision,earned:{fish:revision},progress:.5})})});
+ const footer=[],pet=[];
+ const a=feed.acquire(v=>footer.push(v));const b=feed.acquire(v=>pet.push(v));
+ assert.equal(starts,1);await feed.refresh();assert.equal(footer.at(-1),pet.at(-1));
+ b.dispose();assert.equal(stops,0);const before=footer.at(-1);await feed.refresh();assert.notEqual(footer.at(-1),before);
+ const c=feed.acquire(()=>{});assert.equal(starts,1);a.dispose();c.dispose();c.dispose();assert.equal(stops,1);
+});
+
+test('settled rewards survive task completion and do not replay initial inventory',async t=>{
+ const {useCompanionEffects}=await import('../lib/shared/client/use-companion-effects.js');
+ const refs=[],states=[],effects=[];let ri=0,si=0,ei=0,tick;
+ t.mock.method(globalThis,'setInterval',fn=>{tick=fn;return 1;});
+ t.mock.method(globalThis,'clearInterval',()=>{});
+ const prior=globalThis.document;globalThis.document={hidden:false};t.after(()=>{effects.forEach(e=>e?.cleanup?.());globalThis.document=prior;});
+ const React={Fragment:'fragment',createElement:()=>null,useRef:value=>refs[ri++]??(refs[ri-1]={current:value}),useState:value=>{const i=si++;if(!(i in states))states[i]=value;return [states[i],v=>{states[i]=v;}];},useEffect:(fn,deps)=>{const i=ei++;const old=effects[i];if(!old||deps.some((v,j)=>v!==old.deps[j])){old?.cleanup?.();effects[i]={deps,cleanup:fn()};}}};
+ const playMoment=()=>{},cfgRef={current:{ui:{}}};
+ const render=inventory=>{ri=si=ei=0;useCompanionEffects({React,inventory,playMoment,cfgRef,prefs:{},orbOpen:false,panel:null});};
+ render({ok:true,earned:{fish:5},execution:{active:1}});tick();assert.equal(states[0],null);
+ render({ok:true,earned:{fish:7},execution:{active:0}});tick();assert.equal(states[0].count,2);assert.equal(states[0].kind,'fish');
+ render({ok:true,earned:{fish:7},execution:{active:0}});tick();assert.equal(states[0].count,2);
+ globalThis.document.hidden=true;tick();assert.equal(states[0],null);
+ render({ok:true,earned:{fish:8},execution:{active:0}});tick();assert.equal(states[0],null);
+ globalThis.document.hidden=false;tick();assert.equal(states[0].count,3);
+ tick();assert.equal(states[0].count,3);
+});

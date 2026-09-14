@@ -272,6 +272,274 @@
   [data-panel="settings"]
   .kj-setting
   > input[type="text"]:focus-visible {
+  outline: none;
+  border-color: var(--kj-accent);
+  box-shadow: 0 0 0 2px var(--kj-accent-soft);
+}
+
+/* Settings categories keep one scrolling region and a stable control column. */
+.dsh-kujira-root [data-panel="settings"] .kj-settings-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex: none;
+  gap: 4px;
+  margin: 12px 16px 0;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--kj-line-strong);
+}
+.dsh-kujira-root :is(.kj-settings-tabs, .kj-tablist) [role="tab"] {
+  position: relative;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 auto;
+  gap: 5px;
+  height: 32px;
+  white-space: nowrap;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--kj-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.dsh-kujira-root :is(.kj-settings-tabs, .kj-tablist) [role="tab"]:hover {
+  background: var(--kj-surface-soft);
+}
+.dsh-kujira-root :is(.kj-settings-tabs, .kj-tablist) [aria-selected="true"] {
+  color: var(--kj-accent);
+  background: var(--kj-accent-soft);
+  font-weight: 600;
+}
+.dsh-kujira-root
+  :is(.kj-settings-tabs, .kj-tablist)
+  [role="tab"]:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: -2px;
+}
+.dsh-kujira-root
+  .dsh-kujira-panel[data-panel="settings"]
+  > .kj-settings-content {
+  padding: 16px;
+}
+.dsh-kujira-root .kj-settings-content:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: -3px;
+}
+.dsh-kujira-root .kj-settings-section + .kj-settings-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--kj-line-strong);
+}
+.dsh-kujira-root .kj-settings-section h3 {
+  margin: 0 0 10px;
+  color: var(--kj-ink);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.dsh-kujira-root .kj-settings-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+}
+.dsh-kujira-root [data-panel="settings"] .kj-setting {
+  min-height: 32px;
+  column-gap: 12px;
+}
+.dsh-kujira-root [data-panel="settings"] .kj-slider-row {
+  min-height: 32px;
+}
+.dsh-kujira-root .kj-settings-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.dsh-kujira-root .kj-settings-actions .kj-action {
+  justify-content: center;
+  min-width: 0;
+  min-height: 32px;
+  margin: 0;
+  padding: 6px 8px;
+  line-height: 1.4;
+}
+.dsh-kujira-root .kj-desktop-status {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0 0 2px;
+  color: var(--kj-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.dsh-kujira-root .kj-state-dot {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--kj-muted);
+}
+.dsh-kujira-root .kj-state-dot[data-online="true"] {
+  background: var(--kj-accent);
+}
+
+.dsh-kujira-root
+  .dsh-kujira-panel[data-panel="settings"]:has(.kj-settings-tabs) {
+  height: min(420px, calc(100dvh - 24px));
+}
+.dsh-kujira-root
+  .dsh-kujira-panel[data-panel="settings"]
+  > .kj-settings-content {
+  flex: 1 1 auto;
+}
+
+/* Nested settings groups retain the same spacing as their parent section. */
+.dsh-kujira-root .kj-reward-settings {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.dsh-kujira-root .kj-reward-settings > p {
+  margin: 0;
+}
+
+.dsh-kujira-root .kj-scheduler-summary {
+  margin: 10px 0 4px;
+  color: var(--kj-ink);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.dsh-kujira-root .kj-scheduler-timing {
+  margin: 0;
+  color: var(--kj-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.dsh-kujira-root .kj-session-status-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  max-width: 100%;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 13px;
+}
+.dsh-kujira-root .kj-session-status-list ul {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dsh-kujira-root .kj-session-status-list li {
+  min-width: 0;
+  border-bottom: 1px solid var(--kj-line);
+}
+.dsh-kujira-root .kj-session-status-heading {
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  min-height: 32px;
+  padding: 2px 0;
+  min-width: 0;
+  list-style: none;
+  cursor: pointer;
+}
+.dsh-kujira-root .kj-session-open {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--kj-ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+.dsh-kujira-root .kj-session-status-list p {
+  margin: 0;
+  color: var(--kj-muted);
+  line-height: 1.6;
+}
+
+.dsh-kujira-root .kj-session-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.dsh-kujira-root .kj-session-pagination button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid var(--kj-line);
+  border-radius: 6px;
+  color: var(--kj-ink);
+  background: var(--kj-surface);
+  font: inherit;
+  cursor: pointer;
+}
+.dsh-kujira-root .kj-session-pagination button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.dsh-kujira-root .kj-session-pagination button:focus-visible {
   outline: 2px solid var(--kj-accent);
   outline-offset: 2px;
+}
+
+.dsh-kujira-root .kj-session-open,
+.dsh-kujira-root .kj-session-icon {
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+.dsh-kujira-root .kj-session-open {
+  padding: 4px 0;
+  text-align: start;
+}
+.dsh-kujira-root .kj-session-open:hover {
+  color: var(--kj-accent);
+  text-decoration: underline;
+}
+.dsh-kujira-root .kj-session-open:focus-visible,
+.dsh-kujira-root .kj-session-icon:focus-visible {
+  outline: 2px solid var(--kj-accent);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+.dsh-kujira-root .kj-session-icon {
+  position: static;
+  inset: auto;
+  width: 24px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  flex: 0 0 24px;
+  align-items: center;
+  justify-content: center;
+  color: var(--kj-muted);
+}
+.dsh-kujira-root .kj-session-icon:hover {
+  color: var(--kj-ink);
+  background: var(--kj-line);
+}
+.dsh-kujira-root .kj-session-icon svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.dsh-kujira-root .kj-settings-fields > * {
+  min-width: 0;
+  max-width: 100%;
 }

@@ -102,3 +102,29 @@
   width: 116px;
   flex-basis: 116px;
 }
+
+.dsh-kujira-root .kj-today-spend {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 12px;
+  padding-block: 12px;
+  border-top: 1px solid var(--kj-line);
+}
+
+.dsh-kujira-root .kj-today-spend > strong {
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+.dsh-kujira-root .kj-today-spend > .kj-caption {
+  grid-column: 1 / -1;
+}
+
+.dsh-kujira-root .kj-today-spend > .kj-field-caption {
+  color: var(--kj-muted);
+  font-size: 11px;
+  line-height: 18px;
+}

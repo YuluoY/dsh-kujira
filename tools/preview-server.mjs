@@ -108,6 +108,7 @@ const previewChildren=new Map();
 const previewSession = { header: { id: 'preview-session', cwd: '/workspace/kujira' }, inheritedEventCount: 0, snapshotEvents: () => (previewEventSnapshot ||= Object.freeze(previewEvents.slice())) };
 
 const ctx = {
+    get(name) {if(name==='sessionProjections')return {stateOf:(_session,key)=>key==='title'?'示例任务：整理项目与检查进度':null};},
     inject(deps, callback) { callback(this); },
     agents: {list:()=>previewRunning?[{id:"preview-session",status:"running"}]:[]},
     sessions: { get(id) { return id === 'preview-session' ? previewSession : previewChildren.get(id); } },

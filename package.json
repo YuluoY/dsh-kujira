@@ -1,6 +1,6 @@
 {
     "name": "dsh-kujira",
-    "version": "0.1.17",
+    "version": "0.1.18",
     "private": true,
     "description": "DeepSeek 鲸鱼娘桌宠 —— 独立重写的 DeepSeek Harness Web 插件。零构建依赖：lib/ 里的 JS 就是源码，改完刷新即生效。",
     "keywords": [
@@ -47,19 +47,21 @@
         "docs/EXTENSIONS.md",
         "docs/ANIMATIONS.md",
         "docs/SCHEDULER.md",
+        "docs/SETTINGS-CONSTRAINTS.md",
         "docs/USAGE.md",
         "docs/USAGE.en.md",
         "docs/PERFORMANCE.md",
         "scripts",
         "docs/INSTALL.md",
-        "docs/PRIVACY.md"
+        "docs/PRIVACY.md",
+        "docs/DESKTOP.md"
     ],
     "license": "MIT",
     "scripts": {
         "check": "node tools/check-assets.mjs",
         "test:logic": "node tools/test-logic.mjs",
         "test:host": "node tools/test-host.mjs",
-        "test": "node tools/check-assets.mjs && node tools/test-logic.mjs && node tools/test-host.mjs && node tools/test-usage.mjs && node tools/test-live.mjs && node tools/test-controls.mjs && node tools/test-settings-save.mjs && node tools/test-installer.mjs && node tools/test-balance.mjs && node tools/test-i18n.mjs && node tools/test-inventory.mjs && node tools/test-loot.mjs && node tools/test-usage-preview.mjs && node tools/test-activity.mjs && node tools/test-scheduler.mjs && node tools/test-client.mjs && node tools/test-session-access.mjs && node tools/test-markdown.mjs && node tools/test-companion-effects.mjs && node tools/test-video-player.mjs && node tools/test-rolling-amount.mjs && node tools/test-task-tabs.mjs && node tools/test-usage-index.mjs && node tools/test-performance.mjs && node tools/test-animation-scenes.mjs && node tools/test-companion-refinements.mjs && node tools/test-exchange.mjs",
+        "test": "node tools/check-assets.mjs && node tools/test-logic.mjs && node tools/test-host.mjs && node tools/test-usage.mjs && node tools/test-live.mjs && node tools/test-controls.mjs && node tools/test-settings-save.mjs && node tools/test-installer.mjs && node tools/test-balance.mjs && node tools/test-i18n.mjs && node tools/test-inventory.mjs && node tools/test-loot.mjs && node tools/test-usage-preview.mjs && node tools/test-activity.mjs && node tools/test-scheduler.mjs && node tools/test-client.mjs && node tools/test-session-access.mjs && node tools/test-markdown.mjs && node tools/test-companion-effects.mjs && node tools/test-video-player.mjs && node tools/test-rolling-amount.mjs && node tools/test-task-tabs.mjs && node tools/test-usage-index.mjs && node tools/test-performance.mjs && node tools/test-animation-scenes.mjs && node tools/test-companion-refinements.mjs && node tools/test-exchange.mjs && node tools/test-desktop.mjs",
         "preview": "node tools/preview-server.mjs",
         "preview:whale": "node experiments/whale-lab/server.mjs",
         "link": "node scripts/dsh-plugin.mjs install",
@@ -70,14 +72,18 @@
         "test:live": "node tools/test-live.mjs",
         "test:controls": "node tools/test-controls.mjs",
         "test:client": "node tools/test-client.mjs",
-        "lint": "eslint lib && stylelint \"lib/styles/*.css\" lib/appearance.css",
+        "lint": "eslint lib desktop/src desktop/ui && stylelint \"lib/styles/*.css\" lib/appearance.css desktop/ui/desktop.css",
         "typecheck": "tsc --noEmit",
         "benchmark": "node tools/benchmark-plugin.mjs && node tools/benchmark-performance.mjs",
         "test:performance": "node tools/test-performance.mjs",
         "setup": "node scripts/dsh-plugin.mjs install",
         "doctor": "node scripts/dsh-plugin.mjs doctor",
         "audit:public": "node scripts/audit-public.mjs",
-        "test:exchange": "node tools/test-exchange.mjs"
+        "test:exchange": "node tools/test-exchange.mjs",
+        "desktop:install": "npm --prefix desktop ci",
+        "desktop:start": "npm --prefix desktop start",
+        "desktop:build": "npm --prefix desktop run build",
+        "test:desktop": "node tools/test-desktop.mjs"
     },
     "dsh": {
         "bundle": {

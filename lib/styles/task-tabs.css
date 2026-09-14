@@ -22,61 +22,14 @@
   overflow-x: auto;
   scrollbar-width: thin;
   border-bottom: 1px solid var(--kj-line);
-  padding-bottom: 3px;
-}
-.dsh-kujira-root .kj-tablist [role="tab"] {
-  flex: 1 0 auto;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-height: 36px;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--kj-muted);
-  font: inherit;
-  font-size: 12px;
-  line-height: 20px;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background 140ms ease,
-    color 140ms ease;
+  padding-bottom: 8px;
+  gap: 4px;
 }
 .dsh-kujira-root .kj-tab-count {
   font-size: 10px;
   font-variant-numeric: tabular-nums;
   font-weight: 400;
   opacity: 0.85;
-}
-.dsh-kujira-root .kj-tablist [role="tab"][aria-selected="true"] {
-  color: var(--kj-ink);
-  font-weight: 550;
-}
-.dsh-kujira-root .kj-tablist [role="tab"]:hover {
-  background: var(--kj-task-hover);
-  color: var(--kj-ink);
-}
-.dsh-kujira-root .kj-tablist [role="tab"]:active {
-  background: var(--kj-task-pressed);
-}
-.dsh-kujira-root .kj-tablist [role="tab"]:focus-visible {
-  outline-offset: -2px;
-}
-.dsh-kujira-root .kj-tab-indicator {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 2px;
-  background: var(--kj-accent);
-  border-radius: 2px;
-  pointer-events: none;
-  transition:
-    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
-    width 180ms ease;
 }
 .dsh-kujira-root .kj-tab-alert {
   width: 5px;
@@ -109,12 +62,6 @@
   }
 }
 
-@media (width <= 600px) {
-  .dsh-kujira-root .kj-tablist [role="tab"] {
-    min-height: 44px;
-  }
-}
-
 @media (height <= 500px) {
   .dsh-kujira-root .kj-task-panel .kj-task-goal-brief {
     display: none;
@@ -125,9 +72,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dsh-kujira-root .kj-tab-indicator {
-    transition: none;
-  }
   .dsh-kujira-root .kj-tabpanel {
     animation: none !important;
   }
@@ -167,4 +111,12 @@
   padding: 4px;
   color: var(--kj-muted);
   font-size: 11px;
+}
+
+.dsh-kujira-root .kj-task-file-static {
+  display: block;
+  padding: 8px;
+  min-width: 0;
+  line-height: 1.5;
+  border-bottom: 1px solid var(--kj-line);
 }
