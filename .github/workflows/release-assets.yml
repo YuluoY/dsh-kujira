@@ -1,0 +1,69 @@
+name: Attach verified desktop release assets
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing draft release tag
+        required: true
+        type: string
+      build_run:
+        description: Successful Desktop compatibility builds run ID
+        required: true
+        type: string
+permissions:
+  actions: read
+  contents: write
+jobs:
+  attach:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_TAG: ${{ inputs.tag }}
+      BUILD_RUN: ${{ inputs.build_run }}
+    steps:
+      - name: Verify source commit and draft release
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$BUILD_RUN" =~ ^[0-9]+$ ]]
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN" > build.json
+          [[ $(jq -r .conclusion build.json) == success ]]
+          [[ $(jq -r .path build.json) == .github/workflows/desktop.yml ]]
+          [[ $(jq -r .head_sha build.json) == $(gh api "repos/$GH_REPO/commits/$RELEASE_TAG" --jq .sha) ]]
+          [[ $(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft) == true ]]
+      - name: Download verified build artifacts and plugin archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$BUILD_RUN" --pattern 'kujira-*-unsigned' --dir artifacts
+          mkdir release
+          gh release download "$RELEASE_TAG" --pattern "dsh-kujira-${RELEASE_TAG#v}.tgz" --dir release
+      - name: Assemble assets and checksums
+        shell: python
+        run: |
+          import hashlib, os, pathlib, shutil
+          version = os.environ['RELEASE_TAG'][1:]
+          expected = {
+              f'Kujira-{version}-mac-{arch}.{ext}'
+              for arch in ('arm64', 'x64') for ext in ('dmg', 'zip')
+          } | {
+              f'Kujira-{version}-win-{arch}.exe' for arch in ('arm64', 'x64')
+          } | {f'Kujira-{version}-linux-x86_64.AppImage', f'Kujira-{version}-linux-amd64.deb'}
+          assets = [p for p in pathlib.Path('artifacts').rglob('*') if p.is_file()]
+          assert len(assets) == len(expected) and {p.name for p in assets} == expected, [p.name for p in assets]
+          for source in assets:
+              shutil.copy2(source, pathlib.Path('release') / source.name)
+          lines = []
+          for path in sorted(pathlib.Path('release').iterdir()):
+              with path.open('rb') as stream:
+                  digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+              lines.append(f'{digest}  {path.name}\n')
+          pathlib.Path('release/SHA256SUMS.txt').write_text(''.join(lines))
+      - name: Attach without publishing the draft
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ $(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft) == true ]]
+          gh release upload "$RELEASE_TAG" release/Kujira-* release/SHA256SUMS.txt
