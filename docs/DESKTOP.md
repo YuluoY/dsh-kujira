@@ -2,7 +2,7 @@
 
 桌面应用与 DSH 插件共用人物、动画、气泡和设置组件。浏览器插件仍按原有一行 DSH 命令安装，Electron 不进入插件的运行依赖，也不会在安装插件时自动启动或下载。
 
-v0.1.18 开始提供可选桌面预览包。请在 [GitHub Release](https://github.com/YuluoY/dsh-kujira/releases/tag/v0.1.18) 的附件中选择与系统和架构匹配的文件；仅以实际列出的附件为准。桌面预览包未签名，跨平台构建成功不等同于各系统的实机验收。
+v0.2.0 开始提供可选桌面预览包。请在 [GitHub Release](https://github.com/YuluoY/dsh-kujira/releases/tag/v0.2.0) 的附件中选择与系统和架构匹配的文件；仅以实际列出的附件为准。桌面预览包未签名，跨平台构建成功不等同于各系统的实机验收。
 
 ## 安装与运行
 
