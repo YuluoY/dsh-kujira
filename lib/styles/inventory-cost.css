@@ -1,8 +1,9 @@
 /* Stock belongs to the existing radial action; no additional menu is introduced. */
 .dsh-kujira-root .kj-stock-badge {
   position: absolute;
-  right: -3px;
-  top: -3px;
+  left: calc(100% - 4px);
+  top: -5px;
+  right: auto;
   min-width: 17px;
   height: 17px;
   padding: 0 3px;
@@ -16,6 +17,7 @@
   font-variant-numeric: tabular-nums;
   text-align: center;
   pointer-events: none;
+  white-space: nowrap;
 }
 .dsh-kujira-root .kj-care-count {
   font-size: 10px;

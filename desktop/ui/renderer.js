@@ -33,8 +33,9 @@ const applyPosition = (position) => {
     right: "auto",
     bottom: "auto",
   });
+  root.style.setProperty("--kj-size", position.size + "px");
   root.dataset.corner = "free";
-  window.dispatchEvent(new Event("resize"));
+  window.dispatchEvent(new Event("kujira:position-applied"));
 };
 api.onPosition(applyPosition);
 let menuWasOpen = false,

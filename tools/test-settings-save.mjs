@@ -78,3 +78,15 @@ test('appearance constraints reject invalid stored types and normalize every num
  assert.equal(result.size,260);assert.equal(result.opacity,100);assert.equal(result.menuRadius,0);assert.equal(result.menuLimit,4);assert.equal(result.taskPeekSeconds,60);assert.equal(result.usageDecimals,3);assert.equal(result.budget,12.35);assert.equal(result.care,true);assert.equal(result.theme,'system');
  for(const [key,rule] of Object.entries(PREFERENCE_NUMBERS)){const bounded=normalizePreferences({[key]:Number.MAX_VALUE},PREF_DEFAULTS)[key];assert.equal(bounded,rule.max);}
 });
+
+test('menu size defaults independently, bounds custom values, and preserves follow mode',async()=>{
+ const {createPreferences,normalizePreferences}=await import('../lib/shared/client/preferences.js');
+ const {menuButtonSize}=await import('../lib/shared/client/utilities.js');
+ const {PREF_DEFAULTS}=createPreferences({});const defaults=normalizePreferences({},PREF_DEFAULTS);
+ assert.equal(defaults.menuSizing,'fixed');assert.equal(defaults.menuSize,36);
+ for(const size of [120,260,360])assert.equal(menuButtonSize(defaults,size),36);
+ assert.equal(normalizePreferences({menuSize:999},PREF_DEFAULTS).menuSize,56);
+ assert.equal(normalizePreferences({menuSize:-1},PREF_DEFAULTS).menuSize,28);
+ assert.equal(normalizePreferences({menuSizing:'oops'},PREF_DEFAULTS).menuSizing,'fixed');
+ assert.equal(menuButtonSize({menuSizing:'auto'},120),28);assert.equal(menuButtonSize({menuSizing:'auto'},360),47);
+});

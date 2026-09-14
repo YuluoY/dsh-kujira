@@ -10,7 +10,9 @@ export function createWindowController({ win, screen, store, capabilities }) {
     regions = [],
     timer,
     ignored = false,
-    disposed = false;
+    disposed = false,
+    placed = false,
+    lastPosition = "";
   const saved = store.get().position;
   let pet =
     saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)
@@ -24,12 +26,22 @@ export function createWindowController({ win, screen, store, capabilities }) {
     return screen.getPrimaryDisplay();
   };
   const place = (nextSize = size, reset = false) => {
+    const previousSize = size;
     size = Number.isFinite(nextSize)
       ? Math.max(120, Math.min(360, nextSize))
       : size;
     if (capabilities.wayland) return;
     const display = chooseDisplay(),
       area = display.workArea;
+    if (placed && pet && !reset && size !== previousSize) {
+      const delta = previousSize - size;
+      const left = pet.x - area.x;
+      const right = area.x + area.width - pet.x - previousSize;
+      pet = {
+        x: pet.x + (left <= 32 ? 0 : right <= 32 ? delta : delta / 2),
+        y: pet.y + (pet.y - area.y <= 32 ? 0 : delta),
+      };
+    }
     if (!pet || reset)
       pet = {
         x: area.x + area.width - size - 24,
@@ -44,7 +56,11 @@ export function createWindowController({ win, screen, store, capabilities }) {
       )
     )
       win.setBounds(layout.bounds);
-    win.webContents.send("kujira:position", layout.pet);
+    const position = JSON.stringify(layout.pet);
+    if (position !== lastPosition)
+      win.webContents.send("kujira:position", layout.pet);
+    lastPosition = position;
+    placed = true;
   };
   const setIgnored = (value) => {
     if (ignored === value) return;

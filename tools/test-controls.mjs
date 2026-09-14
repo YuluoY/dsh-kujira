@@ -193,3 +193,16 @@ test('numeric composition commits full-width digits only after IME completion an
  input.props.onCompositionStart();input.props.onChange({currentTarget:{value:'１２'}});assert.deepEqual(writes,[]);input.props.onCompositionEnd({currentTarget:{value:'１２'}});assert.deepEqual(writes,[12]);
  view=f.render(NumberField,{label:'数量',value:12,min:1,max:20,integer:true,disabled:true,onChange:n=>writes.push(n)});input=controlFind(view,n=>n.type==='input');input.props.onChange({currentTarget:{value:'19'}});assert.deepEqual(writes,[12]);
 });
+
+test('size range keeps a local pointer draft, commits once on release, and cancels without resizing',async()=>{
+ const {createControls}=await import('../lib/shared/panel-controls.js');const f=controlHarness(),{Range}=createControls(f.React),changes=[];
+ const props={label:'Size',value:260,min:120,max:360,commitOnRelease:true,onChange:value=>{changes.push(value);props.value=value;}};
+ const input=()=>controlFind(f.render(Range,props),n=>n.type==='input');
+ input().props.onPointerDown();
+ for(const value of [120,360,200,360])input().props.onChange({currentTarget:{value:String(value)}});
+ assert.deepEqual(changes,[]);assert.equal(input().props.value,360);assert.equal(props.value,260);
+ input().props.onPointerUp();input().props.onPointerUp();assert.deepEqual(changes,[360]);assert.equal(input().props.value,360);
+ input().props.onPointerDown();input().props.onChange({currentTarget:{value:'120'}});input().props.onPointerCancel();assert.equal(input().props.value,360);assert.deepEqual(changes,[360]);
+ input().props.onPointerDown();input().props.onChange({currentTarget:{value:'120'}});input().props.onKeyDown({key:'Escape',preventDefault(){},stopPropagation(){}});assert.equal(input().props.value,360);
+ input().props.onChange({currentTarget:{value:'359'}});assert.deepEqual(changes,[360,359]);
+});

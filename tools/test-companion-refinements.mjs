@@ -105,3 +105,11 @@ test('progress message bubble prefers the side of the face when there is room',(
  assert.equal(p.top,anchor.top+anchor.height*.44-30);
  assert.equal(p.tailY,30);assert(p.left+p.width<anchor.left+anchor.width*.2);
 });
+
+test('radial inventory badge caps visual count while preserving the full accessible count',async()=>{
+ const {renderOrbs}=await import('../lib/shared/client/render-orbs.js');const f=harness();
+ const props={h:f.h,cfg:{ui:{buttons:true,arc:{},buttonSide:'left'}},orbGeomRef:{current:{slots:[{x:0,y:0}],labels:[],inDelays:[],outDelays:[]}},inventory:{ok:true,stock:{fish:123456}},FEATURE_REGISTRY:[{key:'feed',label:'Fish'}],lastPanelRef:{current:null},feed(){},page:0,t:(s,p)=>s.replace('{count}',String(p?.count)),ICONS:{},visibleCountRef:{current:0},orbOpen:true,ARCRef:{current:null}};
+ const result=renderOrbs(props),button=find(result.orbs,n=>n.type==='button');
+ assert.equal(find(result.orbs,n=>n.props.className==='kj-stock-badge').children[0],'99+');
+ assert(button.props['aria-label'].includes('123456'));assert(button.props['data-tooltip'].includes('123456'));
+});

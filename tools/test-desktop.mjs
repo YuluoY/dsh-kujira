@@ -237,3 +237,24 @@ test('panel hit testing retains transparent entrance frames and tracks settled a
   style.opacity='1';playState='running';endTime=Infinity;assert.equal(surfaceHitRegion(element,style).moving,false);
  } finally {controller.dispose();}
 });
+
+test('desktop resizing preserves corner margins and duplicate sizes do not emit position feedback',async()=>{
+ const {createWindowController}=await import('../desktop/src/window-controller.js');
+ for(const corner of ['tl','tr','bl','br']){
+  const area={x:-1200,y:24,width:1200,height:900};
+  const position={x:corner.endsWith('l')?area.x+16:area.x+area.width-260-16,y:corner.startsWith('t')?area.y+16:area.y+area.height-260-16};
+  let bounds={x:0,y:0,width:820,height:740};const sent=[];
+  const screen={getCursorScreenPoint:()=>({x:0,y:0}),getPrimaryDisplay:()=>({workArea:area}),getDisplayNearestPoint:()=>({workArea:area}),on(){},removeListener(){}};
+  const win={isDestroyed:()=>false,isVisible:()=>true,getBounds:()=>bounds,setBounds:b=>{bounds=b;},setIgnoreMouseEvents(){},webContents:{send:(_,p)=>sent.push({...p,bounds:{...bounds}})}};
+  const store={get:()=>({position,settings:{display:'remember',clickThrough:true}})};
+  const c=createWindowController({win,screen,store,capabilities:{clickThrough:true}});
+  try {
+   c.place(260);const initialCount=sent.length;c.place(260);c.place(260);assert.equal(sent.length,initialCount);
+   for(const size of [120,360,120,360,260]){
+    c.place(size);const p=sent.at(-1),x=p.bounds.x+p.x,y=p.bounds.y+p.y;
+    assert.equal(corner.endsWith('l')?x-area.x:area.x+area.width-x-size,16,corner);
+    assert.equal(corner.startsWith('t')?y-area.y:area.y+area.height-y-size,16,corner);
+   }
+  }finally{c.dispose();}
+ }
+});
