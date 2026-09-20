@@ -44,7 +44,11 @@ test('appearance edits react immediately while persistence is debounced and flus
  globalThis.setTimeout=fn=>{timer=fn;return 1;};globalThis.clearTimeout=()=>{timer=null;};
  const values=[],cleanups=[];const {usePreferences}=createPreferences({readStore:()=>stored,SET_KEY:'test',useState:value=>[typeof value==='function'?value():value,v=>values.push(v)],I18N:{configure:()=> 'en'},useEffect:fn=>cleanups.push(fn()),writeStore:(_k,v)=>{writes++;stored=v;}});
  const p=usePreferences();p.update({size:200});p.update({size:220});assert.equal(writes,0);assert(values.some(v=>v?.size===220));timer();assert.equal(writes,1);assert.equal(stored.appearance.size,220);
- p.update({opacity:80});listeners.get('pagehide')();assert.equal(writes,2);assert.equal(stored.appearance.opacity,80);cleanups.forEach(fn=>fn?.());
+ p.update({opacity:80});listeners.get('pagehide')();assert.equal(writes,2);assert.equal(stored.appearance.opacity,80);
+ p.update({displayCurrency:'USD',weatherRegion:'global'});p.update({locale:'zh-CN'});timer();
+ assert.equal(stored.appearance.displayCurrency,'USD');assert.equal(stored.appearance.weatherRegion,'global');assert.equal(stored.appearance.locale,'zh-CN');
+ p.update({weatherRegion:'cn'});timer();assert.equal(stored.appearance.locale,'zh-CN');assert.equal(stored.appearance.displayCurrency,'USD');
+ cleanups.forEach(fn=>fn?.());
 });
 
 test('automatic appearance follows live DSH palette, preserves overrides and releases observers',async t=>{
@@ -89,4 +93,13 @@ test('menu size defaults independently, bounds custom values, and preserves foll
  assert.equal(normalizePreferences({menuSize:-1},PREF_DEFAULTS).menuSize,28);
  assert.equal(normalizePreferences({menuSizing:'oops'},PREF_DEFAULTS).menuSizing,'fixed');
  assert.equal(menuButtonSize({menuSizing:'auto'},120),28);assert.equal(menuButtonSize({menuSizing:'auto'},360),47);
+});
+
+test('legacy language survives migration while currency and weather get independent defaults',async()=>{
+ const {createPreferences,normalizePreferences}=await import('../lib/shared/client/preferences.js');
+ const {PREF_DEFAULTS}=createPreferences({});
+ const value=normalizePreferences({locale:'ko-KR'},PREF_DEFAULTS);
+ assert.equal(value.locale,'ko-KR');assert.equal(value.displayCurrency,'original');assert.equal(value.weatherRegion,'auto');
+ const invalid=normalizePreferences({displayCurrency:'ko-KR',weatherRegion:'ko-KR'},PREF_DEFAULTS);
+ assert.equal(invalid.displayCurrency,'original');assert.equal(invalid.weatherRegion,'auto');
 });

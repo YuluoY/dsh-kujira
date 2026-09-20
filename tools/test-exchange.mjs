@@ -1,34 +1,33 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createExchangeClient, normalizeExchange } from '../lib/host/exchange.js';
-import { exchangeAmount, publishExchange, currencyForLocale } from '../lib/shared/exchange.js';
+import { exchangeAmount, publishExchange, configureCurrency } from '../lib/shared/exchange.js';
 import { money, loadLocale, exchangeNote } from '../lib/shared/i18n.js';
 const NOW = Date.parse('2026-09-13T12:00:00Z');
 const rows = ['USD','KRW','RUB'].map((quote,i)=>({base:'CNY',quote,date:'2026-09-13',rate:[0.14,190,12][i]}));
 const response = (value=rows) => new Response(JSON.stringify(value));
 
-test('country mapping and cross rates convert from source values without mutating billing',()=>{
+test('explicit currencies and cross rates preserve original billing values',()=>{
  const rates=normalizeExchange(rows,NOW), original={total:100,currency:'CNY'};
- for(const [locale,currency,value] of [['zh-CN','CNY',100],['en-US','USD',14],['ko-KR','KRW',19000],['ru-RU','RUB',1200]]) {
-  assert.equal(currencyForLocale(locale),currency);
-  const result=exchangeAmount(original.total,original.currency,locale,rates,NOW);
+ for(const [currency,value] of [['CNY',100],['USD',14],['KRW',19000],['RUB',1200]]) {
+  const result=exchangeAmount(original.total,original.currency,currency,rates,NOW);
   assert.ok(Math.abs(result.value-value)<1e-9);assert.equal(result.currency,currency);
  }
- assert.ok(Math.abs(exchangeAmount(14,'USD','ko-KR',rates,NOW).value-19000)<1e-9);
- assert.equal(exchangeAmount(0,'USD','ru-RU',rates,NOW).value,0);
- assert.ok(Math.abs(exchangeAmount(-100,'CNY','en-US',rates,NOW).value+14)<1e-9);
+ assert.ok(Math.abs(exchangeAmount(14,'USD','KRW',rates,NOW).value-19000)<1e-9);
+ assert.equal(exchangeAmount(0,'USD','RUB',rates,NOW).value,0);
+ assert.ok(Math.abs(exchangeAmount(-100,'CNY','USD',rates,NOW).value+14)<1e-9);
  assert.deepEqual(original,{total:100,currency:'CNY'});
- assert.equal(exchangeAmount(100,'CNY','ko-KR',rates,NOW).value,19000);
- assert.equal(exchangeAmount(100,'CNY','zh-CN',rates,NOW).value,100);
+ assert.equal(exchangeAmount(100,'CNY','KRW',rates,NOW).value,19000);
+ assert.equal(exchangeAmount(100,'CNY','CNY',rates,NOW).value,100);
 });
 test('invalid, missing, expired and unsupported rates never relabel an unconverted amount',()=>{
  const rates=normalizeExchange(rows,NOW);
  for(const broken of [null,{ok:false},{...rates,rates:{CNY:1,USD:0}},{...rates,dates:{} }]) {
-  assert.deepEqual(exchangeAmount(100,'CNY','en-US',broken,NOW),{value:100,currency:'CNY',converted:false,unavailable:true});
+  assert.deepEqual(exchangeAmount(100,'CNY','USD',broken,NOW),{value:100,currency:'CNY',converted:false,unavailable:true});
  }
- assert.equal(exchangeAmount(100,'CNY','en-US',rates,NOW+8*86400000).currency,'CNY');
- assert.equal(exchangeAmount(100,'EUR','en-US',rates,NOW).currency,'EUR');
- assert.equal(exchangeAmount(100,'CNY','en-US',{...rates,stale:true},NOW).stale,true);
+ assert.equal(exchangeAmount(100,'CNY','USD',rates,NOW+8*86400000).currency,'CNY');
+ assert.equal(exchangeAmount(100,'EUR','USD',rates,NOW).currency,'EUR');
+ assert.equal(exchangeAmount(100,'CNY','USD',{...rates,stale:true},NOW).stale,true);
 });
 test('normalization rejects duplicates, invalid dates, wrong bases, oversized and nonpositive rates',()=>{
  for(const bad of [[],[rows[0],rows[0],rows[2]],rows.map(r=>({...r,base:'USD'})),rows.map(r=>({...r,rate:-1})),rows.map(r=>({...r,rate:'1'})),rows.map(r=>({...r,date:'2026-02-30'})),rows.map(r=>({...r,date:'2027-01-01'})),rows.map(r=>({...r,date:'2026-08-01'}))])
@@ -64,16 +63,29 @@ test('UI formatting labels estimates, currencies and fallback with four complete
  await Promise.all(['zh-CN','en-US','ko-KR','ru-RU'].map(loadLocale));
  const today=new Date().toISOString().slice(0,10);
  publishExchange(normalizeExchange(rows.map(r=>({...r,date:today})),Date.now()));
+ configureCurrency('USD');
  assert.match(money(100,'CNY','en-US'),/^≈ \$14/);
+ configureCurrency('KRW');
  assert.match(money(100,'CNY','ko-KR'),/^≈ ₩19,000/);
+ configureCurrency('RUB');
  assert.match(money(100,'CNY','ru-RU'),/1.200,00\s*₽/);
+ configureCurrency('USD');
  assert.match(exchangeNote('CNY','en-US'),/Frankfurter/);
+ for(const language of ['zh-CN','en-US','ko-KR','ru-RU']) {
+  assert.match(money(100,'CNY',language), /14/);
+  assert.equal(exchangeAmount(100,'CNY').currency,'USD');
+ }
+ configureCurrency('original');
+ assert.equal(exchangeAmount(100,'CNY').currency,'CNY');
+ assert.equal(exchangeNote('CNY','en-US'),'');
+ configureCurrency('USD');
  assert.match(money(.0001,'CNY','en-US'),/0.000014/);
  publishExchange(null);
  assert.match(money(100,'CNY','en-US'),/^CNY /);
  assert.match(exchangeNote('CNY','en-US'),/Loading/);
  publishExchange({ok:false});
  assert.match(exchangeNote('CNY','en-US'),/unavailable/);
+ configureCurrency('original');
  publishExchange(null);
 });
 

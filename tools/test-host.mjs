@@ -84,7 +84,7 @@ async function collectRoutes()
         }
     };
 
-    apply(ctx, { size: 260, realtime: { enabled: false } });
+    apply(ctx, { harnessUpdate:{enabled:false}, holidayCalendar: { enabled: false }, size: 260, realtime: { enabled: false } });
 
     return {
         routes,

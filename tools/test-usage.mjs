@@ -73,7 +73,7 @@ test('host endpoint selects the explicit session and handles absent selection', 
         webServer: { register(route) { handler = route.handler; return () => {}; } },
         credentials: { async resolve() { return undefined; } }
     };
-    apply(ctx, { realtime: { enabled: false } });
+    apply(ctx, { harnessUpdate:{enabled:false}, holidayCalendar: { enabled: false }, realtime: { enabled: false } });
     const request = async url => {
         const response = { writeHead(status) { this.status = status; }, end(body) { this.body = JSON.parse(body); } };
         await handler({ url, method: 'GET' }, response); return response;

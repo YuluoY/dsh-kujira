@@ -147,7 +147,7 @@ const ctx = {
     }
 };
 
-apply(ctx, { exchangeRates:{enabled:process.env.PREVIEW_OFFLINE !== "1" || process.env.PREVIEW_EXCHANGE === "1"}, size: 260, realtime:{enabled:false,cacheDir:join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT))}, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { now:()=>Date.now() + supplyClock, directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
+apply(ctx, { harnessUpdate:{preview:true,enabled:process.env.PREVIEW_UPDATE === "1"}, holidayCalendar:{enabled:false}, exchangeRates:{enabled:process.env.PREVIEW_OFFLINE !== "1" || process.env.PREVIEW_EXCHANGE === "1"}, size: 260, realtime:{enabled:false,cacheDir:join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT))}, scheduler:{preview:true,now:()=>Date.parse(usagePreviewMode==='peak'?'2026-09-11T10:30:00+08:00':'2026-09-11T20:30:00+08:00')}, inventory: { now:()=>Date.now() + supplyClock, directory: join(homedir(), '.dsh', 'dsh-kujira-preview', String(PORT)) } });
 
 // ============================================================================
 // 模拟会话事件

@@ -1,3 +1,4 @@
+import { createWebNavigation } from "./web-navigation.js";
 import { focusBrowser } from "./browser-focus.js";
 import { desktopTranslator } from "./translate.js";
 import {
@@ -239,6 +240,7 @@ if (!locked) {
         const parsed = new URL(url);
         if (
           parsed.origin === settings().dshUrl ||
+          (parsed.protocol === "https:" && parsed.hostname === "www.npmjs.com" && parsed.pathname === "/package/@deepseek-ai/dsh") ||
           (parsed.protocol === "https:" &&
             parsed.hostname === "github.com" &&
             parsed.pathname.startsWith("/YuluoY/dsh-kujira"))
@@ -310,47 +312,10 @@ if (!locked) {
         clipboard.writeText(id);
         return true;
       });
-      const navigateWeb = async (target) => {
-        if (
-          !target ||
-          !["web", "session", "file", "message", "child", "back"].includes(target.kind) ||
-          JSON.stringify(target).length > 12000
-        )
-          throw Error("invalid-navigation");
-        await connection.tick();
-        if (!connection.snapshot().online) {
-          await service.openWeb();
-          await connection.tick();
-          if (!connection.snapshot().online) {
-            if (target.kind === "web") return { success: true };
-            throw Error("desktop-host-needs-restart");
-          }
-        }
-        const command = await connection.navigate(target);
-        console.info(
-          "[kujira] Web navigation:",
-          target.kind,
-          command.reused,
-          command.browser,
-        );
-        if (!command.reused) await service.openWeb();
-        else
-          await focusBrowser(
-            command.browser,
-            process.platform,
-            undefined,
-            settings().dshUrl,
-          );
-        const deadline = Date.now() + 12000;
-        while (Date.now() < deadline) {
-          const value = await connection.navigationStatus(command.navigationId);
-          if (value.result?.done)
-            return { success: value.result.success, reused: command.reused };
-          if (value.result?.expired) break;
-          await new Promise((resolve) => setTimeout(resolve, 300));
-        }
-        return { success: false, reused: command.reused };
-      };
+      const navigateWeb = createWebNavigation({
+        connection, service,
+        focus: (browser, focusToken) => focusBrowser(browser, process.platform, undefined, settings().dshUrl, { focusToken }),
+      });
       let webRequest;
       const openWeb = () =>
         (webRequest ||= navigateWeb({ kind: "web" }).finally(() => {

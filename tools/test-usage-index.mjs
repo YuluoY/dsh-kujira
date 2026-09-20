@@ -47,7 +47,7 @@ test('unchanged host activity responds with 304, and new events invalidate the r
  let events=[{type:'turn/start',seq:0,time:1,data:{turn:1}}];const session={header:{id:'session'},snapshotEvents:()=>events};
  const ctx={agents:{list:()=>[]},sessions:new Map([['session',session]]),credentials:{resolve:async()=>undefined},inject(keys,fn){fn(this);},effect(fn){const end=fn();if(typeof end==='function')disposes.push(end);return end;},on(){return()=>{};},webServer:{register(route){handler=route.handler;return()=>{};}}};
  t.after(async()=>{await Promise.all(disposes.reverse().map(fn=>fn()));await rm(directory,{recursive:true,force:true});});
- apply(ctx,{inventory:{directory},scheduler:{directory},realtime:{enabled:false}});
+ apply(ctx,{harnessUpdate:{enabled:false}, holidayCalendar:{enabled:false},inventory:{directory},scheduler:{directory},realtime:{enabled:false}});
  const request=async etag=>{const response={headers:{},setHeader(k,v){this.headers[k]=v;},writeHead(code,headers){this.code=code;Object.assign(this.headers,headers);},end(body){this.body=body||'';}};await handler({url:'/dsh-kujira/activity?sessionId=session',method:'GET',headers:{'if-none-match':etag}},response);return response;};
  const first=await request();assert.equal(first.code,200);const same=await request(first.headers.ETag);assert.equal(same.code,304);assert.equal(same.body,'');
  events=[...events,{type:'turn/end',seq:1,time:2,data:{turn:1,reason:{kind:'completed'}}}];const changed=await request(first.headers.ETag);assert.equal(changed.code,200);assert.notEqual(changed.headers.ETag,first.headers.ETag);

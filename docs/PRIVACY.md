@@ -32,3 +32,11 @@ npm pack --dry-run
 自动检查只输出文件名、行号和问题类型，不回显疑似密钥。它用于检查当前 Git 跟踪文件，不能替代历史检查和截图人工检查。提交 Issue 时请遮盖密钥、真实余额、会话正文和私有文件路径。
 
 The audit reports paths, line numbers and finding types, never matched secrets. It covers currently tracked files and does not replace history or image review. Redact credentials, real balances, private paths and conversations before opening issues.
+
+节假日日历：宿主定期向 cdn.jsdelivr.net（失败时 raw.githubusercontent.com）请求公开年度中国放假 JSON，只发送年份，不发送账户、会话、金额、语言或 API 密钥。提供方可见网络 IP。设置 `holidayCalendar.enabled: false` 可禁用联网更新。
+
+Holiday calendar: the host requests public annual Chinese holiday JSON from cdn.jsdelivr.net, falling back to raw.githubusercontent.com. Requests contain only the year, with no accounts, sessions, amounts, languages or API keys. Providers see the network IP. Set `holidayCalendar.enabled: false` to disable updates.
+
+DSH 更新：默认每天向 registry.npmjs.org 查询公开的 `@deepseek-ai/dsh` 版本标签。点击安装后才查询目标版本并通过原 npm/pnpm 全局安装器下载官方包及依赖。查询不发送会话、账户或 API 密钥；服务商可见网络 IP。可在设置中关闭自动检查，或通过 `harnessUpdate.enabled: false` 完全禁用。
+
+DSH updates: daily checks request public `@deepseek-ai/dsh` tags from registry.npmjs.org. Only clicking Install fetches the target metadata and runs the existing global npm/pnpm installer to download the official package and dependencies. Checks send no sessions, accounts or API keys; the provider sees the network IP. Disable automatic checks in Settings or the entire service with `harnessUpdate.enabled: false`.

@@ -19,7 +19,7 @@ Local preview has no real DSH agents and is labelled accordingly. The installed 
 
 ### Amounts and inventory
 
-`total_balance` is available credit, `topped_up_balance` is remaining paid credit, and `granted_balance` is granted credit. None is a lifetime deposit total. Country selection converts displayed balances, session costs and supply amounts to CNY, USD, KRW or RUB at the latest reference rate. Account balances and settlement data remain in their original currencies. Session costs are estimates from verifiable usage records and prices, not an official invoice.
+`total_balance` is available credit, `topped_up_balance` is remaining paid credit, and `granted_balance` is granted credit. None is a lifetime deposit total. Display currency is independent of interface language and weather service region. It defaults to the original currency; selecting CNY, USD, KRW or RUB converts displayed amounts at reference rates. Account balances and settlement data remain in their original currencies. Session costs are estimates from verifiable usage records and prices, not an official invoice.
 
 By default, each CNY 0.10 of eligible usage earns a roll with a 25% chance of 1–3 items. Smaller bundles are more common. Peak bonus doubles roll progress without changing the bill. Items have no time cooldown. Unlimited mode preserves stock and still earns random drops; preview usage never awards real inventory.
 
@@ -32,7 +32,7 @@ Emergency safeguard also covers agents already running when enabled. In-flight m
 
 Button corners range from 0% (square) to 50% (circle) in settings. Hover reactions finish before returning to the current task animation; moving across several buttons keeps only the last hovered reaction. Peak rewards scatter up to 12 fish around the mascot’s feet, with additional quantities included in the reward counter. They clear automatically after a few seconds. Static and focus modes suppress the scatter animation.
 
-Peak hours are Monday–Friday, 09:00–12:00 and 14:00–18:00 Beijing time. Weekends are entirely off-peak. Switch times are displayed in the device’s local time zone. See [DeepSeek pricing](https://api-docs.deepseek.com/quick_start/pricing/).
+Official API peak hours worldwide are Monday–Friday, 09:00–12:00 and 14:00–18:00 Beijing time, excluding Chinese public holidays. Weekends, including makeup workdays, and Chinese public holidays are entirely off-peak. Switch times are displayed in the device’s local time zone. See [DeepSeek pricing](https://api-docs.deepseek.com/quick_start/pricing/).
 
 ## Task overview and accounting
 
@@ -103,4 +103,16 @@ Theme defaults to **Auto**, matching the current DSH appearance and updating whe
 
 [Frankfurter v2](https://frankfurter.dev/) supplies daily reference rates without an API key. The host coalesces requests and caches rates for 15 minutes, with a 5-second timeout and 60-second failure backoff. Hidden pages stop refreshing. Converted amounts show ≈; balance and cost details show source and publication date. Rates older than 7 days are rejected. On outages, a dated cache is labeled or the original currency is shown. No model calls or account data are sent to this service.
 
-Budget and reward-threshold inputs remain explicitly labeled CNY with an approximate local equivalent; changing country never rewrites settlement rules. Set `exchangeRates.enabled: false` in the host plugin configuration to disable requests. Offline previews disable rates by default; `PREVIEW_EXCHANGE=1` enables rate-only network testing without loading account credentials.
+Budget and reward-threshold inputs remain explicitly labeled CNY with an approximate local equivalent; changing display currency never rewrites settlement rules. Set `exchangeRates.enabled: false` in the host plugin configuration to disable requests. Offline previews disable rates by default; `PREVIEW_EXCHANGE=1` enables rate-only network testing without loading account credentials.
+
+### Chinese holiday calendar
+
+The plugin bundles 2025 and 2026 notices from [holiday-cn](https://github.com/NateScarlet/holiday-cn) (MIT). The host refreshes the current and next notice years daily, with a one-hour retry interval on failure and five-second request timeouts. Next-year notices also apply to December dates. Valid data is cached in `~/.dsh/dsh-kujira/holidays.json` (or the configured inventory/holidayCalendar directory). Outages and empty future-year placeholders retain valid data. If the current year is unavailable, weekday hours apply provisionally and scheduler settings show a warning. `holidayCalendar.enabled: false` disables network updates while preserving bundled dates; previews disable updates. Language and currency never affect tariff timing.
+
+## DeepSeek Harness updates
+
+Settings → Services → DeepSeek Harness updates checks the official npm registry daily by default. A dot on Settings indicates a newer version. Automatic checks can be disabled; manual checks are limited to once per minute, and failures retry hourly while retaining the last result. No model calls are involved.
+
+The default channel follows alpha installations, otherwise latest; both channels also consider a newer latest release. Automatic updates never downgrade. The Version history & rollback disclosure lists official non-deprecated releases for an explicit version switch, including older releases. Previous installed versions are remembered. Rollback retains sessions and configuration; older releases may not support newer configuration. It identifies the running npm/pnpm global installation, pins the displayed official `@deepseek-ai/dsh` version, enforces package engine requirements and verifies the installed version. Source checkouts, temporary npx runs and unknown layouts remain read-only. Installation requires a local browser request and no running tasks. No sudo, account changes, plugin changes or session deletion are performed.
+
+Installation has a ten-minute timeout and a per-user process lock. Exiting DSH cancels the installer. After success, restart DSH normally to run the installed version; the current running version stays visible until then. Settings persist in `harness-update.json` in the plugin data directory. `harnessUpdate.enabled: false` disables this service. `PREVIEW_UPDATE=1` enables read-only version checks in previews; previews can never install updates.

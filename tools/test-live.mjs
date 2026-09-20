@@ -10,6 +10,8 @@ const html = await readFile(new URL('./fixtures/pricing.html',import.meta.url),'
 const response = body => ({ok:true,text:async()=>body,json:async()=>body});
 test('official table spans preserve exact prices; changed schedule is rejected',()=>{
  assert.equal(parseOfficialPricing(html)['deepseek-flash'].miss,1);
+ const updated=html.replace(/高峰时段为北京时间周一至周五\s*9:00 - 12:00、14:00 - 18:00/, '北京时间周一至周五（不含中国法定节假日）9:00 - 12:00、14:00 - 18:00 为高峰时段');
+ assert.notEqual(updated,html);assert.equal(parseOfficialPricing(updated)['deepseek-flash'].miss,1);
  assert.equal(parseOfficialPricing(html)['deepseek-v4-pro'].out,13.5);
  assert.throws(()=>parseOfficialPricing(html.replace('14:00 - 18:00','14:00 - 19:00')));
  assert.throws(()=>parseOfficialPricing(html.replace('0.04元','0.05元')));

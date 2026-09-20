@@ -24,6 +24,7 @@ jobs:
           cache-dependency-path: desktop/package-lock.json
       - run: npm ci
       - run: npm run test:desktop
+      - run: npm run test:platform
       - run: npm run lint
       - run: npm ci --prefix desktop
       - run: npm --prefix desktop run build -- --${{ matrix.platform }} --${{ matrix.arch }}

@@ -2,45 +2,52 @@ import { boundedText } from "./http.js";
 import { spawn } from "node:child_process";
 import { access, stat } from "node:fs/promises";
 import { constants } from "node:fs";
-import { delimiter, dirname, join, isAbsolute } from "node:path";
+import { win32, posix } from "node:path";
 import { homedir } from "node:os";
 import { localOrigin } from "./settings.js";
 
 /**
  * @description Find the existing CLI without invoking an interactive shell.
  */
-export async function findExecutable(
-  configured,
-  { platform = process.platform, env = process.env } = {},
-) {
-  const roots = (env.PATH || "").split(delimiter).filter(Boolean);
-  roots.push(
-    join(homedir(), "Library/pnpm"),
-    join(homedir(), ".local/share/pnpm"),
-    join(homedir(), ".local/bin"),
-    "/opt/homebrew/bin",
-    "/usr/local/bin",
-  );
-  if (env.APPDATA) roots.push(join(env.APPDATA, "npm"));
-  if (env.PNPM_HOME) roots.push(env.PNPM_HOME);
-  const names = platform === "win32" ? ["dsh.exe", "dsh.cmd"] : ["dsh"];
-  if (configured && !isAbsolute(configured))
+export async function findExecutable(configured, { platform = process.platform, env = process.env,
+  home = homedir(), fs = { access, stat } } = {}) {
+  const paths = platform === "win32" ? win32 : posix;
+  const roots = executableSearchPaths({ platform, env, home });
+  const names = platform === "win32" ? ["dsh.exe", "dsh.cmd", "dsh.bat"] : ["dsh"];
+  if (configured && !paths.isAbsolute(configured))
     throw Error("absolute-path-required");
   const candidates = configured
     ? [configured]
-    : roots.flatMap((root) => names.map((name) => join(root, name)));
+    : roots.flatMap((root) => names.map((name) => paths.join(root, name)));
   for (const file of candidates) {
     try {
-      await access(
+      await fs.access(
         file,
         platform === "win32" ? constants.F_OK : constants.X_OK,
       );
-      if ((await stat(file)).isFile()) return file;
+      if ((await fs.stat(file)).isFile()) return file;
     } catch {
       /* Try the next installed CLI. */
     }
   }
   throw Error("dsh-not-found");
+}
+
+/**
+ * @description Collect absolute CLI search paths using the target operating system's conventions.
+ * @param {object} options Platform, environment and home directory.
+ * @returns {string[]} Deduplicated directories for CLI lookup and child process PATH.
+ */
+export function executableSearchPaths({ platform = process.platform, env = process.env, home = homedir() } = {}) {
+  const paths = platform === "win32" ? win32 : posix;
+  const key = Object.keys(env).find((name) => platform === "win32" ? name.toLowerCase() === "path" : name === "PATH");
+  const roots = [...(env[key] || "").split(paths.delimiter), env.PNPM_HOME,
+    ...(platform === "win32"
+      ? [env.APPDATA && paths.join(env.APPDATA, "npm"), env.LOCALAPPDATA && paths.join(env.LOCALAPPDATA, "pnpm"),
+        env.ProgramFiles && paths.join(env.ProgramFiles, "nodejs"), env.NVM_SYMLINK]
+      : [paths.join(home, "Library", "pnpm"), paths.join(home, ".local", "share", "pnpm"),
+        paths.join(home, ".local", "bin"), "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"])];
+  return [...new Set(roots.filter(Boolean).map((root) => root.replace(/^"(.*)"$/, "$1")).filter((root) => paths.isAbsolute(root)))];
 }
 
 /**
@@ -128,31 +135,29 @@ export function createDshService({
   fetcher = fetch,
   spawnProcess = spawn,
   resolveExecutable = findExecutable,
+  platform = process.platform,
+  env = process.env,
 }) {
-  let pending;
-  const openWeb = () => {
+  let pending, opening;
+  const ensureRunning = () => {
     if (pending) return pending;
     pending = (async () => {
       const settings = { ...getSettings() };
       const initial = await probeDsh(settings.dshUrl, fetcher);
       if (initial.online || initial.legacy) {
-        await openUrl(settings.dshUrl);
-        return;
+        return initial;
       }
       if (initial.occupied) throw Error("port-occupied-or-plugin-old");
       if (settings.startDsh === "never") throw Error("dsh-offline");
-      const executable = await resolveExecutable(settings.executable);
-      const command = launchCommand(executable, settings);
+      const executable = await resolveExecutable(settings.executable, { platform, env });
+      const command = launchCommand(executable, settings, platform, env);
       let failed = false;
-      const commandEnv = {
-        ...process.env,
-        PATH: [
-          dirname(executable),
-          process.env.PATH || "",
-          "/opt/homebrew/bin",
-          "/usr/local/bin",
-        ].join(delimiter),
-      };
+      const paths = platform === "win32" ? win32 : posix;
+      const commandEnv = { ...env };
+      for (const key of Object.keys(commandEnv)) {
+        if (platform === "win32" ? key.toLowerCase() === "path" : key === "PATH") delete commandEnv[key];
+      }
+      commandEnv.PATH = [paths.dirname(executable), ...executableSearchPaths({ platform, env })].join(paths.delimiter);
       const child = spawnProcess(command.file, command.args, {
         detached: true,
         shell: false,
@@ -171,10 +176,8 @@ export function createDshService({
       const deadline = Date.now() + 30000;
       while (Date.now() < deadline && !failed) {
         await new Promise((resolve) => setTimeout(resolve, 700));
-        if ((await probeDsh(settings.dshUrl, fetcher)).online) {
-          await openUrl(settings.dshUrl);
-          return;
-        }
+        const result = await probeDsh(settings.dshUrl, fetcher);
+        if (result.online || result.legacy) return result;
       }
       throw Error(failed ? "dsh-start-failed" : "dsh-start-timeout");
     })().finally(() => {
@@ -182,5 +185,11 @@ export function createDshService({
     });
     return pending;
   };
-  return { openWeb, isStarting: () => !!pending };
+  const openWeb = () => {
+    if (opening) return opening;
+    const origin = getSettings().dshUrl;
+    opening = ensureRunning().then(() => openUrl(origin)).finally(() => { opening = null; });
+    return opening;
+  };
+  return { ensureRunning, openWeb, isStarting: () => !!pending || !!opening };
 }

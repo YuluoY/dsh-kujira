@@ -1,0 +1,38 @@
+name: Cross-platform logic tests
+on:
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'desktop/src/**'
+      - 'tools/**'
+      - 'package*.json'
+      - '.github/workflows/platform-tests.yml'
+  push:
+    paths:
+      - 'lib/**'
+      - 'desktop/src/**'
+      - 'tools/**'
+      - 'package*.json'
+      - '.github/workflows/platform-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  logic:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, windows-latest, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:platform
+      - run: npm run test:desktop
+      - run: npm run lint
+      - run: npm run typecheck

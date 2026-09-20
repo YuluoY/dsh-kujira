@@ -120,7 +120,7 @@
 /* The DSH slot wrapper is display:contents by default. */
 [data-slot="conversation.composer.dock"]:has(> .kj-usage-root) {
   display: flex !important;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   width: 100%;
   max-width: var(--dsh-composer-card-max-width, 100%);
@@ -129,14 +129,43 @@
   box-sizing: border-box;
 }
 [data-slot="conversation.composer.dock"]:has(> .kj-usage-root)
-  > [data-composer-stats] {
+  > :is([data-composer-stats], [data-kj-composer-stats]) {
   flex: 1 1 0;
   min-width: 0;
   max-width: none;
   width: auto;
   margin: 0;
-  padding: 4px 0 0;
+  padding: 0;
   justify-content: flex-start;
+}
+
+[data-kj-composer-dock] {
+  width: 100%;
+  max-width: var(--dsh-composer-card-max-width, 100%);
+  align-items: center;
+}
+
+[data-kj-composer-dock] > [data-slot="conversation.composer.dock"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+[data-kj-composer-dock] .kj-usage-root {
+  padding-top: 0;
+}
+
+[data-kj-composer-root] {
+  position: relative;
+}
+
+[data-kj-context-meter] {
+  position: absolute;
+  left: var(--kj-context-x);
+  top: var(--kj-context-y);
+}
+
+[data-kj-context-space] {
+  margin-left: var(--kj-context-space);
 }
 [data-slot="conversation.composer.dock"] > .kj-usage-root {
   flex: 0 0 auto;

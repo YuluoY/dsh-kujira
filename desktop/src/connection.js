@@ -10,6 +10,7 @@ const DATA_ROUTES = new Set([
   "weather",
   "exchange",
   "realtime",
+  "harness-update",
   "scheduler",
   "meta",
 ]);
@@ -113,6 +114,7 @@ export function createConnection({ getSettings, onState, fetcher = fetch }) {
       "content-type",
       "x-kujira-inventory",
       "x-kujira-settings",
+      "x-kujira-update",
       "x-kujira-scheduler",
       "if-none-match",
     ]) {
@@ -153,6 +155,7 @@ export function createConnection({ getSettings, onState, fetcher = fetch }) {
     snapshot,
     navigate: (target) => post({ action: "navigate", target }),
     navigationStatus: (id) => post({ action: "navigation-status", id }),
+    finishNavigation: (id) => post({ action: "navigation-finish", id }),
     tick,
     proxy,
     setReady: () => {
