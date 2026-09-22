@@ -131,7 +131,7 @@ test('supply progress wraps forward, coalesces reward bursts and skips animation
 test('care actions preserve the panel and serialize distinct rapid clicks without a time cooldown',async t=>{
  const {useCareActions}=await import('../lib/shared/client/use-care-actions.js');let closes=0,requests=0,finish,busy=false;
  const saved=new Map(['fetch','sessionStorage','localStorage'].map(k=>[k,globalThis[k]]));t.after(()=>{for(const[k,v]of saved)v===undefined?delete globalThis[k]:globalThis[k]=v;});
- globalThis.sessionStorage={setItem(){},removeItem(){}};globalThis.localStorage={setItem(){}};
+ globalThis.sessionStorage={setItem(){},removeItem(){}};const storage=new Map();globalThis.localStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)};
  globalThis.fetch=()=>{requests++;return new Promise(resolve=>{finish=()=>resolve({ok:true,json:async()=>({ok:true,receiptId:'one',gain:{},cooldownMs:8000})});});};
  const G={migrate:()=>({satiety:20}),tick:n=>({state:n}),applyGain:n=>({state:n})};
  const actions=useCareActions({useCallback:fn=>fn,useRef:v=>({current:v}),useEffect(){},inventoryBusyRef:{current:false},GROWRef:{current:G},cfgRef:{current:{growth:{enabled:true,rates:{}},pools:{click:[]}}},closeOrb:()=>closes++,speak(){},pendingResource:{current:null},readStore:()=>({}),GROW_KEY:'test',busyRef:{current:false},setInventoryBusy:v=>{busy=v;},ASSET_BASE:'/test',acceptInventory(){},pick:()=>'',play(){},loadGrowth(){},prefsRef:{current:{playful:true}},t:s=>s});
@@ -142,7 +142,7 @@ test('care actions preserve the panel and serialize distinct rapid clicks withou
 test('uncertain care requests stop unsent clicks and reuse the receipt ID on explicit retry',async t=>{
  const {useCareActions}=await import('../lib/shared/client/use-care-actions.js');
  const saved=new Map(['fetch','sessionStorage','localStorage'].map(k=>[k,globalThis[k]]));t.after(()=>{for(const[k,v]of saved)v===undefined?delete globalThis[k]:globalThis[k]=v;});
- globalThis.sessionStorage={setItem(){},removeItem(){}};globalThis.localStorage={setItem(){}};
+ globalThis.sessionStorage={setItem(){},removeItem(){}};const storage=new Map();globalThis.localStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)};
  const ids=[];globalThis.fetch=async(_url,options)=>{ids.push(JSON.parse(options.body).requestId);throw Error('offline');};
  const G={migrate:()=>({satiety:100}),tick:n=>({state:n}),applyGain:n=>({state:n})};
  const pending={current:null};const actions=useCareActions({useCallback:fn=>fn,useRef:v=>({current:v}),useEffect(){},inventoryBusyRef:{current:false},GROWRef:{current:G},cfgRef:{current:{growth:{enabled:true,rates:{}},pools:{click:[]}}},closeOrb(){},speak(){},pendingResource:pending,readStore:()=>({}),GROW_KEY:'test',busyRef:{current:false},setInventoryBusy(){},ASSET_BASE:'/test',acceptInventory(){},pick:()=>'',play(){},loadGrowth(){},prefsRef:{current:{playful:true}},t:s=>s});

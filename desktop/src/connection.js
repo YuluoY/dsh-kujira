@@ -49,7 +49,7 @@ export function createConnection({ getSettings, onState, fetcher = fetch }) {
       },
     );
     if (!response.ok) throw Error("handoff-conflict");
-    return JSON.parse(await boundedText(response, 32768));
+    return JSON.parse(await boundedText(response, 192 * 1024));
   };
   const tick = () => {
     if (inflight) return inflight;

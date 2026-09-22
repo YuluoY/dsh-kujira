@@ -92,7 +92,7 @@ Rolls are independent and may miss, without a guaranteed fallback. A success fir
 
 Continuous use has no timed restriction. Requests serialize with up to 20 pending clicks; failures cancel unsent clicks and retries retain the original request ID. Animation playback coalesces repeated actions into at most one pending reaction.
 
-Local appearance changes apply immediately; storage writes debounce for 200 ms and flush on page exit. Settings use a consistent control column with units inside numeric inputs. See [installation](INSTALL.md) and [data handling](PRIVACY.md).
+Confirmed appearance, language, currency and menu-size edits persist immediately. The same browser site restores settings, weather city, growth and position. Desktop mode also backs up this data in desktop.json in its application user-data directory, restoring the newer record before showing the mascot. Each handoff snapshot is applied only once; browser and native desktop positions stay independent. Settings use a consistent control column with units inside numeric inputs. See [installation](INSTALL.md) and [data handling](PRIVACY.md).
 
 
 ### Appearance

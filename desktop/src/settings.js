@@ -80,25 +80,32 @@ export function normalizeSettings(input = {}, {strict=false} = {}) {
 export async function createSettings(file) {
   let value = { settings: { ...DEFAULTS }, position: null },
     queue = Promise.resolve();
-  try {
-    const saved = JSON.parse(await readFile(file, "utf8"));
-    value = { ...value, ...saved, settings: normalizeSettings(saved.settings) };
-  } catch (error) {
-    if (error.code !== "ENOENT")
-      console.warn(
-        "[kujira] Settings reset:",
-        error.code || "invalid-settings",
-      );
+  for (const path of [file, file + ".bak"]) {
+    try {
+      const saved = JSON.parse(await readFile(path, "utf8"));
+      if (!saved || typeof saved !== "object" || Array.isArray(saved)) throw Error("invalid-settings");
+      value = { ...value, ...saved, settings: normalizeSettings(saved.settings) };
+      break;
+    } catch (error) {
+      if (error.code !== "ENOENT") console.warn("[kujira] Settings recovery:", error.code || "invalid-settings");
+    }
   }
   const save = (patch) => {
-    value = { ...value, ...patch };
-    const body = JSON.stringify(value);
+    const captured = typeof patch === "function" ? patch : structuredClone(patch);
     const write = queue
       .catch(() => {})
       .then(async () => {
+        const change = typeof captured === "function" ? captured(value) : captured;
+        if (!change) return;
+        const next = { ...value, ...change };
+        const body = JSON.stringify(next);
+        if (body === JSON.stringify(value)) return;
         await mkdir(dirname(file), { recursive: true });
+        await writeFile(file + ".bak.tmp", JSON.stringify(value), { mode: 0o600 });
+        await rename(file + ".bak.tmp", file + ".bak");
         await writeFile(file + ".tmp", body, { mode: 0o600 });
         await rename(file + ".tmp", file);
+        value = next;
       });
     queue = write;
     return write;

@@ -10,7 +10,7 @@ The plugin does not upload conversations, credentials, inventory or account name
 | 参考汇率 / Exchange rates | 宿主按需向 api.frankfurter.dev 请求固定 CNY/USD/KRW/RUB 表；不发送金额、账户、地区偏好或密钥。服务可见宿主网络 IP。Host requests a fixed public rate table; no amounts, accounts, country preferences or credentials are sent. The provider sees the host network IP. |
 | 会话用量 / Usage | 本地计算当前会话及子代理费用。Local parent/subagent cost accounting. |
 | 库存 / Inventory | 宿主持久保存，使用已结算用量发放物品，不保存聊天正文。Persisted by the host; settlement-based rewards without transcript content. |
-| 称呼与外观 / Name and appearance | 自定义偏好在浏览器保存；系统账户名由 DSH 宿主提供，仅显示在界面。Browser preferences; the host account name is used only in the UI. |
+| 称呼与外观 / Name and appearance | 自定义偏好在浏览器站点存储保存；桌面端另存于应用用户数据目录的 desktop.json 及备份。系统账户名由 DSH 宿主提供，仅显示在界面。Browser site storage and a desktop-local settings file; the host account name is used only in the UI. |
 | 天气 / Weather | 查询城市；留空时可依据服务所在网络 IP 定位。City query, optionally IP-based location from the host's network. |
 | 价目同步 / Price sync | 默认关闭。启用后访问公开官网；模型辅助须单独开启，可能消耗额度。Off by default; optional paid model assistance has a separate switch. |
 

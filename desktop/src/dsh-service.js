@@ -107,8 +107,7 @@ export async function probeDsh(origin, fetcher = fetch) {
       }
       return { online: false, occupied: true };
     }
-    const body = await boundedText(response, 32768);
-    if (body.length > 32768) return { online: false, occupied: true };
+    const body = await boundedText(response, 192 * 1024);
     const data = JSON.parse(body);
     return data.product === "dsh-kujira" &&
       data.protocol === 1 &&

@@ -9,7 +9,9 @@ contextBridge.exposeInMainWorld(
   "kujiraDesktop",
   Object.freeze({
     status: () => invoke("status"),
+    readPreferences: () => invoke("read-preferences"),
     savePreferences: (value) => invoke("save-preferences", value),
+    preferencesFlushed: (id) => ipcRenderer.send("kujira:preferences-flushed", id),
     configure: (patch) => invoke("configure", patch),
     copySessionId: (id) => invoke("copy-session-id", id),
     navigate: (target) => invoke("navigate", target),
@@ -30,6 +32,7 @@ contextBridge.exposeInMainWorld(
     onPosition: (fn) => subscribe("position", fn),
     onPower: (fn) => subscribe("power", fn),
     onPreferences: (fn) => subscribe("preferences", fn),
+    onFlushPreferences: (fn) => subscribe("flush-preferences", fn),
     onDismiss: (fn) => subscribe("dismiss", fn),
     onPanel: (fn) => subscribe("panel", fn),
   }),

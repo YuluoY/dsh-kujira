@@ -14,10 +14,20 @@ export function createWindowController({ win, screen, store, capabilities }) {
     placed = false,
     lastPosition = "";
   const saved = store.get().position;
+  let savedPosition = JSON.stringify(saved);
   let pet =
     saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)
       ? { x: saved.x, y: saved.y }
       : null;
+  const persistPosition = () => {
+    const body = JSON.stringify(pet);
+    if (!pet || body === savedPosition || !store.save) return;
+    savedPosition = body;
+    store.save({ position: { ...pet } }).catch(() => {
+      savedPosition = "";
+      console.warn("[kujira] Position save failed");
+    });
+  };
   const chooseDisplay = () => {
     const mode = store.get().settings.display;
     if (mode === "cursor")
@@ -61,6 +71,7 @@ export function createWindowController({ win, screen, store, capabilities }) {
       win.webContents.send("kujira:position", layout.pet);
     lastPosition = position;
     placed = true;
+    persistPosition();
   };
   const setIgnored = (value) => {
     if (ignored === value) return;
@@ -170,12 +181,10 @@ export function createWindowController({ win, screen, store, capabilities }) {
     },
     end: () => {
       drag = null;
-      if (pet)
-        store
-          .save({ position: pet })
-          .catch(() => console.warn("[kujira] Position save failed"));
+      persistPosition();
     },
     dispose: () => {
+      persistPosition();
       disposed = true;
       clearTimeout(timer);
       for (const event of [

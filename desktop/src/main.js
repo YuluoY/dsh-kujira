@@ -30,6 +30,7 @@ import { createConnection } from "./connection.js";
 import { createProtocol } from "./protocol.js";
 import { createWindowController } from "./window-controller.js";
 import { setStartup } from "./startup.js";
+import { createPreferenceFlush, savePreferenceSnapshot } from "./preference-lifecycle.js";
 
 const desktopRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 if (process.env.KUJIRA_USER_DATA)
@@ -77,7 +78,7 @@ let win,
   connection,
   quitting = false,
   ready = false,
-  desktopHidden = false,
+  desktopHidden = store.get().displayMode === "browser",
   lastRevision = -1,
   pendingLink = null;
 console.info("[kujira] Starting native window");
@@ -87,6 +88,7 @@ if (!locked) {
 } else {
   const show = () => {
     desktopHidden = false;
+    store.save({ displayMode: "desktop" }).catch(() => console.warn("[kujira] Display mode save failed"));
     if (win) {
       capabilities.wayland ? win.show() : win.showInactive();
       connection?.activate();
@@ -204,24 +206,37 @@ if (!locked) {
           if (p && `${p.instance}:${p.revision}` !== lastRevision) {
             lastRevision = `${p.instance}:${p.revision}`;
             if (p.desired === "desktop") {
+              const wasHidden = desktopHidden;
               desktopHidden = false;
               capabilities.wayland ? win.show() : win.showInactive();
+              if (wasHidden) connection.activate();
+              store.save({ displayMode: "desktop" }).catch(() => console.warn("[kujira] Display mode save failed"));
             }
             if (
               p.desired === "desktop" &&
               p.preferences &&
-              p.preferencesRevision === p.revision
-            )
-              win.webContents.send("kujira:preferences", p.preferences);
+              p.preferencesRevision === p.revision &&
+              store.get().handoff !== lastRevision
+            ) {
+              const token = lastRevision;
+              const { __position, ...shared } = p.preferences;
+              const preferences = { ...shared, __position: store.get().preferences?.__position ?? null,
+                __updatedAt: Math.max(Date.now(), Number(shared.__updatedAt) || 0, Number(store.get().preferences?.__updatedAt) || 0) + 1 };
+              store.save({ preferences, handoff: token }).then(() => {
+                if (!win.isDestroyed() && lastRevision === token) win.webContents.send("kujira:preferences", preferences);
+              }).catch(() => console.warn("[kujira] Handoff preferences save failed"));
+            }
           }
           if (p?.desired === "browser" && p.browserReady && p.desktopActive) {
             win.hide();
             desktopHidden = true;
+            store.save({ displayMode: "browser" }).catch(() => console.warn("[kujira] Display mode save failed"));
             connection.standby();
           }
           publish();
         },
       });
+      if (desktopHidden) await connection.standby();
       protocol.handle(
         "kujira",
         createProtocol({
@@ -270,16 +285,12 @@ if (!locked) {
           return fn(...args);
         });
       handle("status", status);
+      handle("read-preferences", async () => { await store.flush(); return store.get().preferences || null; });
+      const preferenceFlush = createPreferenceFlush({ send: (id) => win.webContents.send("kujira:flush-preferences", id) });
+      ipcMain.on("kujira:preferences-flushed", (event, id) => { if (trusted(event)) preferenceFlush.acknowledge(id); });
       handle("save-preferences", async (value) => {
-        if (
-          !value ||
-          typeof value !== "object" ||
-          Array.isArray(value) ||
-          JSON.stringify(value).length > 16000
-        )
-          throw Error("invalid-preferences");
         const previousLocale = store.get().preferences?.appearance?.locale;
-        await store.save({ preferences: value });
+        if (!await savePreferenceSnapshot(store, value)) return;
         if (previousLocale !== value.appearance?.locale)
           await refreshLanguage();
       });
@@ -327,6 +338,7 @@ if (!locked) {
         return status();
       });
       handle("browser", async () => {
+        await preferenceFlush.flush();
         if (!(await openWeb()).success) throw Error("web-navigation-timeout");
         await connection.toBrowser(store.get().preferences);
         return status();
@@ -430,6 +442,9 @@ if (!locked) {
           event.preventDefault();
           desktopHidden = true;
           win.hide();
+        } else if (!quitting) {
+          event.preventDefault();
+          app.quit();
         }
       });
       win.webContents.on("render-process-gone", () => {
@@ -466,7 +481,7 @@ if (!locked) {
         event.preventDefault();
         quitting = true;
         controller.dispose();
-        Promise.allSettled([connection.dispose(), store.flush()]).finally(
+        preferenceFlush.flush().then(() => Promise.allSettled([connection.dispose(), store.flush()])).finally(
           () => {
             tray?.destroy();
             app.quit();

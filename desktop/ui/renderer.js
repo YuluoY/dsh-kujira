@@ -1,4 +1,6 @@
 import { orbHitRegion, surfaceHitRegion } from "./hit-regions.js";
+import { connectPreferencePersistence } from "./preference-persistence.js";
+import { captureLocalState, restoreLocalState } from "/dsh-kujira/shared/client/utilities.js";
 const { React, ReactDOM } = window;
 import {
   createClient,
@@ -172,35 +174,7 @@ window.addEventListener(
   },
   { passive: true },
 );
-api.onPreferences((value) => {
-  if (!value) return;
-  const { __growth, ...appearance } = value;
-  localStorage.setItem("dsh-kujira:settings", JSON.stringify(appearance));
-  if (__growth)
-    localStorage.setItem("dsh-kujira:growth", JSON.stringify(__growth));
-  window.dispatchEvent(new Event("kujira:preferences"));
-});
-
-let preferencesTimer;
-const savePreferences = () => {
-  clearTimeout(preferencesTimer);
-  preferencesTimer = setTimeout(() => {
-    try {
-      api
-        .savePreferences({
-          ...JSON.parse(localStorage.getItem("dsh-kujira:settings") || "{}"),
-          __growth: JSON.parse(
-            localStorage.getItem("dsh-kujira:growth") || "null",
-          ),
-        })
-        .catch(() => {});
-    } catch {
-      /* Invalid local data is not synchronized. */
-    }
-  }, 300);
-};
-window.addEventListener("kujira:preferences", savePreferences);
-window.addEventListener("pagehide", savePreferences);
+await connectPreferencePersistence({ api, capture: captureLocalState, restore: restoreLocalState });
 await prepareClient();
 const client = createClient(React),
   h = React.createElement;
@@ -209,7 +183,6 @@ function Ready() {
   if (nativePosition) applyPosition(nativePosition);
   if (initial) {
     initial = false;
-    savePreferences();
     document.getElementById("startup").textContent = "";
     api.ready().catch(() => {});
   }

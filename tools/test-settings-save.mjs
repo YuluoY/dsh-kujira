@@ -35,20 +35,20 @@ test('numeric units stay inside the control and preserve an accessible formatted
  assert.equal(field.children.length,3);assert.equal(field.children[0].type,'button');assert.equal(field.children[2].type,'button');
  const middle=field.children[1];assert.equal(middle.props.className,'kj-number-value');assert.equal(middle.children[0].children[0],'¥');assert(middle.children[1].props['aria-valuetext'].includes('¥'));
 });
-test('appearance edits react immediately while persistence is debounced and flushed on exit',async t=>{
- const {createPreferences}=await import('../lib/shared/client/preferences.js');const previous=new Map(['window','navigator','matchMedia','setTimeout','clearTimeout'].map(k=>[k,Object.getOwnPropertyDescriptor(globalThis,k)]));
+test('confirmed appearance edits persist synchronously before handoff or immediate close',async t=>{
+ const {createPreferences}=await import('../lib/shared/client/preferences.js');const previous=new Map(['window','navigator','matchMedia'].map(k=>[k,Object.getOwnPropertyDescriptor(globalThis,k)]));
  t.after(()=>{for(const [k,v]of previous)v?Object.defineProperty(globalThis,k,v):delete globalThis[k];});
- let timer,writes=0,stored={};const listeners=new Map();
+ let writes=0,stored={city:'Shanghai'};const listeners=new Map();
  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{languages:['en'],language:'en'}});
  globalThis.window={addEventListener:(k,fn)=>listeners.set(k,fn),removeEventListener(){},dispatchEvent:e=>listeners.get(e.type)?.()};globalThis.matchMedia=()=>({matches:false,addEventListener(){},removeEventListener(){}});
- globalThis.setTimeout=fn=>{timer=fn;return 1;};globalThis.clearTimeout=()=>{timer=null;};
- const values=[],cleanups=[];const {usePreferences}=createPreferences({readStore:()=>stored,SET_KEY:'test',useState:value=>[typeof value==='function'?value():value,v=>values.push(v)],I18N:{configure:()=> 'en'},useEffect:fn=>cleanups.push(fn()),writeStore:(_k,v)=>{writes++;stored=v;}});
- const p=usePreferences();p.update({size:200});p.update({size:220});assert.equal(writes,0);assert(values.some(v=>v?.size===220));timer();assert.equal(writes,1);assert.equal(stored.appearance.size,220);
- p.update({opacity:80});listeners.get('pagehide')();assert.equal(writes,2);assert.equal(stored.appearance.opacity,80);
- p.update({displayCurrency:'USD',weatherRegion:'global'});p.update({locale:'zh-CN'});timer();
+ const values=[],cleanups=[];const {usePreferences,readPrefs}=createPreferences({readStore:()=>stored,SET_KEY:'test',useState:value=>[typeof value==='function'?value():value,v=>values.push(v)],I18N:{configure:()=> 'en'},useEffect:fn=>cleanups.push(fn()),writeStore:(_k,v)=>{writes++;stored=v;}});
+ const p=usePreferences();p.update({size:200});p.update({size:220});assert.equal(writes,2);assert.equal(stored.appearance.size,220);assert.equal(stored.city,'Shanghai');assert(values.some(v=>v?.size===220));
+ p.update({opacity:80});assert.equal(stored.appearance.opacity,80);assert.equal(readPrefs().opacity,80);
+ p.update({displayCurrency:'USD',weatherRegion:'global'});p.update({locale:'zh-CN'});
  assert.equal(stored.appearance.displayCurrency,'USD');assert.equal(stored.appearance.weatherRegion,'global');assert.equal(stored.appearance.locale,'zh-CN');
- p.update({weatherRegion:'cn'});timer();assert.equal(stored.appearance.locale,'zh-CN');assert.equal(stored.appearance.displayCurrency,'USD');
- cleanups.forEach(fn=>fn?.());
+ p.update({weatherRegion:'cn'});assert.equal(stored.appearance.locale,'zh-CN');assert.equal(stored.appearance.displayCurrency,'USD');
+ const before=writes;p.update({weatherRegion:'cn'});assert.equal(writes,before);
+ cleanups.forEach(fn=>fn?.());assert.equal(stored.appearance.size,220);
 });
 
 test('automatic appearance follows live DSH palette, preserves overrides and releases observers',async t=>{
