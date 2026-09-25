@@ -120,6 +120,6 @@ test('open DSH shows a live state whenever a local service is already up',async(
  const offline=find(renderOrbs(base).orbs,n=>n.type==='button');
  assert.equal(offline.props['data-live'],'0');assert.equal(offline.props['aria-label'],'打开 DSH');
  const online=find(renderOrbs({...base,dshOnline:true}).orbs,n=>n.type==='button');
- assert.equal(online.props['data-live'],'1');assert.equal(online.props['aria-label'],'打开 DSH（DSH 已连接）');
+ assert.equal(online.props['data-live'],'1');assert.equal(online.props['aria-label'],'已连接');assert.equal(online.props['data-tooltip'],'已连接');
  assert.equal(find(renderOrbs({...base,dshOnline:true}).orbs,n=>n.props.className==='kj-orb-live').type,'span');
 });
