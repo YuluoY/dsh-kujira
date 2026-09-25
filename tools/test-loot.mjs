@@ -77,3 +77,12 @@ test('replaying the same rules is idempotent and changing peak bonus never chang
  list=[...list,{...list[1],seq:2,time:peak+1,data:{...list[1].data,step:2}}];
  const bonus=await wallet.observe(session);assert.equal(bonus.credited,.5);assert.equal(bonus.attempts,7);
 });
+test('drop ring hover stays short and the click panel lists only the facts',async()=>{
+ const {supplyFacts}=await import('../lib/shared/client/reward-scatter.js');
+ const t=(s,vars)=>vars?s.replace(/\{(\w+)\}/g,(_,k)=>vars[k]):s, money=(n)=>'¥'+n, number=(n,options)=>options?.style==='percent'?Math.round(n*100)+'%':String(n);
+ const idle=supplyFacts(null,{t,money,number});
+ assert.equal(idle.tooltip,'正在读取');assert.deepEqual(idle.rows,[]);
+ const live=supplyFacts({ok:true,remaining:0.04,drops:3,rewardMultiplier:2,rules:{chance:25,min:1,max:3}},{t,money,number});
+ assert.equal(live.tooltip,'再 ¥0.04');
+ assert.deepEqual(live.rows,[['距下次判定','¥0.04'],['已掉落','3'],['判定','25% · 1–3'],['峰价','双倍']]);
+});
