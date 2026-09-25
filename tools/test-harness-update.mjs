@@ -17,6 +17,7 @@ async function fixture(t, extra={}) {
   const directory=await mkdtemp(join(tmpdir(),'kujira-updater-'));
   let clock=1000000000,calls=0,runs=0,active=0;
   const options={directory,lockDirectory:directory,now:()=>clock,detect:async()=>({...installation}),verify:async()=>tags.alpha,activeTasks:()=>active,
+    inspect:async()=>({packages:[],issues:[]}),prepare:async()=>[],
     fetch:async (url,init)=>{calls++;assert.equal(init.headers.Accept,"application/json");return new Response(JSON.stringify(url.endsWith('dist-tags')?tags:metadata));},run:async()=>{runs++;},...extra};
   const service=createHarnessUpdater(options);
   t.after(async()=>{service.dispose();await service.settled();await rm(directory,{recursive:true,force:true});});
@@ -123,6 +124,10 @@ test('update UI exposes exact target, disabled running-task state and restart co
   assert(walk(render(base)).some(node=>node.type==='button'&&node.children.includes('安装 '+tags.alpha)&&!node.props.disabled));
   assert(walk(render({...base,activeTasks:1,canInstall:false})).some(node=>node.type==='button'&&node.children.includes('安装 '+tags.alpha)&&node.props.disabled));
   assert(walk(render({...base,restartRequired:true,installed:tags.alpha})).some(node=>node.children.includes('已安装 '+tags.alpha+'，重启 DSH 后生效')));
+  const broken=render({...base,available:false,needsRepair:true,canRepair:true,restartRequired:true,installed:tags.alpha});
+  assert(walk(broken).some(node=>node.type==='button'&&node.children.includes('修复当前版本')&&!node.props.disabled));
+  assert(walk(broken).some(node=>node.children.includes('DSH 组件版本不一致，需要修复')));
+  assert(!walk(broken).some(node=>node.children.includes('已安装 '+tags.alpha+'，重启 DSH 后生效')));
 });
 
 test('new requests wait for installation and cancelled requests never restart',async t=>{
@@ -159,4 +164,69 @@ test('version list failure keeps the existing catalogue and cannot authorize arb
  const f=await fixture(t,{fetch:async()=>new Response(JSON.stringify({name:'not-dsh',versions:{'9.0.0':{}}}))});
  await f.service.listVersions();assert.equal(f.service.status().error,'versions-failed');assert.deepEqual(f.service.status().versions,[]);
  await assert.rejects(f.service.install('9.0.0',{selected:true}));assert.equal(f.runs(),0);
+});
+
+test('coordinated update verifies dependency health before recording success',async t=>{
+ const peer='@deepseek-ai/dsh-session-title-llm';let healthy=false;
+ const f=await fixture(t,{prepare:async()=>[peer],inspect:async()=>({packages:[],issues:healthy?[]:[{name:peer,version:'0.1.5-rc.2'}]}),
+  run:async command=>{assert(command.args.includes(peer+'@'+tags.alpha));healthy=true;}});
+ assert.equal(f.service.status().needsRepair,true);
+ await f.service.check();await f.service.install(tags.alpha);await f.service.settled();
+ assert.equal(f.service.status().error,'');assert.equal(f.service.status().needsRepair,false);
+ assert.deepEqual(f.service.status().previousVersions,[installation.installed]);
+});
+
+test('a newer main package with an old peer is a failed update and remains repairable',async t=>{
+ const issues=[{name:'@deepseek-ai/dsh-session-title-llm',version:'0.1.5-rc.2'}];
+ const f=await fixture(t,{inspect:async()=>({packages:[],issues})});
+ await f.service.check();await f.service.install(tags.alpha);await f.service.settled();
+ assert.equal(f.service.status().error,'dependency-verify-failed');
+ assert.equal(f.service.status().installed,tags.alpha);assert.equal(f.service.status().needsRepair,true);
+ assert.equal(f.service.status().canRepair,true);assert.deepEqual(f.service.status().previousVersions,[]);
+});
+
+test('same-version repair runs without a version upgrade and still requires restart',async t=>{
+ let healthy=false;
+ const f=await fixture(t,{detect:async()=>({...installation,current:tags.alpha,installed:tags.alpha}),
+  inspect:async()=>({packages:[],issues:healthy?[]:[{name:'@deepseek-ai/dsh-session-title-llm',version:'0.1.5-rc.2'}]}),
+  run:async()=>{healthy=true;}});
+ f.active(1);await assert.rejects(f.service.install(tags.alpha,{repair:true}),/update-not-ready/);f.active(0);
+ await f.service.install(tags.alpha,{repair:true});await f.service.settled();
+ assert.equal(f.service.status().needsRepair,false);assert.equal(f.service.status().restartRequired,true);
+ assert.deepEqual(f.service.status().previousVersions,[]);
+ await assert.rejects(f.service.install(tags.alpha,{repair:true}),/update-not-ready/);
+});
+
+test('unavailable coordinated release is rejected before installation',async t=>{
+ const f=await fixture(t,{prepare:async()=>{throw Error('dependency-release-unavailable');}});
+ await f.service.check();await f.service.install(tags.alpha);await f.service.settled();
+ assert.equal(f.runs(),0);assert.equal(f.service.status().error,'dependency-release-unavailable');
+});
+
+test('newly exposed old implicit peers are reconciled once before successful completion',async t=>{
+ let runs=0;const peer='@deepseek-ai/dsh-ptc-runtime';
+ const f=await fixture(t,{prepare:async()=>runs?[peer]:[],
+ inspect:async()=>({packages:[],issues:runs===1?[{name:peer,version:installation.installed}]:[]}),
+ run:async command=>{runs++;if(runs===2)assert(command.args.includes(peer+'@'+tags.alpha));}});
+ await f.service.check();await f.service.install(tags.alpha);await f.service.settled();
+ assert.equal(runs,2);assert.equal(f.service.status().error,'');assert.equal(f.service.status().needsRepair,false);
+});
+
+test('repair route uses the server-owned current version and refuses supplied targets',async()=>{
+ const calls=[];const updater={ready:Promise.resolve(),status:()=>({installed:tags.alpha}),install:async(...args)=>{calls.push(args);return {ok:true};}};
+ const res=response();await handleHarnessUpdate(request({action:'repair'}),res,updater);
+ assert.equal(res.code,200);assert.deepEqual(calls,[[tags.alpha,{repair:true}]]);
+ const invalid=response();await handleHarnessUpdate(request({action:'repair',version:'9.0.0'}),invalid,updater);
+ assert.equal(invalid.code,400);assert.equal(calls.length,1);
+});
+
+test('failed same-version repair tracks changed dependencies and can retry before restart',async t=>{
+ let runs=0,detects=0;
+ const f=await fixture(t,{detect:async()=>{detects++;return {...installation,current:tags.alpha,installed:tags.alpha};},
+ inspect:async()=>({packages:[],issues:runs<2?[{name:'@deepseek-ai/dsh-session-title-llm',version:'0.1.5-rc.2'}]:[]}),
+ run:async()=>{runs++;}});
+ await f.service.install(tags.alpha,{repair:true});await f.service.settled();
+ assert.equal(f.service.status().error,'dependency-verify-failed');assert.equal(f.service.status().restartRequired,true);
+ await f.service.install(tags.alpha,{repair:true});await f.service.settled();
+ assert.equal(runs,2);assert.equal(detects,2);assert.equal(f.service.status().error,'');
 });

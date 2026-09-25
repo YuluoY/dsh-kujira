@@ -27,3 +27,8 @@ output/
 # Transactional inventory files
 inventory.sqlite
 inventory.sqlite-*
+
+# Local mail helper and browser dumps
+mail_helper.py
+.mail-config.example.json
+.playwright-cli/
