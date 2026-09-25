@@ -82,6 +82,24 @@
   border-color: var(--kj-orb-on-line, #4a3f35);
   color: #fffdf8;
 }
+
+.dsh-kujira-root[data-orb="1"] .dsh-kujira-orb[data-live="1"] {
+  border-color: var(--kj-accent);
+  box-shadow:
+    0 0 0 2px var(--kj-accent-soft),
+    0 3px 10px rgb(20 14 8 / 34%);
+}
+
+.dsh-kujira-root .kj-orb-live {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 7px;
+  height: 7px;
+  border: 2px solid #fffdf8;
+  border-radius: 50%;
+  background: var(--kj-accent);
+}
 .dsh-kujira-orb:focus-visible {
   outline: 2px solid rgb(107 90 72 / 90%);
   outline-offset: 2px;

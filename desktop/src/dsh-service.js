@@ -1,8 +1,8 @@
 import { boundedText } from "./http.js";
-import { spawn } from "node:child_process";
-import { access, stat } from "node:fs/promises";
+import { spawn, execFile } from "node:child_process";
+import { access, mkdir, readFile, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { constants } from "node:fs";
-import { win32, posix } from "node:path";
+import { win32, posix, dirname } from "node:path";
 import { homedir } from "node:os";
 import { localOrigin } from "./settings.js";
 
@@ -126,7 +126,70 @@ export async function probeDsh(origin, fetcher = fetch) {
 }
 
 /**
- * @description Coalesce explicit starts; never stop a DSH process when the pet exits.
+ * @description Stop only after a registered browser tab has actually disappeared.
+ * @param {number} previousCount Browser tabs seen on the previous presence snapshot.
+ * @param {number} nextCount Browser tabs seen now.
+ * @returns {boolean} Whether an owned service should be released.
+ */
+export function shouldReleaseOwnedService(previousCount, nextCount) {
+  return previousCount > 0 && nextCount === 0;
+}
+
+/**
+ * @description Read a previously recorded spawn without adopting a foreign service.
+ */
+function parseOwnership(body) {
+  const data = JSON.parse(body);
+  if (
+    !data ||
+    typeof data !== "object" ||
+    !Number.isInteger(data.pid) ||
+    data.pid <= 0 ||
+    typeof data.instance !== "string" ||
+    !data.instance ||
+    data.instance.length > 80 ||
+    typeof data.origin !== "string" ||
+    typeof data.profile !== "string" ||
+    !Number.isInteger(data.startedAt)
+  )
+    return null;
+  return {
+    pid: data.pid,
+    instance: data.instance,
+    origin: localOrigin(data.origin),
+    profile: data.profile,
+    startedAt: data.startedAt,
+  };
+}
+
+/**
+ * @description End one process tree without a shell. Unix targets the detached process group.
+ */
+export async function terminateProcessTree(pid, { force = false, platform = process.platform, exec = execFile, signal = process.kill } = {}) {
+  if (!Number.isInteger(pid) || pid <= 0) throw Error("invalid-pid");
+  if (platform === "win32") {
+    const args = ["/PID", String(pid), "/T"];
+    if (force) args.push("/F");
+    await new Promise((resolve, reject) => {
+      exec("taskkill", args, { windowsHide: true, shell: false }, (error) => error && error.code !== 128 ? reject(error) : resolve());
+    });
+    return;
+  }
+  const name = force ? "SIGKILL" : "SIGTERM";
+  try {
+    signal(-pid, name);
+  } catch (error) {
+    if (error.code !== "ESRCH") throw error;
+    try {
+      signal(pid, name);
+    } catch (again) {
+      if (again.code !== "ESRCH") throw again;
+    }
+  }
+}
+
+/**
+ * @description Coalesce explicit starts and remember only the process this pet spawned.
  */
 export function createDshService({
   getSettings,
@@ -136,11 +199,52 @@ export function createDshService({
   resolveExecutable = findExecutable,
   platform = process.platform,
   env = process.env,
+  ownershipFile = "",
+  terminate = terminateProcessTree,
+  processAlive = (pid) => {
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch (error) {
+      return error.code === "EPERM";
+    }
+  },
+  sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  stopTimeout = 5000,
+  now = Date.now,
+  fs = { mkdir, readFile, rename, unlink, writeFile },
 }) {
-  let pending, opening;
+  let pending, opening, stopping, record = null;
+  const load = ownershipFile
+    ? fs.readFile(ownershipFile, "utf8").then((body) => {
+        record = parseOwnership(body);
+      }).catch(() => {
+        record = null;
+      })
+    : Promise.resolve();
+  const remember = async (next) => {
+    record = next;
+    if (!ownershipFile || !next) return;
+    await fs.mkdir(dirname(ownershipFile), { recursive: true });
+    const temporary = ownershipFile + ".tmp";
+    await fs.writeFile(temporary, JSON.stringify(next), { mode: 0o600 });
+    await fs.rename(temporary, ownershipFile);
+  };
+  const forget = async () => {
+    record = null;
+    if (!ownershipFile) return;
+    await fs.unlink(ownershipFile).catch((error) => {
+      if (error.code !== "ENOENT") throw error;
+    });
+  };
+  const matchesSettings = (value, settings) =>
+    value &&
+    value.origin === localOrigin(settings.dshUrl) &&
+    value.profile === settings.profile;
   const ensureRunning = () => {
     if (pending) return pending;
     pending = (async () => {
+      await load;
       const settings = { ...getSettings() };
       const initial = await probeDsh(settings.dshUrl, fetcher);
       if (initial.online || initial.legacy) {
@@ -172,10 +276,19 @@ export function createDshService({
         failed = true;
       });
       child.unref();
-      const deadline = Date.now() + 30000;
-      while (Date.now() < deadline && !failed) {
-        await new Promise((resolve) => setTimeout(resolve, 700));
+      const deadline = now() + 30000;
+      while (now() < deadline && !failed) {
+        await sleep(700);
         const result = await probeDsh(settings.dshUrl, fetcher);
+        if (result.online && result.presence?.instance && Number.isInteger(child.pid) && child.pid > 0) {
+          await remember({
+            pid: child.pid,
+            instance: result.presence.instance,
+            origin: localOrigin(settings.dshUrl),
+            profile: settings.profile,
+            startedAt: now(),
+          });
+        }
         if (result.online || result.legacy) return result;
       }
       throw Error(failed ? "dsh-start-failed" : "dsh-start-timeout");
@@ -190,5 +303,57 @@ export function createDshService({
     opening = ensureRunning().then(() => openUrl(origin)).finally(() => { opening = null; });
     return opening;
   };
-  return { ensureRunning, openWeb, isStarting: () => !!pending || !!opening };
+  const owns = (snapshot) => {
+    const settings = getSettings();
+    return !!(
+      snapshot?.online &&
+      matchesSettings(record, settings) &&
+      snapshot.presence?.instance === record.instance
+    );
+  };
+  const stopOwned = () => {
+    if (stopping) return stopping;
+    stopping = (async () => {
+      await load;
+      const settings = { ...getSettings() };
+      const owned = record;
+      if (!matchesSettings(owned, settings)) {
+        if (owned) await forget();
+        return { stopped: false, reason: owned ? "stale" : "not-owned" };
+      }
+      const probe = await probeDsh(settings.dshUrl, fetcher);
+      if (!probe.online || probe.presence?.instance !== owned.instance) {
+        await forget();
+        return { stopped: false, reason: probe.online ? "instance-mismatch" : "offline" };
+      }
+      if (!processAlive(owned.pid)) {
+        await forget();
+        return { stopped: false, reason: "process-gone" };
+      }
+      await terminate(owned.pid, { force: false, platform });
+      const deadline = now() + stopTimeout;
+      let current = probe;
+      while (now() < deadline) {
+        await sleep(200);
+        current = await probeDsh(settings.dshUrl, fetcher);
+        if (!current.online || current.presence?.instance !== owned.instance) break;
+      }
+      if (current.online && current.presence?.instance === owned.instance)
+        await terminate(owned.pid, { force: true, platform });
+      await forget();
+      return { stopped: true };
+    })().finally(() => {
+      stopping = null;
+    });
+    return stopping;
+  };
+  return {
+    ensureRunning,
+    openWeb,
+    owns,
+    stopOwned,
+    ready: load,
+    ownership: () => record,
+    isStarting: () => !!pending || !!opening,
+  };
 }

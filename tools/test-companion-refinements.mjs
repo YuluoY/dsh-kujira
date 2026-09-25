@@ -113,3 +113,13 @@ test('radial inventory badge caps visual count while preserving the full accessi
  assert.equal(find(result.orbs,n=>n.props.className==='kj-stock-badge').children[0],'99+');
  assert(button.props['aria-label'].includes('123456'));assert(button.props['data-tooltip'].includes('123456'));
 });
+
+test('open DSH shows a live state whenever a local service is already up',async()=>{
+ const {renderOrbs}=await import('../lib/shared/client/render-orbs.js');const f=harness();
+ const base={h:f.h,cfg:{ui:{buttons:true,arc:{},buttonSide:'left'}},orbGeomRef:{current:{slots:[{x:0,y:0}],labels:[],inDelays:[],outDelays:[]}},FEATURE_REGISTRY:[{key:'desktop-open',label:'打开 DSH',kind:'action'}],lastPanelRef:{current:null},page:0,t:s=>s,ICONS:{},visibleCountRef:{current:0},orbOpen:true,ARCRef:{current:null}};
+ const offline=find(renderOrbs(base).orbs,n=>n.type==='button');
+ assert.equal(offline.props['data-live'],'0');assert.equal(offline.props['aria-label'],'打开 DSH');
+ const online=find(renderOrbs({...base,dshOnline:true}).orbs,n=>n.type==='button');
+ assert.equal(online.props['data-live'],'1');assert.equal(online.props['aria-label'],'打开 DSH（DSH 已连接）');
+ assert.equal(find(renderOrbs({...base,dshOnline:true}).orbs,n=>n.props.className==='kj-orb-live').type,'span');
+});

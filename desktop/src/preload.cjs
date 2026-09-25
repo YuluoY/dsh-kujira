@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld(
     copySessionId: (id) => invoke("copy-session-id", id),
     navigate: (target) => invoke("navigate", target),
     openDsh: () => invoke("open-dsh"),
+    stopDsh: () => invoke("stop-dsh"),
     browser: () => invoke("browser"),
     chooseExecutable: () => invoke("choose-executable"),
     resetPosition: () => invoke("reset-position"),

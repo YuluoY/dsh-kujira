@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,readFile,rm} from 'node:fs/promises';
+import {mkdtemp,readFile,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createDesktopPresence} from '../lib/host/desktop-presence.js';
 import {DEFAULTS,normalizeSettings,localOrigin,platformCapabilities,createSettings} from '../desktop/src/settings.js';
-import {launchCommand,createDshService,probeDsh} from '../desktop/src/dsh-service.js';
+import {launchCommand,createDshService,probeDsh,shouldReleaseOwnedService,terminateProcessTree} from '../desktop/src/dsh-service.js';
 import {windowPlacement} from '../desktop/src/window-layout.js';
 import {createProtocol} from '../desktop/src/protocol.js';
 import {boundedText,createConnection} from '../desktop/src/connection.js';
@@ -122,6 +122,51 @@ test('on-demand startup launches one detached service without shell or output pi
  await Promise.all([service.openWeb(),service.openWeb()]);assert.equal(spawned,1);assert.equal(opened,1);
 });
 
+test('browser count releases an owned service only when the last registered page disappears',()=>{
+ assert.equal(shouldReleaseOwnedService(0,0),false);
+ assert.equal(shouldReleaseOwnedService(0,1),false);
+ assert.equal(shouldReleaseOwnedService(2,1),false);
+ assert.equal(shouldReleaseOwnedService(1,0),true);
+});
+test('an already running DSH is not recorded as owned',async t=>{
+ const dir=await mkdtemp(join(tmpdir(),'kujira-owned-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+ let spawned=0;const service=createDshService({getSettings:()=>DEFAULTS,openUrl:async()=>{},ownershipFile:join(dir,'dsh-owned.json'),fetcher:async()=>Response.json({product:'dsh-kujira',protocol:1,instance:'external'}),spawnProcess:()=>{spawned++;}});
+ await service.ready;await service.openWeb();assert.equal(spawned,0);assert.equal(service.ownership(),null);
+ assert.equal(service.owns({online:true,presence:{instance:'external'}}),false);
+});
+test('on-demand start records the spawned pid and reloads that ownership',async t=>{
+ const dir=await mkdtemp(join(tmpdir(),'kujira-owned-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+ const file=join(dir,'dsh-owned.json');let probes=0;
+ const service=createDshService({getSettings:()=>DEFAULTS,openUrl:async()=>{},ownershipFile:file,sleep:async()=>{},now:()=>1700000000000,resolveExecutable:async()=>'/installed/dsh',fetcher:async()=>{
+  if(probes++===0)throw Object.assign(Error('offline'),{cause:{code:'ECONNREFUSED'}});
+  return Response.json({product:'dsh-kujira',protocol:1,instance:'owned-1'});
+ },spawnProcess:()=>({pid:4242,once(){return this;},unref(){}})});
+ await service.openWeb();assert.equal(service.ownership().pid,4242);assert.equal(service.ownership().instance,'owned-1');
+ assert.equal(JSON.parse(await readFile(file,'utf8')).profile,'web');
+ const again=createDshService({getSettings:()=>DEFAULTS,openUrl:async()=>{},ownershipFile:file,fetcher:async()=>Response.json({product:'dsh-kujira',protocol:1,instance:'owned-1'})});
+ await again.ready;assert.equal(again.owns({online:true,presence:{instance:'owned-1'}}),true);
+});
+test('a replaced instance is not signalled and a matching pid is',async t=>{
+ const dir=await mkdtemp(join(tmpdir(),'kujira-owned-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+ const file=join(dir,'dsh-owned.json');
+ const record={pid:4242,instance:'owned-1',origin:DEFAULTS.dshUrl,profile:'web',startedAt:1};
+ await writeFile(file,JSON.stringify(record));
+ const signals=[];const replaced=createDshService({getSettings:()=>DEFAULTS,openUrl:async()=>{},ownershipFile:file,processAlive:()=>true,terminate:async pid=>{signals.push(pid);},fetcher:async()=>Response.json({product:'dsh-kujira',protocol:1,instance:'other'})});
+ await replaced.ready;assert.deepEqual(await replaced.stopOwned(),{stopped:false,reason:'instance-mismatch'});assert.deepEqual(signals,[]);
+ await writeFile(file,JSON.stringify(record));let probes=0;
+ const matched=createDshService({getSettings:()=>DEFAULTS,openUrl:async()=>{},ownershipFile:file,processAlive:()=>true,stopTimeout:1000,sleep:async()=>{},now:()=>100,terminate:async pid=>{signals.push(pid);},fetcher:async()=>{
+  probes++;return probes<2?Response.json({product:'dsh-kujira',protocol:1,instance:'owned-1'}):Promise.reject(Object.assign(Error('offline'),{cause:{code:'ECONNREFUSED'}}));
+ }});
+ await matched.ready;assert.equal(shouldReleaseOwnedService(0,0)&&matched.owns({online:true,presence:{instance:'owned-1'}}),false);
+ assert.equal(shouldReleaseOwnedService(1,0)&&matched.owns({online:true,presence:{instance:'owned-1'}}),true);
+ assert.deepEqual(await matched.stopOwned(),{stopped:true});assert.deepEqual(signals,[4242]);
+});
+test('terminate targets the unix process group and the windows process tree without a shell',async()=>{
+ const signals=[];await terminateProcessTree(12,{platform:'darwin',signal:(pid,name)=>signals.push([pid,name])});
+ assert.deepEqual(signals,[[-12,'SIGTERM']]);
+ const commands=[];await terminateProcessTree(12,{force:true,platform:'win32',exec:(file,args,options,callback)=>{commands.push([file,args,options.shell]);callback(null);}});
+ assert.deepEqual(commands,[['taskkill',['/PID','12','/T','/F'],false]]);
+});
 test('connect-only mode never starts a missing service',async()=>{
  const service=createDshService({getSettings:()=>({...DEFAULTS,startDsh:'never'}),openUrl:()=>{throw Error('must not open');},fetcher:async()=>{throw Object.assign(Error('offline'),{cause:{code:'ECONNREFUSED'}});},spawnProcess:()=>{throw Error('must not spawn');}});
  await assert.rejects(service.openWeb(),/dsh-offline/);

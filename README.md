@@ -35,7 +35,7 @@
 在任意目录执行这一行，macOS、Linux 和 Windows 通用：
 
 ```sh
-dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.2.3/dsh-kujira-0.2.3.tgz
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.2.4/dsh-kujira-0.2.4.tgz
 ```
 
 DSH 自动下载、安装并注册插件，无需 Git、手动解压或进入项目目录。等正在执行的会话完成后，正常重启 DSH Web 并刷新页面。命令固定到明确版本；升级时使用新版发布包地址。
@@ -59,7 +59,7 @@ dsh plugin --profile web remove dsh-kujira
 
 ## 🖥️ 可选桌面模式（预览版）
 
-桌面应用可独立运行，通过人物菜单打开本机 DSH；插件安装方式不变，桌面运行环境单独安装。外观与本地养成快照在浏览器/桌面两端同步；库存、奖励及调度仍由 DSH 服务负责，离线不伪造交易。平台边界、默认配置与构建方法见[桌面模式文档](docs/DESKTOP.md)。可选桌面预览包见 [v0.2.3 Release](https://github.com/YuluoY/dsh-kujira/releases/tag/v0.2.3) 附件；这些预览包未签名。
+桌面应用可独立运行，通过人物菜单打开本机 DSH；插件安装方式不变，桌面运行环境单独安装。外观与本地养成快照在浏览器/桌面两端同步；库存、奖励及调度仍由 DSH 服务负责，离线不伪造交易。平台边界、默认配置与构建方法见[桌面模式文档](docs/DESKTOP.md)。可选桌面预览包见 [v0.2.4 Release](https://github.com/YuluoY/dsh-kujira/releases/tag/v0.2.4) 附件；这些预览包未签名。
 
 ## 🛠️ 开发
 

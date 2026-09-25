@@ -25,7 +25,7 @@ import {
   platformCapabilities,
   localOrigin,
 } from "./settings.js";
-import { createDshService } from "./dsh-service.js";
+import { createDshService, shouldReleaseOwnedService } from "./dsh-service.js";
 import { createConnection } from "./connection.js";
 import { createProtocol } from "./protocol.js";
 import { createWindowController } from "./window-controller.js";
@@ -80,7 +80,9 @@ let win,
   ready = false,
   desktopHidden = store.get().displayMode === "browser",
   lastRevision = -1,
-  pendingLink = null;
+  pendingLink = null,
+  service = null,
+  browserCount = 0;
 console.info("[kujira] Starting native window");
 const locked = app.requestSingleInstanceLock();
 if (!locked) {
@@ -177,6 +179,7 @@ if (!locked) {
           connection?.snapshot().presence?.browserSessionId || null,
         navigationAvailable:
           connection?.snapshot().presence?.browserCount !== undefined,
+        dshOwned: service?.owns(connection?.snapshot()) || false,
         theme: nativeTheme.shouldUseDarkColors ? "dark" : "light",
       });
       const publish = () => {
@@ -233,6 +236,12 @@ if (!locked) {
             store.save({ displayMode: "browser" }).catch(() => console.warn("[kujira] Display mode save failed"));
             connection.standby();
           }
+          if (state.online && state.presence) {
+            const nextCount = state.presence.browserCount || 0;
+            if (shouldReleaseOwnedService(browserCount, nextCount) && service?.owns(state))
+              service.stopOwned().then(() => { publish(); rebuildTrayMenu(); }).catch((error) => console.warn("[kujira] Owned DSH stop failed:", error.message));
+            browserCount = nextCount;
+          }
           publish();
         },
       });
@@ -272,10 +281,12 @@ if (!locked) {
           openExternal(url).catch(() => {});
         }
       });
-      const service = createDshService({
+      service = createDshService({
         getSettings: settings,
         openUrl: (url) => shell.openExternal(url),
+        ownershipFile: join(app.getPath("userData"), "dsh-owned.json"),
       });
+      await service.ready;
       const trusted = (event) =>
         event.sender === win.webContents &&
         event.senderFrame?.url?.startsWith("kujira://app/");
@@ -314,8 +325,11 @@ if (!locked) {
         if (
           next.dshUrl !== previous.dshUrl ||
           next.profile !== previous.profile
-        )
+        ) {
+          await service.stopOwned();
           connection.tick();
+          rebuildTrayMenu();
+        }
         return status();
       });
       handle("copy-session-id", (id) => {
@@ -369,6 +383,22 @@ if (!locked) {
         desktopHidden = true;
         win.hide();
       });
+      const confirmStop = async () => {
+        const answer = await dialog.showMessageBox(win, {
+          type: "question",
+          buttons: [translate("取消"), translate("关闭服务")],
+          defaultId: 0,
+          cancelId: 0,
+          message: translate("关闭桌宠启动的 DSH"),
+          detail: translate("会结束桌宠拉起的 DSH，正在进行的任务会中断。你自己打开的服务不会被结束。"),
+        });
+        if (answer.response !== 1) return status();
+        await service.stopOwned();
+        publish();
+        rebuildTrayMenu();
+        return status();
+      };
+      handle("stop-dsh", confirmStop);
       handle("quit", () => app.quit());
       handle("ready", async () => {
         ready = true;
@@ -402,13 +432,15 @@ if (!locked) {
         nativeImage.createFromPath(join(desktopRoot, "ui/tray.png")),
       );
       tray.setToolTip("Kujira");
-      tray.setContextMenu(
-        Menu.buildFromTemplate([
+      rebuildTrayMenu = () => {
+        if (!tray || tray.isDestroyed()) return;
+        tray.setContextMenu(Menu.buildFromTemplate([
           { label: translate("显示人物"), click: show },
-          {
-            label: translate("打开 DSH"),
-            click: menuAction(openWeb),
-          },
+          { label: translate("打开 DSH"), click: menuAction(openWeb) },
+          ...(service?.owns(connection?.snapshot()) ? [{
+            label: translate("关闭桌宠启动的 DSH"),
+            click: menuAction(confirmStop),
+          }] : []),
           {
             label: translate("设置"),
             click: () => {
@@ -433,8 +465,8 @@ if (!locked) {
             },
           },
           { label: translate("退出桌宠（保留 DSH）"), click: () => app.quit() },
-        ]),
-      );
+        ]));
+      };
       rebuildTrayMenu();
       tray.on("click", show);
       win.on("close", (event) => {
