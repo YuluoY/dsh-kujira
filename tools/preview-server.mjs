@@ -106,11 +106,12 @@ const previewEvents = [];
 let previewEventSnapshot=null;
 const previewChildren=new Map();
 const previewSession = { header: { id: 'preview-session', cwd: '/workspace/kujira' }, inheritedEventCount: 0, snapshotEvents: () => (previewEventSnapshot ||= Object.freeze(previewEvents.slice())) };
+let previewAgent = {id:'preview-session',session:previewSession,get status(){return previewRunning?'running':'idle';}};
 
 const ctx = {
     get(name) {if(name==='sessionProjections')return {stateOf:(_session,key)=>key==='title'?'示例任务：整理项目与检查进度':null};},
     inject(deps, callback) { callback(this); },
-    agents: {list:()=>previewRunning?[{id:"preview-session",status:"running"}]:[]},
+    agents: {list:()=>previewRunning?[previewAgent]:[]},
     sessions: { get(id) { return id === 'preview-session' ? previewSession : previewChildren.get(id); } },
     effect(fn)
     {
@@ -212,7 +213,8 @@ const server = createServer(async (req, res) =>
             previewHolds.get('preview-session')?.abort(Error('preview replacement'));
             const controller=new AbortController();previewHolds.set('preview-session',controller);
             emit('working','preview-session');
-            const payload={agent:{id:'preview-session',session:previewSession},signal:controller.signal,turn:1,step:1};
+            previewAgent={id:'preview-session',session:previewSession,get status(){return previewRunning?'running':'idle';}};
+            const payload={agent:previewAgent,signal:controller.signal,turn:1,step:1};
             const next=async()=>{previewResumeCount++;return {kind:'enter',messages:[]};};
             const run=previewGates.reduceRight((next,gate)=>()=>gate(payload,next),next);
             run().catch(()=>{}).finally(()=>{if(previewHolds.get('preview-session')===controller)previewHolds.delete('preview-session');});

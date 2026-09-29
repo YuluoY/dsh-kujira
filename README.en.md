@@ -17,7 +17,7 @@
 ## ✨ Features
 
 - **Task progress** — current operations, plans and subagents, with expandable results, files and links to their sessions.
-- **Tariff scheduling** — pause main agents and subagents during peak hours and resume off-peak within the same DSH service. Off by default; enable in settings.
+- **Tariff scheduling** — pause main agents and subagents during peak hours and resume off-peak within the same DSH service. Sending a message or choosing Continue releases that task tree until the current peak period ends. Off by default; enable in settings.
 - **Costs and balances** — tariff status and combined parent/subagent costs at the bottom right of the composer; balances from your configured DSH DeepSeek account.
 - **Pet interactions** — 130 transparent clips of the same character covering idle, work, daily routines, holidays and interactions. Continuous use has no cooldown; configurable spending thresholds and probabilities award random bundles, with an unlimited mode. Reactions make no model requests and never preload the full library.
 - **Desktop mode** — a standalone Electron app sharing the mascot, animations and settings with the browser plugin. Browser/desktop display handoff, tray menu, transparent-area click-through, always-on-top and on-demand DSH launch from the mascot menu or tray.
@@ -35,7 +35,7 @@ Requires Node.js 22.13+, pnpm and a working DeepSeek Harness Web installation, w
 Run one command from any directory on macOS, Linux or Windows:
 
 ```sh
-dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.2.7/dsh-kujira-0.2.7.tgz
+dsh plugin --profile web add https://github.com/YuluoY/dsh-kujira/releases/download/v0.2.8/dsh-kujira-0.2.8.tgz
 ```
 
 DSH downloads, installs and registers the plugin. No Git clone, manual extraction or project directory is needed. Let active sessions finish, then restart DSH Web and refresh the page. The URL pins an explicit version; use a newer release URL when upgrading.
@@ -59,7 +59,7 @@ Further docs: [Scheduling and supply rules](docs/USAGE.en.md) · [Data and priva
 
 ## 🖥️ Optional desktop mode (preview)
 
-The desktop app runs standalone and opens the local DSH from the mascot menu; plugin installation is unchanged and the desktop runtime is installed separately. Appearance and the local companion snapshot sync between browser and desktop, while inventory, rewards and scheduling stay with the DSH service — no offline transactions are faked. Platform boundaries, defaults and build steps are documented in [desktop mode](docs/DESKTOP.md). Optional unsigned desktop previews are listed in the [v0.2.7 Release](https://github.com/YuluoY/dsh-kujira/releases/tag/v0.2.7) assets.
+The desktop app runs standalone and opens the local DSH from the mascot menu; plugin installation is unchanged and the desktop runtime is installed separately. Appearance and the local companion snapshot sync between browser and desktop, while inventory, rewards and scheduling stay with the DSH service — no offline transactions are faked. Platform boundaries, defaults and build steps are documented in [desktop mode](docs/DESKTOP.md). Optional unsigned desktop previews are listed in the [v0.2.8 Release](https://github.com/YuluoY/dsh-kujira/releases/tag/v0.2.8) assets.
 
 ## 🛠️ Development
 

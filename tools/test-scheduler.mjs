@@ -116,7 +116,7 @@ test('takeover list identifies parent, child, goal and exact request boundary wi
  assert.equal(scheduler.snapshot().sessions.length,2);
  const run=scheduler.gate({agent:child,signal:new AbortController().signal},()=>1,'request');await settled();
  const list=scheduler.snapshot().sessions;
- assert.deepEqual(list.find(s=>s.id==='child'),{id:'child',title:null,parentId:'main',state:'paused',since:peak,boundary:'request',goal:null});
+ const pausedChild=list.find(s=>s.id==='child');assert.ok(pausedChild.pauseId);assert.deepEqual(pausedChild,{id:'child',title:null,parentId:'main',state:'paused',since:peak,boundary:'request',pauseId:pausedChild.pauseId,goal:null});
  assert.equal(list.find(s=>s.id==='main').state,'pausing');assert.deepEqual(list.find(s=>s.id==='main').goal,goal);
  clock=valley;scheduler.tick();await run;assert.equal(scheduler.snapshot().sessions.length,2);assert(scheduler.snapshot().sessions.every(s=>s.state==='upcoming'));assert.equal(scheduler.snapshot().pausing,0);
 });
@@ -164,4 +164,77 @@ test('scheduler displays current title projection independently from immutable s
  await scheduler.configure(true);assert.equal(scheduler.snapshot().sessions[0].title,'原始标题');
  title='修改后的标题';assert.equal(scheduler.snapshot().sessions[0].title,title);assert.equal(scheduler.snapshot().sessions[0].id,'exact-session-id');
  title=null;assert.equal(scheduler.snapshot().sessions[0].title,null);
+});
+
+test('an empty closing step completes at peak while a real request still waits',async t=>{
+ const {scheduler}=await setup(t);await scheduler.configure(true);const agent={id:'tail'};
+ const decision={kind:'enter',messages:[]};
+ assert.equal(await scheduler.gate({agent,messages:[]},()=>decision),decision);
+ assert.equal(scheduler.snapshot().paused,0);
+ let calls=0;const pending=scheduler.gate({agent,messages:[]},()=>++calls,'request');await settled();
+ assert.equal(calls,0);assert.equal(scheduler.snapshot().paused,1);
+ await scheduler.configure(false);await pending;assert.equal(calls,1);
+});
+
+test('human submissions release only their own task tree and stay admitted across every request',async t=>{
+ const directory=await mkdtemp(join(tmpdir(),'kujira-human-'));let clock=peak;
+ const parent={id:'new',status:'running'},child={id:'child',status:'running',session:{header:{parentSession:'new'}}},old={id:'old',status:'running'};
+ const scheduler=createPeakScheduler({directory,now:()=>clock,available:true,getAgents:()=>[parent,child,old]});
+ t.after(async()=>{scheduler.dispose();await rm(directory,{recursive:true,force:true});});await scheduler.configure(true);
+ let oldCalls=0;const oldRun=scheduler.gate({agent:old},()=>++oldCalls);await settled();
+ await scheduler.userMessage({agent:parent,message:{source:{kind:'user'}}});
+ for(const agent of [parent,child])for(const boundary of ['step','request','request'])
+   assert.equal(await scheduler.gate({agent,messages:[{}]},()=>42,boundary),42);
+ assert.equal(oldCalls,0);assert.equal(scheduler.sessionState('new').exempt,true);assert.equal(scheduler.sessionState('child').pausing,false);
+ assert.deepEqual(scheduler.snapshot().sessions.map(s=>s.id),['old']);
+ clock=valley;scheduler.tick();await oldRun;assert.equal(oldCalls,1);
+ clock=Date.parse('2026-09-11T14:00:00+08:00');scheduler.tick();assert.equal(scheduler.sessionState('new').pausing,true);
+ const next=scheduler.gate({agent:parent},()=>7);await settled();assert(scheduler.paused('new'));
+ await scheduler.configure(false);assert.equal(await next,7);
+});
+
+test('only new human inbox events grant admission; automated goals and opening history stay protected',async t=>{
+ const {scheduler}=await setup(t);await scheduler.configure(true);
+ for(const kind of ['goal','agent','system-prompt']){
+   const agent={id:kind};await scheduler.userMessage({agent,message:{source:{kind,round:1}}});
+   const abort=new AbortController(),run=scheduler.gate({agent,signal:abort.signal},()=>assert.fail());await settled();
+   assert(scheduler.paused(kind));abort.abort(Error('done'));await assert.rejects(run,/done/);
+ }
+ assert.equal(scheduler.sessionState('history').exempt,false);
+});
+
+test('resume uses the exact pause identity, releases descendants and does not replay or disable protection',async t=>{
+ const directory=await mkdtemp(join(tmpdir(),'kujira-resume-'));
+ const main={id:'registry',session:{header:{id:'main'}}},child={id:'child',session:{header:{parentSession:'main'}}};
+ const agents=[main,child,{id:'unrelated'}];let calls=0;
+ const scheduler=createPeakScheduler({directory,now:()=>peak,available:true,getAgents:()=>agents});
+ t.after(async()=>{scheduler.dispose();await rm(directory,{recursive:true,force:true});});await scheduler.configure(true);
+ const runs=agents.map(agent=>scheduler.gate({agent},()=>++calls));await settled();
+ const pauseId=scheduler.sessionState('registry').pauseId;assert(pauseId);
+ await scheduler.resume('main',pauseId);await Promise.all(runs.slice(0,2));assert.equal(calls,2);
+ assert(scheduler.paused('unrelated'));assert.equal(scheduler.snapshot().enabled,true);
+ await assert.rejects(scheduler.resume('main',pauseId),{status:409});assert.equal(calls,2);
+ assert.equal(JSON.parse(await readFile(join(directory,'peak-scheduler.json'))).enabled,true);
+ await scheduler.configure(false);await runs[2];assert.equal(calls,3);
+});
+
+test('a stale resume cannot grant a replacement run or resurrect a cancelled task',async t=>{
+ const {scheduler}=await setup(t);await scheduler.configure(true);
+ const agent={id:'same'},abort=new AbortController();
+ const run=scheduler.gate({agent,signal:abort.signal},()=>assert.fail());await settled();
+ const old=scheduler.sessionState('same').pauseId;abort.abort(Error('user stop'));await assert.rejects(run,/user stop/);
+ const replacement=scheduler.gate({agent},()=>9);await settled();
+ assert.notEqual(scheduler.sessionState('same').pauseId,old);
+ await assert.rejects(scheduler.resume('same',old),{status:409});assert(scheduler.paused('same'));
+ await scheduler.configure(false);assert.equal(await replacement,9);
+});
+
+test('restored protection accepts a fresh human message before settings have finished loading',async t=>{
+ const {scheduler,directory}=await setup(t);await scheduler.configure(true);scheduler.dispose();
+ const restored=createPeakScheduler({directory,now:()=>peak,available:true});t.after(()=>restored.dispose());
+ const agent={id:'fresh'};const submitted=restored.userMessage({agent,message:{source:{kind:'user'}}});
+ assert.equal(await restored.gate({agent,messages:[{}]},()=>11),11);await submitted;
+ await restored.configure(false);await restored.configure(true);
+ const run=restored.gate({agent},()=>12);await settled();assert(restored.paused('fresh'));
+ await restored.configure(false);assert.equal(await run,12);
 });

@@ -36,5 +36,6 @@ jobs:
       - run: npm ci
       - run: npm run test:platform
       - run: npm run test:desktop
+      - run: npm run test:scheduler
       - run: npm run lint
       - run: npm run typecheck

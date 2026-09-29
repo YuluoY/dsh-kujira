@@ -4,7 +4,8 @@
 .kj-composer-pause[data-active] {
   display: inline-flex;
   align-items: center;
-  max-width: min(180px, 32vw);
+  gap: 6px;
+  max-width: min(220px, 36vw);
   padding: 4px 7px;
   border-radius: 6px;
   color: var(--dsw-alias-label-secondary, currentColor);
@@ -16,13 +17,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-[data-composer-card] button[data-kj-peak-paused] {
+button[data-kj-peak-paused],
+[data-kj-goal-paused] {
   position: relative;
 }
-[data-composer-card] button[data-kj-peak-paused] > svg {
+button[data-kj-peak-paused] > svg,
+[data-kj-goal-paused] > svg {
   visibility: hidden;
 }
-[data-composer-card] button[data-kj-peak-paused]::after {
+button[data-kj-peak-paused]::after,
+[data-kj-goal-paused]::after {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -46,7 +50,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-composer-card] button[data-kj-peak-paused]::after {
+  button[data-kj-peak-paused]::after,
+  [data-kj-goal-paused]::after {
     animation: none;
   }
 }
@@ -58,12 +63,47 @@
   }
 }
 
-[data-composer-card]:has(button[data-kj-peak-paused]) .kj-composer-pause {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+[data-composer-card]:has(button[data-kj-peak-paused]) .kj-scheduler-fallback-resume,
+[data-composer-card] button[data-kj-duplicate-stop] {
+  display: none;
+}
+
+[data-kj-goal-paused]::after {
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='2' width='3' height='12' rx='1'/%3E%3Crect x='10' y='2' width='3' height='12' rx='1'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+[data-goal-bar] [data-kj-goal-label] {
+  font-size: 0;
+}
+
+[data-kj-goal-label]::after {
+  content: attr(data-kj-goal-label);
+  font-size: 13px;
+}
+
+.kj-scheduler-cancel,
+.kj-scheduler-fallback-resume {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.kj-scheduler-cancel:hover,
+.kj-scheduler-fallback-resume:hover {
+  background: var(--dsw-alias-interactive-bg-hover, #8882);
+}
+
+button[data-kj-peak-paused][aria-disabled="true"],
+.kj-scheduler-fallback-resume:disabled {
+  opacity: 0.5;
+  cursor: wait;
 }

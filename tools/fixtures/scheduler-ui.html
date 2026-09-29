@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>紧急避险交互回归</title>
+<link rel="stylesheet" href="/dsh-kujira/styles/composer-pause.css">
+<style>
+  body{margin:40px;font:14px/1.5 system-ui;background:#f6f7f8;color:#24252a}
+  main{display:grid;grid-template-columns:2fr 1fr;gap:24px;max-width:1120px;margin:auto}
+  section{min-width:0} h1{font-size:22px} h2{font-size:16px}
+  [data-composer-card],[data-goal-bar]>div{padding:14px;background:white;border:1px solid #ddd;border-radius:12px;margin-top:8px}
+  [data-goal-bar]>div,.row{display:flex;align-items:center;gap:10px}
+  [data-goal-bar]>div>span:nth-child(3){flex:1;min-width:0}
+  button{cursor:pointer;border:1px solid #ddd;border-radius:6px;padding:6px 10px;color:inherit;background:white}
+  .stop{border:0;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;background:#4d6bfe;color:white;padding:0}
+  .actions{display:flex;gap:8px}.row{justify-content:flex-end}.draft{height:70px;color:#888}
+  .fixture_goalGlyph{display:inline-flex}.fixture_label{font-size:13px;flex:none}
+  #checks{max-width:1120px;margin:0 auto 24px;padding:12px;background:#e7f4ec}
+  @media(max-width:720px){body{margin:16px}main{grid-template-columns:1fr}}
+</style>
+<div id="checks" role="status">正在验证…</div>
+<main></main>
+<script type="module">
+import { decoratePausedComposer } from '/dsh-kujira/shared/client/scheduler-controls.js';
+const label='继续当前任务及子代理（本段峰价放行）';
+const icon='<svg viewBox="0 0 16 16" width="16" height="16"><rect x="3" y="3" width="10" height="10" rx="3" fill="currentColor"/></svg>';
+const goalIcon='<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor"/></svg>';
+const cards={};
+for(const [id,title] of [['main','主会话'],['child','子代理侧栏']]){
+  const section=document.createElement('section');section.dataset.composerSeat='';section.dataset.session=id;
+  section.innerHTML=`<h1>${title}</h1><div class="actions"><button class="hold">进入避险</button><button class="offline">模拟断线</button><button class="online">重新同步</button></div>
+    <div data-goal-bar><div><span class="fixture_goalGlyph">${goalIcon}</span><span class="fixture_label">执行中的目标</span><span>验证原任务继续执行</span><button class="goal" aria-label="暂停目标">${goalIcon}</button></div></div>
+    <div data-composer-card><div class="draft">发消息或创建任务</div><div class="row"><span class="kj-composer-pause" data-active><span class="status"></span><button class="cancel" aria-label="停止任务（取消自动续跑）">■</button></span><button class="stop duplicate" aria-label="停止任务">${icon}</button><button class="stop primary" aria-label="停止任务">${icon}</button></div></div>
+    <p class="result"></p>`;
+  document.querySelector('main').append(section);
+  const card=section.querySelector('[data-composer-card]');let adapter,resumes=0,cancels=0,goalPauses=0;
+  const render=()=>{section.querySelector('.result').textContent=`已继续 ${resumes} 次 · 已停止 ${cancels} 次 · 手动暂停 Goal ${goalPauses} 次`;};
+  const finish=()=>{adapter?.dispose();adapter=null;section.querySelector('.status').textContent='执行中';render();};
+  const hold=(disabled=false)=>{
+    adapter?.dispose();section.querySelector('.status').textContent=disabled?'调度服务暂不可用':'峰价暂停 · 谷价自动继续';
+    adapter=decoratePausedComposer(card,{label,statusLabel:'峰价暂停',disabled,goal:{phase:'active',activation:'armed'},resume:()=>{resumes++;finish();}});
+    render();
+  };
+  section.querySelectorAll('.stop').forEach(button=>button.onclick=()=>{cancels++;finish();});
+  section.querySelector('.goal').onclick=()=>{goalPauses++;finish();};
+  section.querySelector('.cancel').onclick=()=>adapter?.stop();
+  section.querySelector('.hold').onclick=()=>hold();section.querySelector('.offline').onclick=()=>hold(true);section.querySelector('.online').onclick=()=>hold();
+  cards[id]={section,hold,finish,counts:()=>({resumes,cancels,goalPauses})};hold();
+}
+let checks=0;
+const check=(condition,message)=>{if(!condition)throw Error(message);checks++;};
+try{
+ const main=cards.main,child=cards.child,primary=main.section.querySelector('.primary');
+ check(main.section.querySelector('[data-kj-goal-paused]'),'Goal pause glyph');
+ check(getComputedStyle(main.section.querySelector('.duplicate')).display==='none','one composer resume control');
+ primary.click();check(main.counts().resumes===1 && main.counts().cancels===0,'resume must not cancel');
+ check(child.section.querySelector('.primary').hasAttribute('data-kj-peak-paused'),'sidebar remains paused');
+ check(primary.getAttribute('aria-label')==='停止任务','restore native label');
+ main.hold(true);primary.click();check(main.counts().resumes===1 && main.counts().cancels===0,'offline must not fall through');
+ main.hold();main.section.querySelector('.goal').click();check(main.counts().resumes===2 && main.counts().goalPauses===0,'Goal resume must not pause persistent Goal');
+ main.hold();main.section.querySelector('.cancel').click();check(main.counts().cancels===1,'explicit cancellation');
+ main.hold();primary.innerHTML='<svg viewBox="0 0 16 16"><path d="M8 2v12"/></svg>';primary.setAttribute('aria-label','发送消息');
+ await new Promise(resolve=>setTimeout(resolve,0));
+ check(!primary.hasAttribute('data-kj-peak-paused') && primary.getAttribute('aria-label')==='发送消息','send action must not be decorated');
+ check(getComputedStyle(main.section.querySelector('.duplicate')).display!=='none' && main.section.querySelector('.duplicate').hasAttribute('data-kj-peak-paused'),'replacement resume stays visible when the primary becomes send');
+ main.finish();primary.innerHTML=icon;primary.setAttribute('aria-label','停止任务');main.hold();
+ const goalButton=main.section.querySelector('.goal');goalButton.setAttribute('aria-label','恢复目标');await new Promise(resolve=>setTimeout(resolve,0));
+ check(!goalButton.hasAttribute('data-kj-peak-paused'),'manual Goal pause wins over old scheduler snapshot');
+ main.finish();goalButton.setAttribute('aria-label','暂停目标');main.hold();child.hold();
+ document.querySelector('#checks').textContent=`通过 ${checks} 项浏览器断言：继续、停止、Goal、断线、主子会话隔离、发送按钮恢复。`;
+}catch(error){document.querySelector('#checks').textContent='失败：'+error.message;document.querySelector('#checks').style.background='#ffe5e5';throw error;}
+</script>
+</html>

@@ -102,3 +102,18 @@ test('goal continuation does not enable a disabled peak scheduler', {skip:!upstr
  const pending=await f.start();assert.equal((await pending.run).kind,'enter');
  assert.equal(f.scheduler.snapshot().enabled,false);assert.equal(f.scheduler.snapshot().paused,0);
 });
+
+test('manual peak resume keeps the installed Goal reservation and durable phase intact', {skip:!upstream}, async t=>{
+ const f=await fixture(t);const pending=await f.start();await flush();
+ const before={...f.goal};const pauseId=f.scheduler.sessionState(f.agent.id).pauseId;
+ await f.scheduler.resume(f.agent.id,pauseId);
+ assert.equal((await pending.run).kind,'enter');assert.deepEqual(f.goal,before);
+ assert.equal(f.queued.length,1);assert.equal(f.scheduler.snapshot().enabled,true);
+});
+
+test('an explicit human Goal start allows its installed automatic round during the same peak period', {skip:!upstream}, async t=>{
+ const f=await fixture(t);await f.scheduler.userStart(f.agent);
+ const pending=await f.start();assert.equal((await pending.run).kind,'enter');
+ assert.equal(f.scheduler.snapshot().paused,0);assert.equal(f.scheduler.snapshot().enabled,true);
+ assert.equal(f.queued.length,1);
+});
