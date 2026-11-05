@@ -8,7 +8,7 @@
 
 [![Release](https://img.shields.io/github/v/release/YuluoY/dsh-kujira)](https://github.com/YuluoY/dsh-kujira/releases) [![Desktop CI](https://github.com/YuluoY/dsh-kujira/actions/workflows/desktop.yml/badge.svg)](https://github.com/YuluoY/dsh-kujira/actions/workflows/desktop.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<img src="docs/images/menu.zh.png" width="355" alt="鲸鱼娘发散功能按钮组" />
+<img src="https://raw.githubusercontent.com/kingOfSoySauce/dsh-skin-market/main/site/public/skin-screenshots/YuluoY__dsh-kujira/9e6b82de8be0a1b9ad4a8f811c0c7a4bc95f15e4/home.gif" width="355" alt="鲸鱼娘发散功能按钮组" />
 
 <sub>独立预览截图；下方余额面板使用演示金额。</sub>
 
